@@ -1,0 +1,62 @@
+[
+  {
+    "id": "fuel_centerline_melt",
+    "validated": false,
+    "field": "T",
+    "component": null,
+    "reduction": "max",
+    "limit": 3113.0,
+    "unit": "K",
+    "direction": "below",
+    "warning_fraction": 0.90,
+    "criterion": "Temperature a coeur pastille sous la fusion de l'UO2.",
+    "diagnosis": "Marge a la fusion du combustible : le centre de la pastille est le point le plus chaud du crayon.",
+    "note": "3113 K (~2840 C) = fusion UO2 fraiche. La limite BAISSE avec le burnup (~-32 K par 10 GWd/tU environ). Valeur indicative a valider avec l'encadrant / la litterature (IAEA, MATPRO).",
+    "references": ["Fusion UO2 ~3113 K (a confirmer)"]
+  },
+  {
+    "id": "cladding_hoop_strain_pcmi",
+    "validated": false,
+    "field": "epsilonCyl",
+    "component": 1,
+    "reduction": "max_abs",
+    "limit": 0.01,
+    "unit": "-",
+    "direction": "below",
+    "warning_fraction": 0.80,
+    "criterion": "Deformation circonferentielle (hoop) sous la limite de conception ~1%.",
+    "diagnosis": "Marge PCMI (interaction pastille-gaine) : au-dela de ~1% de deformation plastique circonferentielle, risque de rupture de gaine.",
+    "note": "epsilonCyl composante 1 = deformation hoop (theta-theta) en ordre VTK. Le pic sur TOUT le domaine sur-estime la deformation gaine (le pic peut etre dans la pastille) : proxy conservatif v1, a affiner en filtrant la region gaine. Limite 1% a confirmer.",
+    "references": ["Critere de conception ~1% deformation gaine (a confirmer)"]
+  },
+  {
+    "id": "cladding_hoop_stress",
+    "validated": false,
+    "field": "sigmaCyl",
+    "component": 1,
+    "reduction": "max_abs",
+    "limit": 350000000.0,
+    "unit": "Pa",
+    "direction": "below",
+    "warning_fraction": 0.80,
+    "criterion": "Contrainte circonferentielle (hoop) sous la limite d'ecoulement de la gaine.",
+    "diagnosis": "Marge a la plastification de la gaine (Zircaloy).",
+    "note": "350 MPa = limite d'ecoulement INDICATIVE du Zircaloy ; elle baisse fortement avec la temperature (~200 MPa a 350 C). sigmaCyl composante 1 = hoop (theta-theta) en ordre VTK, pic en valeur absolue sur tout le domaine. A valider avec l'encadrant.",
+    "references": ["Limite d'ecoulement Zircaloy (a confirmer)"]
+  },
+  {
+    "id": "gap_closure_pcmi_onset",
+    "validated": false,
+    "field": "gapWidth",
+    "component": null,
+    "reduction": "min",
+    "limit": 5e-06,
+    "unit": "m",
+    "direction": "above",
+    "warning_fraction": 0.50,
+    "criterion": "Largeur de gap pastille-gaine au-dessus d'une marge de securite.",
+    "diagnosis": "Debut de PCMI : quand le gap se ferme (gapWidth -> 0), la pastille entre en contact dur avec la gaine et la charge mecaniquement.",
+    "note": "Le gap initial vaut typiquement ~80 um. Limite 5 um = marge indicative avant contact. direction 'above' : le danger est un gap TROP PETIT (min du domaine). Sur un run a haut burnup le gap est deja ferme (attendu : statut rouge = contact etabli).",
+    "references": ["Fermeture du gap = debut du PCMI (physique standard)"]
+  }
+]

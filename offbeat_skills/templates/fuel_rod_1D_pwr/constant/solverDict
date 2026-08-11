@@ -1,0 +1,209 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//- Thermal and Mechanical solver selection:
+thermalSolver           solidConduction;
+mechanicsSolver         smallStrain;
+neutronicsSolver        diffusion;
+elementTransport        fromLatestTime;
+
+//- Material and rhelogy treatment:
+materialProperties      byZone;
+rheology                byMaterial;
+
+heatSource              timeDependentLhgr;
+burnup                  Lassmann;
+fastFlux                timeDependentAxialProfile;
+corrosion               fromLatestTime;
+gapGas                  FRAPCON;
+fgr                     SCIANTIX;
+sliceMapper             autoAxialSlices;
+corrosion               fromLatestTime;
+
+globalOptions
+{
+    pinDirection            (0 0 1);
+    reactorType             "LWR";
+}
+
+thermalSolverOptions
+{
+    heatFluxSummary     off;
+}
+
+rheologyOptions
+{
+    thermalExpansion on;
+    modifiedPlaneStrain on;
+    springModulus   3500;
+    coolantPressureList
+    {
+        file            "$FOAM_CASE/constant/systemPressure";
+        outOfBounds     clamp;
+    }
+    planeStress     off;
+}
+
+mechanicsSolverOptions
+{
+    forceSummary        off;  
+    cylindricalStress   on; 
+
+    multiMaterialCorrection
+    {
+        type                    uniform;
+        defaultWeights          1;
+        defaultWeightsGrad          0.0;
+    }
+}
+
+fgrOptions
+{
+    nFrequency  1;
+    relax       1;
+    addToRegistry   true;
+
+    SCIANTIX
+    {
+        iverification                                   0; // (0= no verification)
+        igrain_growth                                   1; // (1 = ainscough)
+        iinert_gas_behavior                             1; // (1= do IGB)
+        igas_diffusion_coefficient                      1; // (1= Turnbull et al., 1988)
+        iintra_bubble_evolution                         1; // (1=Pizzocri et al., 2018)
+        ibubble_radius                                  1; // (1= Olander&Wongy, 2006)
+        iresolution_rate                                1; // (1=Turnbull 1971)
+        itrapping_rate                                  1; // (1= Ham 1958)
+        inucleation_rate                                1; // (1= Baker 1971)
+        isolver                                         1; // (1= SDA, Pizzocri et al., 2019)
+        iformat_output                                  1; // (1 = output.txt, values separated by tabs)
+        igrain_boundary_vacancy_diffusion_coefficient   1; // (1= Reynolds and Burton, 1979)
+        igrain_boundary_behaviour                       1; // (1= do InterGranularGasBehavior - Pastore et al., 2013; Barani et al., 2017)
+        igrain_boundary_micro_cracking                  1; // (1 = Barani et al., 2017)
+        igrain_recrystallization                        0; // (0 = non active)
+        ifuel_reactor_type                              0; // (0=UO2/PWR)
+        igas_effective_coefficient                      1; // gas effective (=0) or single atom (=1)
+        igas_sweeping                                   1; // add boundary gas sweeping
+    }
+}
+
+gapGasOptions
+{
+    gapPatches ( fuelOuter cladInner );
+    holePatches ();
+    topFuelPatches    ( fuelTop);
+    bottomFuelPatches ( fuelBottom);
+
+    gapVolumeOffset 0.0;
+    gasReserveVolume 0.0;
+    gasReserveTemperature 290;
+}
+
+heatSourceOptions
+{
+    timePoints  ( 0  3600     1.26E+08 );
+    lhgr        ( 0  15000    15000 );
+    timeInterpolationMethod linear;
+
+    axialProfile
+    {
+        type timeDependentTabulated;
+        #include "axialProfile";
+        axialInterpolationMethod linear;
+        burnupInterpolationMethod linear;
+    }
+
+    radialProfile
+    {
+        type    fromBurnup;
+    }
+
+    materials ( fuel );
+}
+
+fastFluxOptions
+{
+    timePoints  ( 0  3600     1.26E+08 );
+    fastFlux    ( 0  2e13     1e13 );
+    timeInterpolationMethod linear;
+
+    axialProfile
+    {
+        type flat;
+    }
+
+    materials ( fuel cladding );
+}
+
+
+materials
+{
+    fuel
+    {
+        material                    UO2;
+        Tref                        Tref [ 0 0 0 1 0 ] 293;
+
+        densificationModel          UO2FRAPCON;
+        swellingModel               UO2FRAPCON;
+        relocationModel             UO2FRAPCON;
+
+        enrichment                  0.045;
+        rGrain                      5e-06;
+        GdContent                   0.0;
+        theoreticalDensity          10960;
+        densityFraction             0.95;
+        dishFraction                0.0;
+
+        resinteringDensityChange    1;
+        GapCold                     0.13e-3;
+        DiamCold                    9.0e-3; // cold fuel diameter
+        recoveryFraction            0.5;
+        outerPatch                  "fuelOuter";
+
+        isotropicCracking           on;
+        nCracksMax                  12;
+
+        rheologyModel               elasticity;
+		rheologyModelOptions
+		{
+			plasticStrainVsYieldStress table ( ( 0 1e+30 ) );
+			creepModel      MatproCreepModel;
+			relax           0.3;
+		}
+    }
+
+    cladding
+    {
+        material                zircaloy;
+        Tref                    Tref [ 0 0 0 1 0 ] 293;
+
+        PoissonRatioModel ZyConstant;
+
+        rheologyModel   misesPlasticCreep;
+        rheologyModelOptions
+        {
+            plasticStrainVsYieldStress table
+            (
+                (0    250e6)
+            );
+
+            creepModel LimbackCreepModel;
+            relax 1.0;
+        }
+    }
+}
+
+// ************************************************************************* //

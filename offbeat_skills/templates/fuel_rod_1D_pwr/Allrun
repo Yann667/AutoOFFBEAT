@@ -1,0 +1,8 @@
+#!/bin/bash
+
+python3 rodMaker.py
+mv blockMeshDict system
+blockMesh > log.blockMesh
+offbeat | tee log.offbeat
+
+#postProcess -func sampleDict

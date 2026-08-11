@@ -1,0 +1,151 @@
+[
+  {
+    "id": "restart_coolantPressureList_eof",
+    "validated": true,
+    "pattern": "attempt to read beyond EOF.*coolantPressureList|coolantPressureList.*attempt to read beyond EOF",
+    "diagnosis": "Redémarrage impossible : la condition limite coolantPressureList écrite dans le champ D n'est pas relisible (startFrom latestTime). Confirmé sur OFFBEAT v2506.",
+    "fix_function": "fix_clean_restart",
+    "fix_description": "Nettoyer les pas de temps écrits (foamListTimes -rm) pour forcer un redémarrage propre depuis 0/.",
+    "dict_patches": [],
+    "references": ["Validé empiriquement (cas fuel_rod_1D_pwr relancé)"]
+  },
+  {
+    "id": "endtime_beyond_power_history",
+    "validated": true,
+    "pattern": "nextTimeMarker|timeDependentTabulatedAxialProfile",
+    "diagnosis": "endTime atteint (ou dépasse) le dernier point tabulé de l'historique de puissance / profil axial. OFFBEAT cherche le marqueur temporel suivant pour le pas de temps adaptatif et n'en trouve pas. Confirmé sur OFFBEAT v2506.",
+    "fix_function": "fix_reduce_endtime",
+    "fix_description": "Réduire endTime sous le dernier point tabulé (ou prolonger les tables timePoints de solverDict/axialProfile/systemPressure).",
+    "dict_patches": [
+      { "file": "system/controlDict", "key": "endTime", "action": "scale", "value": "0.99" }
+    ],
+    "references": ["Validé empiriquement (run long fuel_rod_1D_pwr, endTime=1.26e8)"]
+  },
+  {
+    "id": "courant_exceeded",
+    "validated": false,
+    "note": "NON APPLICABLE à OFFBEAT : le mot 'Courant' n'apparaît jamais dans les logs (conduction + mécanique quasi-statique + burnup, aucun terme d'advection donc aucune condition CFL). Motif hérité d'AutoFLUKA/CFD, sans objet ici. Conservé désactivé pour mémoire.",
+    "pattern": "Courant Number.*exceed|Maximum Courant",
+    "diagnosis": "Le nombre de Courant dépasse la limite de stabilité CFL : le pas de temps deltaT est trop grand pour la vitesse du front thermique ou mécanique.",
+    "fix_function": "fix_reduce_timestep",
+    "fix_description": "Diviser deltaT par 10 dans system/controlDict et activer adjustTimeStep.",
+    "dict_patches": [
+      { "file": "system/controlDict", "key": "deltaT",         "action": "divide_by_10" },
+      { "file": "system/controlDict", "key": "adjustTimeStep", "action": "set", "value": "yes" }
+    ],
+    "references": ["OpenFOAM User Guide §4.3 – Time Control"]
+  },
+  {
+    "id": "floating_point_exception",
+    "validated": true,
+    "note": "Signature réelle = trace de pile via 'sigFpe::sigHandler' (PAS un bloc FOAM FATAL ERROR). Attention : la ligne de démarrage 'trapFpe: ...trapping enabled' est BÉNIGNE, ne pas s'y fier. C'est aussi la manifestation d'une température négative / propriétés matériaux hors domaine (voir negative_temperature).",
+    "pattern": "sigFpe::sigHandler|Floating point exception|SIGFPE",
+    "diagnosis": "Exception flottante : division par zéro ou valeur NaN dans le solveur (divergence numérique, puissance/conditions irréalistes, propriété matériau évaluée hors domaine).",
+    "fix_function": "fix_reduce_timestep",
+    "fix_description": "Réduire deltaT par 10. Si l'erreur persiste, vérifier les champs initiaux dans 0/ et la puissance (valeurs physiquement plausibles).",
+    "dict_patches": [
+      { "file": "system/controlDict", "key": "deltaT", "action": "divide_by_10" }
+    ],
+    "references": ["Validé empiriquement (lhgr=5e6 et lhgr=-5e6 W/m)"]
+  },
+  {
+    "id": "linear_solver_not_converged",
+    "validated": false,
+    "note": "NON reproductible avec les recettes standard (maxIter=1 + tolerance 1e-30, ou retrait de l'ancrage Dirichlet) : OpenFOAM ne plante PAS sur une non-convergence du solveur linéaire (il avertit et poursuit), et en transitoire le terme en dT/dt régularise la matrice (pas de 'solution singularity', phénomène de régime permanent). Entrée conservée par prudence si le motif apparaissait, mais non confirmée sur OFFBEAT v2506.",
+    "pattern": "solution singularity|has not converged|GAMG.*not converged|PCG.*not converged",
+    "diagnosis": "Le solveur linéaire (PCG/GAMG) ne converge pas dans le nombre d'itérations imparti. La matrice est mal conditionnée ou les tolérances sont trop strictes.",
+    "fix_function": "fix_relax_solver",
+    "fix_description": "Assouplir tolerance (1e-06) et relTol (0.01) dans system/fvSolution.",
+    "dict_patches": [
+      { "file": "system/fvSolution", "key": "tolerance", "action": "set", "value": "1e-06" },
+      { "file": "system/fvSolution", "key": "relTol",    "action": "set", "value": "0.01"  }
+    ],
+    "references": ["OpenFOAM User Guide §4.5 – Linear solvers"]
+  },
+  {
+    "id": "outer_loop_not_converged",
+    "validated": false,
+    "note": "NON reproductible en fatale : testé avec maxOuterIter=1 + résidu 1e-30, OFFBEAT effectue ses itérations externes puis POURSUIT sans erreur fatale (avertissement seulement), comme le solveur linéaire. Entrée conservée par prudence mais non confirmée sur OFFBEAT v2506.",
+    "pattern": "outer (iteration|corrector).*not converg|PIMPLE.*not converged",
+    "diagnosis": "La boucle de couplage thermo-mécanique d'OFFBEAT (point fixe entre T et D) ne converge pas : nOuterCorrectors insuffisant ou critère de convergence trop strict.",
+    "fix_function": "fix_increase_outer_iterations",
+    "fix_description": "Augmenter nOuterCorrectors à 200 dans system/fvSolution (bloc PIMPLE).",
+    "dict_patches": [
+      { "file": "system/fvSolution", "key": "nOuterCorrectors", "action": "set", "value": "200" }
+    ],
+    "references": ["OFFBEAT Theory Manual §3.2 – Thermo-mechanical coupling"]
+  },
+  {
+    "id": "invalid_geometry_inside_out",
+    "validated": true,
+    "pattern": "is inside-out",
+    "diagnosis": "Géométrie de barreau invalide dans rodDict : un bloc est retourné (ex. rayon intérieur > rayon extérieur). blockMesh refuse le bloc. Le message donne le bloc et le patch concernés. (Motif validé sur OFFBEAT v2506, phase maillage.)",
+    "fix_function": null,
+    "fix_description": "Corriger rodDict : vérifier la cohérence des rayons (rInner < rOuter) et des hauteurs pour chaque bloc, puis relancer rodMaker + blockMesh.",
+    "dict_patches": [],
+    "references": ["Validé empiriquement (rInnerClad > rOuterClad dans rodDict)"]
+  },
+  {
+    "id": "dictionary_entry_missing",
+    "validated": true,
+    "pattern": "not found in dictionary",
+    "diagnosis": "Une entrée attendue est absente d'un dictionnaire OpenFOAM (souvent une faute de syntaxe : point-virgule manquant qui fusionne deux clés, ou entrée oubliée). Le message indique la clé et le fichier. (Motif validé sur OFFBEAT v2506.)",
+    "fix_function": null,
+    "fix_description": "Ouvrir le dictionnaire indiqué, vérifier la syntaxe (point-virgule en fin de chaque entrée) et ajouter la clé manquante.",
+    "dict_patches": [],
+    "references": ["Validé empiriquement (point-virgule retiré dans controlDict)"]
+  },
+  {
+    "id": "mesh_not_found",
+    "validated": true,
+    "pattern": "Cannot find file \"points\" in directory \"polyMesh\"",
+    "diagnosis": "Le maillage polyMesh est absent ou incomplet dans constant/polyMesh/. Le cas n'a pas été maillé avant le lancement du solveur. (Motif validé sur OFFBEAT v2506.)",
+    "fix_function": null,
+    "fix_description": "Générer le maillage avec blockMesh (ou snappyHexMesh) avant de relancer : `blockMesh -case <case_dir>`.",
+    "dict_patches": [],
+    "references": ["OpenFOAM User Guide §5.1 – Meshing with blockMesh"]
+  },
+  {
+    "id": "boundary_field_missing",
+    "validated": true,
+    "pattern": "Cannot find patchField entry for",
+    "diagnosis": "Un champ (T, D…) dans 0/ ne définit pas de condition aux limites pour un patch déclaré dans le maillage. Incohérence entre constant/polyMesh/boundary et les fichiers de 0/. Le message indique le nom du patch manquant. (Motif validé sur OFFBEAT v2506.)",
+    "fix_function": null,
+    "fix_description": "Ouvrir le fichier de 0/ concerné et ajouter le patchField manquant (type zeroGradient ou fixedValue selon la physique).",
+    "dict_patches": [],
+    "references": ["Validé empiriquement (patch cladOuter retiré de 0/T)"]
+  },
+  {
+    "id": "solverdict_missing",
+    "validated": true,
+    "pattern": "cannot find file .*constant/solverDict",
+    "diagnosis": "Le dictionnaire principal OFFBEAT constant/solverDict est absent. Le cas a probablement été créé manuellement sans passer par input_creator. (Motif validé sur OFFBEAT v2506 : message en minuscule 'cannot find file'.)",
+    "fix_function": null,
+    "fix_description": "Utiliser l'outil input_creator pour (re)générer le cas complet, ou copier solverDict depuis offbeat_skills/templates/.",
+    "dict_patches": [],
+    "references": ["OFFBEAT User Guide §2.1 – Required dictionaries"]
+  },
+  {
+    "id": "negative_temperature",
+    "validated": false,
+    "note": "PAS de signature distincte : testé avec puissance fortement négative (lhgr=-5e6 W/m), le crash se manifeste comme un FPE (sigFpe, propriété matériau évaluée à T<0 -> NaN), pas via un message 'negative temperature'. Cas couvert par l'entrée floating_point_exception. Conservé désactivé pour mémoire.",
+    "pattern": "Negative temperature|T.*< 0|min\\(T\\).*negative",
+    "diagnosis": "Le champ de température devient négatif (instabilité numérique). Se manifeste en pratique par un FPE.",
+    "fix_function": "fix_reduce_timestep",
+    "fix_description": "Réduire deltaT et vérifier que T_init dans 0/T et la puissance sont physiquement cohérents.",
+    "dict_patches": [
+      { "file": "system/controlDict", "key": "deltaT", "action": "divide_by_10" }
+    ],
+    "references": []
+  },
+  {
+    "id": "parallel_decomposition_error",
+    "validated": true,
+    "pattern": "cannot open case directory .*processor",
+    "diagnosis": "Run parallèle lancé sans décomposition préalable : offbeat cherche les dossiers processorN qui n'existent pas (decomposePar non exécuté). Message d'accompagnement : 'WARNING: running without decomposeParDict'. (Motif validé sur OFFBEAT v2506.)",
+    "fix_function": null,
+    "fix_description": "Créer system/decomposeParDict et exécuter decomposePar avant mpirun, ou lancer offbeat en série (sans mpirun -parallel).",
+    "dict_patches": [],
+    "references": ["Validé empiriquement (mpirun -np 2 offbeat -parallel sans decomposePar)"]
+  }
+]

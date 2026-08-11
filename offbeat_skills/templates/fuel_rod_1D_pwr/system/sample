@@ -1,0 +1,40 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      sample;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type surfaces;
+libs            ("libsampling.so");
+
+interpolationScheme cellPoint;
+
+surfaceFormat       raw;
+
+surfaces
+(
+    data
+    {
+        type        cuttingPlane;
+        planeType   pointAndNormal;
+        point       (0 0 1.51);
+        normal      (0 0 1);
+        average      yes;
+        filtering      full;
+        interpolate yes;
+    }
+);
+
+fields          (T);
+
+// ************************************************************************* //

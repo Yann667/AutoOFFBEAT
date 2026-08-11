@@ -1,0 +1,166 @@
+########################## COMMENT SECTION ##########################
+# This input file 'rodDict' is read by the python script 'rodMaker.py' in order
+# to build the 'blockMeshDict' file for a 1.5D or 2D (r-z) nuclear fuel rod model.
+
+# The keyword 'geometryType' can be set to '1D', '2Dsmeared' or '2Ddiscrete'. 
+# In all three cases, the rod is reproduced with a computational mesh made of a  
+# series of blocks. A block is a portion of the mesh with constant geometry  
+# (radii, height etc.) and same numerical discretization (number of cells along 
+# x, y and z). Note that the blocks must be created both for the fuel and for 
+# the cladding.
+
+# Each block is identified with a name, which OFFBEAT uses to set the material 
+# properties and models. Note that the same name can be used for different
+# blocks. In this case, OFFBEAT will group the blocks together under the same
+# cellZone/material, that is a group of cells sharing the same material 
+# properties and behavioral models (see the file solverDict).  
+
+# For each block, it is necessary to specify:
+# -the height;
+# -the inner and outer radii;
+# -the number of radial cells 'nCellsR' (the number of azimuthal cells is 1);
+# -the number of axial cells 'nCellsZ';
+
+# One can also specify the offset value from the 0m axial position 
+# (one for the fuel and one for the cladding). For example, it can be used to 
+# create a lower plenum below the fuel stack.
+
+# If 'geometryType' is set to '1D' all top and bottom patches are set to 'empty' 
+# by default.
+
+# If 'geometryType' is set to '2Dsmeared', the top and bottom patches of fuel and 
+# cladding are set to 'patch' by default. If the bottom cap is included, then 
+# the fuelBottom patch type is changed to regionCoupledOFFBEAT to allow coupling
+# with the 'bottomCapInner' patch.
+
+# If 'geometryType' is set to '2Ddiscrete', then the number of pellets in the 
+# fuel blocks must be introduced in the block dictionary with the keyword 'nPelletsFuel'. 
+# Each pellet is modeled separately with a number of axial cells specified by 
+# the keyword 'nCellsZFuel'. The patch type for the top and bottom patches
+# in between pellets is set to 'regionCoupledOFFBEAT' by default so that the two 
+# subsequent patches are coupled (unless one uses the mergePatchPairs option).
+
+# If the options mergeCladPatchPairs/mergeFuelPatchPairs are set to False, then 
+# the top and bottom patches between blocks are set to 'regionCoupledOFFBEAT' so 
+# that the two subsequent patches can be coupled.
+# If mergeCladPatchPairs/mergeFuelPatchPairs is set to True, the subsequent
+# patches are merged together and disappear from the mesh boundary.
+# Note that when visualizing a merged mesh in ParaFoam, it might be necessary to
+# activate the VTK Polyhedron to correctly visualize the mesh.
+# Note also that only the overlapping portion of the two subsequent patches is 
+# going to be merged and disappear. The remaining portion remains as a separate patch.
+
+# The wedge patch types are always set to 'wedge' by default.
+
+# The name of the patches are set by default:
+# -fuelInner and cladInner
+# -fuelOuter and cladOuter
+# -fuelFront and fuelBack
+# -cladFront and cladBack
+# -fuelTop and cladTop
+# -fuelBottom and cladBottom
+# The name of the top/bottom patches in between slices/pellets/blocks are obtained
+# by adding the number of the section to the corresponing top/bottom patch name
+# e.g. fuelTop_1, fuelTop_2 etc..
+
+# Note 1 : 
+# Physical dimensions:
+# - angles -> degrees
+
+# Note 2 : 
+# the origin is (0, 0, 0)
+
+# Note 3 :
+# The wedge axis is aligned with the z axis,
+# and the symmetry plane that cuts the wedge in half is the xy plane
+
+# Note 4 :
+# For both fuel and cladding the blocks are created from bottom to top in the 
+# order they are introduced in this dctionary
+
+# Note 5 :
+# Geometrical quantities (heights, radii and offset) must always be written in
+# the dictionary as floats (i.e. with the dot followed by decimal digits), even
+# if the decimal part is zero: e.g. 5 --> 5.00 
+
+########################## INPUT SECTION ##########################
+
+{
+
+# Either '1D', '2Dsmeared', '2Ddiscrete'
+'geometryType':             	'1D',
+
+# Angle of the wedge, degrees
+'wedgeAngle':               	0.25,
+
+# Unit conversion (e.g. 0.001 for units in mm)
+'convertToMeters':          	0.001,
+
+# Number of blocks of fuel and cladding
+'nBlocksFuel':                  1,
+'nBlocksClad':                  2,
+
+# Block names (one per block)
+'blockNameFuel':                ['fuel'],
+'blockNameClad':                ['cladding', 'cladding'],
+
+# Inner radii (one per block)
+'rInnerFuel':                   [0.0],
+'rInnerClad':                   [4.565, 4.565],
+
+# Outer radii (one per block)
+'rOuterFuel':                   [4.5],
+'rOuterClad':                   [5.315, 5.315],
+
+# Height (or lenght) of each block (bottom to top)
+# (e.g. [1500, 1500] for a 3000 long column)
+'heightFuel':                   [3000],
+'heightClad':                   [3000, 200],
+
+# Starting vertical offset
+'offsetFuel':                   0.0,
+'offsetClad':                   0.0,
+
+# Merge consecutive overlapping patches (along z) - True by default
+'mergeCladPatchPairs':              True,
+'mergeFuelPatchPairs':              True,
+
+# Number of cells in the radial (or x) direction (one per block)
+'nCellsRFuel':                  [30],
+'nCellsRClad':                  [10, 10],
+
+# # Only for 2D discrete geometries - number of pellets per block
+# 'nPelletsFuel':                 [10],   
+
+# Number of cells in the axial (or z) direction (one per block)
+# NOTE that in case of discrete model, nCellsZFuel is the number
+# of axial division per pellet in that block
+'nCellsZFuel':                  [10],
+'nCellsZClad':                  [10, 1],
+
+# Bottom cap (Set height to 0 for neglecting the cap)
+'bottomCapHeight':              0,
+# 'nCellsRBottomCap':             40,
+# 'nCellsZBottomCap':             10,
+
+# Top cap (Set height to 0 for neglecting the cap)
+'topCapHeight':              0,
+# 'nCellsRTopCap':             40,
+# 'nCellsZTopCap':             10,
+
+# # Only for 2D discrete geometries - Outer radius of dish and land portion
+# 'rDishFuel':                     [3.2975],
+# 'chamferWidth':                  [0.4295],
+
+# # Only for 2D discrete geometries - disch curvature and chamfer height
+# 'rCurvatureDish':                  [43.66],
+# 'heightChamferFuel':               [0.16],
+
+# # Only for 2D discrete geometries - axial division in dish, land 
+# # and chamfer (nCellsRFuel is neglected)
+# 'nCellsRDish':                  [15],
+# 'nCellsRLand':                  [8],
+# 'nCellsRChamfer':               [7],
+
+
+}

@@ -1,0 +1,32 @@
+# ── Secrets (NE JAMAIS committer) ─────────────────────────────────────────────
+.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ── Logs runtime ──────────────────────────────────────────────────────────────
+AutoOFFBEAT_logs/*.log
+
+# ── Résultats OpenFOAM / OFFBEAT ──────────────────────────────────────────────
+# Pas de temps résultats (dossiers numériques), maillage généré, logs solveur.
+# On garde le 0/ initial et les templates.
+*.foam
+*.OpenFOAM
+log.offbeat
+log.blockMesh
+constant/polyMesh/
+postProcessing/
+processor*/
+
+# ── Index RAG (généré, reconstructible via `python -m tools.rag_retriever --ingest`)
+offbeat_skills/.rag_index/
+
+# ── Artefacts WSL (métadonnées de provenance Windows) ─────────────────────────
+*:Zone.Identifier
+
+# NB : offbeat_skills/.surrogate/ (dataset + modèle entraîné) est VOLONTAIREMENT
+# suivi — il évite de relancer 16 simulations OFFBEAT sur la nouvelle machine.

@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      D;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions          [0 1 0 0 0 0 0];
+
+internalField       uniform (0 0 0);
+
+boundaryField
+{
+    ".*Front|.*Back"
+    {
+        type            wedge;
+    }
+
+    cladOuter
+    {
+        type            coolantPressure;
+
+        coolantPressureList    
+        {
+            file           "$FOAM_CASE/constant/systemPressure";
+            outOfBounds     clamp;
+        };
+
+        relax           1.0;
+        value           $internalField;
+    }
+
+    "fuelOuter|cladInner"
+    {
+        type            gapContact;
+        patchType       regionCoupledOFFBEAT;
+
+        penaltyFactor   0.1;
+        frictionCoefficient        0;
+
+        relax           1.0;
+        relaxInterfacePressure           0.1;
+        
+        value           $internalField;
+    }
+
+}
+
+// ************************************************************************* //
