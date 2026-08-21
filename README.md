@@ -26,7 +26,7 @@ with a calibrated uncertainty.
 **The second half of the work is the part I would most like reviewed**: rather
 than adding features, I built benchmarks that measure what the system actually
 does, and they turned out to be where the real findings are. Every number below
-comes from a run in this repository — none is illustrative.
+comes from a run in this repository; none is illustrative.
 
 > **The full report (52 pages, English) is the main deliverable:**
 > [`rapport/rapport_PRe_EN.pdf`](rapport/rapport_PRe_EN.pdf)
@@ -44,14 +44,14 @@ Concretely: the language model chooses which tool to call and with what
 arguments. It never produces a physical value, never edits a solver dictionary
 directly, and never decides whether a safety criterion is met. Self-healing
 tries a pattern-matched deterministic fix first, and only falls back to the
-model when the error is unknown to the knowledge base — and even then, the
-model's diagnosis is displayed, not applied.
+model when the error is unknown to the knowledge base, and even then the
+model's diagnosis is displayed rather than applied.
 
 ---
 
 ## Headline results
 
-### Reference simulation — a full two-year irradiation cycle
+### Reference simulation: a full two-year irradiation cycle
 
 A PWR rod at 25 kW/m simulated over 6.3 × 10⁷ s. The chain reproduces the
 expected physics: the pellet-cladding gap closes, and cladding hoop stress
@@ -109,7 +109,7 @@ Fault injection, 14 cases (12 faults + 2 healthy controls):
 
 Self-healing repairs *exactly* the faults whose root cause falls within the
 scope of the available correction, and only those. The middle row is the
-finding: the pattern matches, the diagnosis prints, the fix fires — and fails
+finding: the pattern matches, the diagnosis prints, the fix fires, and it fails
 every time, consuming the full retry budget. **The mechanism looks like it is
 working while it structurally cannot succeed.**
 
@@ -119,7 +119,7 @@ should never reach the solver.
 
 ---
 
-## Fourteen correctness defects — none of which raised an error
+## Fourteen correctness defects, none of which raised an error
 
 The most dangerous defects found were not crashes but **plausible, correctly
 formatted, wrong numbers**. A few, to give their flavour:
@@ -127,16 +127,16 @@ formatted, wrong numbers**. A few, to give their flavour:
 - A **closed** (hence negative) pellet-cladding gap was reported as *safe*: the
   ratio to the limit is a division, and a negative value flips its sign. This
   masked the only exceeded criterion of the reference case.
-- "Maximum cladding temperature" read **1467 K** instead of 637 K — an 830 K
-  error. The extremum was taken over the whole mesh, hence at the pellet
+- "Maximum cladding temperature" read **1467 K** instead of 637 K, an error of
+  830 K. The extremum was taken over the whole mesh, hence at the pellet
   centreline. The same cause reversed the *sign* of the hoop stress: tension
   reported where the cladding is in compression.
 - The cladding stress criterion checked **350 MPa** while the solver applies
-  **250 MPa** — a frozen constant, out of sync with the material model.
+  **250 MPa**: a frozen constant, out of sync with the material model.
 - The PCMI criterion states a limit on **plastic** strain but was reading
   **total** strain. Plastic strain is exactly zero here; the irreversible strain
   actually present is *creep*, which no criterion was monitoring.
-- The surrogate passed leave-one-out cross-validation at R² > 0.998 — on a
+- The surrogate passed leave-one-out cross-validation at R² > 0.998, on a
   domain 10 000× shorter than the problem of interest, where the rod has
   already reached thermal equilibrium and the second input variable carries
   almost no information. **A rigorously validated, useless model.**
@@ -206,7 +206,7 @@ non-regression harness, not one-off measurements.
 
 ## Reproducing
 
-Requires Linux (or WSL2) — OpenFOAM and OFFBEAT are native Linux codes. Keep
+Requires Linux (or WSL2): OpenFOAM and OFFBEAT are native Linux codes. Keep
 the project and the cases on the native filesystem; OpenFOAM I/O is severely
 degraded on a mounted host filesystem.
 
@@ -258,16 +258,16 @@ substantive ones.
 
 In the order I would tackle them:
 
-1. **Validate the safety thresholds** — prerequisite to everything else.
+1. **Validate the safety thresholds.** Everything else rests on them.
 2. **Settle the scope**: single rod, or assembly?
-3. **Shift effort from repair to input validation** — the benchmark says this
-   is where the reliability is.
+3. **Shift effort from repair to input validation.** The benchmark says this is
+   where the reliability is.
 4. **Extend the surrogate to a third variable** (initial gap geometry). A
    25-simulation design now takes half an hour; the code already handles an
    arbitrary number of variables.
 5. **Fix time-step self-healing**: the correction is undone by the solver's
    adaptive controller. It should act on the *maximum* time step, not the
-   initial one — identified and localised.
+   initial one. The change is identified and localised.
 6. **Extend the tool-selection benchmark to multi-step requests**: it currently
    evaluates only the first call, and the end-to-end session in appendix G
    shows that long chaining is where the agent still drops steps.

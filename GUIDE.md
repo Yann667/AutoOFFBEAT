@@ -8,11 +8,12 @@ Ce guide est en **deux parties** :
   passer de l'agent *réactif* actuel à un jumeau *prédictif* qui détecte les
   situations de danger et s'adapte aux données d'exploitation.
 
-> ⚠️ La Partie 2 est le volet « jumeau numérique », **hors périmètre par défaut**
-> dans [CLAUDE.md](CLAUDE.md) (§1, §8). Elle ne se construit qu'**une fois
-> l'agent de base stable** (Partie 1) et **après validation du périmètre avec
-> l'encadrant** (question ouverte n°1 du CLAUDE.md §9). C'est une feuille de
-> route de développement, pas un mode déjà livré.
+> ℹ️ La Partie 2 était initialement hors périmètre. Elle a depuis été
+> **construite et livrée** : analyseur de sûreté, pronostic, tableau de bord et
+> émulateur par processus gaussien sont en place (voir
+> [README.md](README.md) et le rapport, chapitre 3). Ce qui reste ouvert n'est
+> plus le périmètre du développement mais la **validation des seuils de sûreté
+> avec l'encadrant** — préalable à toute exploitation des marges calculées.
 
 ---
 

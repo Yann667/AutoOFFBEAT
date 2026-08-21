@@ -1,5 +1,12 @@
 # AutoOFFBEAT — explication complète du code
 
+> **Couverture.** Ce document décrit l'agent de base : fabrique de modèles,
+> `input_creator`, `offbeat_executor`, `data_processor`, `rag_retriever`,
+> superviseur, interface et `run_sim.py`. Les outils du jumeau numérique
+> (`safety_analyzer.py`, `surrogate.py`, `twin_monitor.py`) et les bancs
+> d'essai d'`evaluation/` sont décrits dans `GUIDE.md` et, en détail, dans le
+> rapport (`rapport/rapport_PRe_EN.pdf`, chapitres 3 et 4).
+
 > Document pédagogique : chaque fichier et chaque fonction est expliqué en
 > langage simple, sans supposer d'expérience en programmation. À lire de haut
 > en bas la première fois.

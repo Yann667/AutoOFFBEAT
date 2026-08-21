@@ -1,9 +1,13 @@
 # CLAUDE.md — AutoOFFBEAT (agent OFFBEAT de base)
 
 > Fichier d'instructions projet pour un assistant de code (Claude Code / agent).
-> Périmètre : **uniquement l'agent OFFBEAT de base.** Les volets « jumeau
-> numérique » (monitoring temps réel, analytique prédictive) sont HORS périmètre
-> pour l'instant — ne pas les implémenter sans instruction explicite.
+>
+> **Périmètre — mis à jour.** Ce fichier décrivait initialement le seul agent de
+> base, les volets « jumeau numérique » étant explicitement exclus. Ils ont été
+> ouverts par la suite et sont désormais implémentés (§1). L'ordre de
+> construction du §4 reste la trace de la progression suivie, et les
+> avertissements du §8 valent toujours, à l'exception de celui sur le jumeau
+> numérique.
 
 ---
 
@@ -26,6 +30,19 @@ performance code OFFBEAT »*. L'agent de base est le tronc commun et la priorit�
 3. **Data Processor** — post-traite les résultats via `pyvista`.
 
 Le superviseur LangChain oriente ces outils selon la demande de l'utilisateur.
+
+### Extensions ajoutées ensuite (jumeau numérique + évaluation)
+4. **Safety Analyzer** (`tools/safety_analyzer.py`) — évalue les critères de
+   sûreté de `offbeat_skills/safety_kb.json`, par zone de maillage.
+5. **Surrogate** (`tools/surrogate.py`) — émulateur par processus gaussien
+   (noyau de Matérn), prédiction + incertitude.
+6. **Twin Monitor** (`tools/twin_monitor.py`) — surveillance, pronostic de
+   franchissement de seuil, tableau de bord.
+7. **RAG Retriever** (`tools/rag_retriever.py`) — assistant documentaire.
+   L'embedding DOIT être multilingue : le corpus est bilingue.
+
+`evaluation/` contient trois bancs d'essai réexécutables (auto-réparation,
+sélection d'outils, qualité de la recherche documentaire) avec leurs résultats.
 
 ---
 
@@ -164,8 +181,6 @@ non-convergence des outer correctors.
 
 ## 8. Ce qu'il NE faut PAS faire
 
-- Ne pas implémenter les volets jumeau numérique (monitoring, prédiction) — hors
-  périmètre actuel.
 - Ne pas coder en dur un fournisseur LLM ni une clé.
 - Ne pas commencer par l'interface graphique.
 - Ne pas utiliser LangChain 0.3.x ni les API parties dans `langchain-classic`.
