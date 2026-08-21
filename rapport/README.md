@@ -126,9 +126,7 @@ Aucune image externe n'est nécessaire, tout est vectoriel :
 
 ## Points d'attention pour la soutenance
 
-Les consignes valorisent explicitement l'exposé des erreurs et fausses routes
-« accompagné d'une réflexion montrant vos progrès ». Le rapport s'appuie
-là-dessus dans deux sections qui sont ses plus originales :
+
 
 - **§4.3** : les trois plantages provoqués délibérément, dont **deux échecs**
   du self-healing, avec l'analyse de *pourquoi* il échoue (limite de nature :
@@ -136,5 +134,3 @@ là-dessus dans deux sections qui sont ses plus originales :
 - **§5.2** : l'approximation « conservative » qui ne l'était pas, et le
   recul sur l'usage d'un assistant de programmation.
 
-C'est probablement l'angle le plus défendable à l'oral : ne pas présenter un
-outil qui marche, mais un outil dont on a mesuré les limites.

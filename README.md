@@ -154,7 +154,7 @@ Stated plainly, because it bears on how any result here should be read:
 - **The five safety thresholds in `offbeat_skills/safety_kb.json` are flagged
   as unvalidated.** They are published design orders of magnitude, not invented
   values, but confirming them is a prerequisite to any serious use of the safety
-  analysis. This is the first thing I would like to go through with you.
+  analysis.
 - The **Zircaloy yield strength** is strongly temperature-dependent and is
   currently supplied as a single value. The architecture now reads it from the
   solver's `sigmaY` field, which removes the drift, but the underlying material
