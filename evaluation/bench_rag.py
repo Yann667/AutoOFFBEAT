@@ -1,5 +1,5 @@
 """
-bench_rag.py — L'assistant documentaire retrouve-t-il le bon document ?
+bench_rag.py : L'assistant documentaire retrouve-t-il le bon document ?
 
 L'assistant documentaire (recherche semantique) est le seul composant du
 systeme qui n'etait etaye par aucune mesure. Ce banc evalue la brique qui

@@ -1,10 +1,10 @@
 """
-capture_session.py — Capture d'une session complete de l'agent, de bout en bout.
+capture_session.py : Capture d'une session complete de l'agent, de bout en bout.
 
 Le rapport decrit l'architecture de l'agent, mesure ses limites et valide sa
 physique, mais ne montre nulle part l'agent EN TRAIN DE FONCTIONNER. Ce script
-enregistre une session reelle — demande en francais, enchainement d'outils
-effectivement declenche, resultats intermediaires, reponse finale — pour servir
+enregistre une session reelle (demande en francais, enchainement d'outils
+effectivement declenche, resultats intermediaires, reponse finale) pour servir
 d'exemple deroule en annexe.
 
 Contrairement au banc de selection d'outils, les outils sont ICI REELLEMENT

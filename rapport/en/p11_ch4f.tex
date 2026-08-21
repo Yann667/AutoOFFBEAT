@@ -65,17 +65,17 @@ Cladding stress threshold & The criterion checked \SI{350}{\mega\pascal} while
   \SI{32}{\percent} (§\ref{sec:seuils})\\
 \addlinespace
 PCMI criterion & Reported \SI{18}{\percent} of a plastic-strain limit & Read the
-  \emph{total} strain; the plastic part is exactly zero, and creep —
-  irreversible — was not monitored (§\ref{sec:seuils})\\
+  \emph{total} strain; the plastic part is exactly zero, and creep, which is
+  irreversible, was not monitored (§\ref{sec:seuils})\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The two defects concerning cladding quantities — the maximum temperature and the
-hoop stress — share a common origin, worth spelling out because it is
+The two defects concerning cladding quantities, the maximum temperature and the
+hoop stress, share a common origin, worth spelling out because it is
 instructive. The mesh of a rod contains both the pellet and the cladding. Taking
 the maximum of a field ``over the domain'' therefore amounts, for temperature,
-to measuring the pellet centreline — the hottest region — whereas the criterion
+to measuring the pellet centreline, the hottest region, whereas the criterion
 bears on the cladding. The initial code was aware of this and documented the
 choice as a conservative approximation; the analysis showed that it was not
 always so, since in the case of stress it reversed the sign of the result.

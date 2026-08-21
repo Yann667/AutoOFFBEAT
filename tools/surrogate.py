@@ -1,5 +1,5 @@
 """
-surrogate.py – Emulateur rapide du crayon combustible (jumeau numerique, D5).
+surrogate.py : Emulateur rapide du crayon combustible (jumeau numerique, D5).
 
 Le vrai « temps reel » (cf. GUIDE.md Partie 2). OFFBEAT est un solveur batch
 (minutes a heures) : impossible de re-simuler a chaque seconde. La parade
@@ -41,7 +41,7 @@ FEATURES = ["linear_heat_rate", "end_time"]
 # non le critere PCMI. Ce dernier mesure desormais la deformation PLASTIQUE, qui
 # vaut exactement zero en fonctionnement nominal : elle constituerait une cible
 # degeneree, sans variation a apprendre. Le fluage, lui, croit continument avec
-# la puissance et la duree — c'est la grandeur irreversible qui porte
+# la puissance et la duree : c'est la grandeur irreversible qui porte
 # l'information dans ce domaine d'exploitation.
 TARGET_TO_RULE = {
     "peak_T":          "fuel_centerline_melt",
@@ -68,8 +68,8 @@ def _metrics_from_case(case_dir: str) -> dict:
 
 def build_dataset(lhgr_values, end_time_values=(3000,), template="fuel_rod_1D_pwr",
                   workdir="/tmp/surrogate_runs", dataset_path=DATASET_PATH) -> int:
-    """Lance OFFBEAT pour chaque couple (puissance lineique, duree simulee) —
-    produit cartesien — et enregistre les metriques de surete. Retourne le
+    """Lance OFFBEAT pour chaque couple (puissance lineique, duree simulee),
+    produit cartesien, et enregistre les metriques de surete. Retourne le
     nombre de points reussis. Reutilise la chaine validee input_creator ->
     executor -> safety_analyzer. Un seul point d'entree = une grille 2D."""
     from tools.input_creator import OffbeatInputCreatorTool
@@ -112,7 +112,7 @@ def build_dataset(lhgr_values, end_time_values=(3000,), template="fuel_rod_1D_pw
 def _build_estimator(model_type: str, degree: int, n_features: int):
     """Construit le pipeline sklearn (mise a l'echelle systematique, car les
     variables ont des ordres de grandeur tres differents : lhgr ~1e4, temps ~1e3).
-      - 'gp'   : processus gaussien (kriging) — interpole finement une surface
+      - 'gp'   : processus gaussien (kriging), interpole finement une surface
                  lisse ET fournit une incertitude. Standard pour emuler un code.
       - 'poly' : regression polynomiale (repli simple, extrapolation douce)."""
     from sklearn.pipeline import Pipeline
@@ -138,7 +138,7 @@ def _build_estimator(model_type: str, degree: int, n_features: int):
 def train(dataset_path=DATASET_PATH, model_path=MODEL_PATH,
           model_type="gp", degree=2):
     """Entraine un emulateur par metrique et le sauvegarde (joblib). Rapporte
-    une validation HONNETE par leave-one-out (R^2 et MAE) — bien plus fiable que
+    une validation HONNETE par leave-one-out (R^2 et MAE), bien plus fiable que
     le R^2 d'ajustement quand on n'a qu'une poignee de points. Retourne les
     scores LOO."""
     import numpy as np

@@ -3,7 +3,7 @@
 **An LLM agent and digital twin for the OFFBEAT nuclear fuel performance code.**
 
 ENSTA Paris *Projet de Recherche* (PRe), carried out at SPEIT, Shanghai Jiao
-Tong University · April–July 2026
+Tong University · April to July 2026
 Student: Yann Butel (ENSTA Paris, class of 2027) ·
 Host supervisor: GONG Helin (SPEIT) ·
 ENSTA supervisor: Patrice Paricaud
@@ -13,8 +13,8 @@ ENSTA supervisor: Patrice Paricaud
 ## What this is
 
 Fuel performance simulation relies on codes whose use stays confined to
-specialists. AutoOFFBEAT drives [OFFBEAT](https://gitlab.com/foam-for-nuclear/offbeat)
-— an OpenFOAM-based fuel behaviour solver — from requests written in plain
+specialists. AutoOFFBEAT drives [OFFBEAT](https://gitlab.com/foam-for-nuclear/offbeat),
+an OpenFOAM-based fuel behaviour solver, from requests written in plain
 language. A supervisor built on LangChain orchestrates domain tools; the tools,
 not the model, do the physics.
 
@@ -68,14 +68,14 @@ switches from compression to tension at that moment.
 The stress limit is not a constant: it is read point-by-point from the
 `sigmaY` field the solver itself computes.
 
-### Surrogate — dating a safety event, not just fitting a curve
+### Surrogate: dating a safety event, not just fitting a curve
 
 | | Value |
 |---|---|
 | Predicted gap closure | 387 days |
 | Computed by OFFBEAT | 370 days |
 | Deviation | **4.4 %** (16 days over a 2-year cycle) |
-| Cost | 2 ms vs 36 s — ≈ 18 000× |
+| Cost | 2 ms vs 36 s, a factor of ≈ 18 000 |
 
 At a linear power **absent from its training set**. Leave-one-out R² on the
 realistic domain: 0.9951 (temperature), 0.9905 (creep strain), 0.9715 (gap
@@ -92,8 +92,8 @@ width).
 | End-to-end 4-step request | 0 cases created, 30 calls, 179 s | **success, 5 calls, 39 s** | Tool schema accepted objects; context window 4096 → 16384 |
 | LLM latency per call | 64 s (CPU) | **0.33 s** (GPU) | ≈ 190× |
 
-None of these three failures — overlapping descriptions, degenerate training
-domain, cross-lingual retrieval — was visible without measurement, and each was
+None of these three failures (overlapping descriptions, degenerate training
+domain, cross-lingual retrieval) was visible without measurement, and each was
 fixed **without rewriting any application code**. What was missing was not
 technique, but instrumentation.
 
@@ -221,7 +221,7 @@ cp .env.example .env        # then set OFFBEAT_BIN and the LLM provider
 
 # 3. A local model (the project runs fully offline on Ollama)
 ollama pull qwen2.5:7b
-ollama pull bge-m3          # multilingual embeddings — see the RAG result above
+ollama pull bge-m3          # multilingual embeddings, see the RAG result above
 ```
 
 Then:
@@ -246,7 +246,7 @@ above.
 |---|---|
 | [`rapport/rapport_PRe_EN.pdf`](rapport/rapport_PRe_EN.pdf) | **Full report, English, 52 pages** |
 | `rapport/rapport_PRe_EN.tex` | Assembled LaTeX source |
-| `rapport/en/p01…p16.tex` | Source by part — edit here, then `cat en/p*.tex > rapport_PRe_EN.tex` |
+| `rapport/en/p01…p16.tex` | Source by part; edit here, then `cat en/p*.tex > rapport_PRe_EN.tex` |
 | `rapport/compiler.sh --en` | Compiles in ~5 s (3 passes) |
 
 Chapter 4 (results and stress-testing) and chapter 5 (false starts) are the

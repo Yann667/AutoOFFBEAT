@@ -2,7 +2,7 @@
 % CHAPTER 5
 %==============================================================================
 \chapter{Difficulties, false starts and schedule}
-\markboth{Chapter 5 — Difficulties, false starts and schedule}{}
+\markboth{Chapter 5: Difficulties, false starts and schedule}{}
 
 This chapter reports the obstacles encountered. It is not a catalogue of
 anecdotes: each of these difficulties changed a design decision or a working
@@ -76,8 +76,7 @@ the whole domain, documenting it as a conservative approximation. The reasoning
 seemed sound: overestimating a stress can only err on the side of safety.
 
 It was wrong. In the case of hoop stress, the extremum retained lay inside the
-pellet and carried a sign opposite to the actual stress in the cladding —
-tension reported where the cladding was in compression. An approximation
+pellet and carried a sign opposite to the actual stress in the cladding: tension reported where the cladding was in compression. An approximation
 prudent in principle had turned into a qualitatively false result.
 
 The lesson drawn goes beyond this particular case: a choice documented as
@@ -96,8 +95,8 @@ honest than a goodness-of-fit coefficient, and coefficients of determination
 above $0.998$ on the three quantities tracked. The statistical method was
 correct and the result excellent.
 
-The problem is that the question asked was not. The sampling domain — a few
-thousand seconds — had been chosen so that the design of experiments would
+The problem is that the question asked was not. The sampling domain, a few
+thousand seconds, had been chosen so that the design of experiments would
 remain quick to build, at a time when the solver was not compiled locally. Yet
 over that domain the rod reaches thermal equilibrium: the irradiation duration,
 the model's second variable, carried almost no information. I had therefore
@@ -112,8 +111,8 @@ domain of use cannot be read off an $R^2$.
 The lesson is twofold. On the one hand, a validation metric only qualifies the
 fit to a dataset, never the relevance of that dataset: a model can be
 impeccably validated and nonetheless useless. On the other hand, the practical
-constraint that had dictated the choice — the cost of building the design of
-experiments — had disappeared once the solver was compiled locally, without my
+constraint that had dictated the choice, the cost of building the design of
+experiments, had disappeared once the solver was compiled locally, without my
 re-examining the decision it had motivated. Design assumptions deserve to be
 re-evaluated when the constraints that justified them change.
 
@@ -126,8 +125,7 @@ of the internship concerns this very class of tools.
 The assistance proved very effective for producing structured code and for
 exploring an unfamiliar codebase. It proved, on the other hand, incapable of
 detecting on its own the correctness defects of table~\ref{tab:bugs}: these were
-found only by \emph{confronting numerical results with a physical expectation} —
-why is the cladding temperature equal to the pellet centreline temperature? why
+found only by \emph{confronting numerical results with a physical expectation}: why is the cladding temperature equal to the pellet centreline temperature? why
 is a closed gap reported as safe? Physical judgement remains the decisive link,
 and this observation applies equally to the agent developed here.
 

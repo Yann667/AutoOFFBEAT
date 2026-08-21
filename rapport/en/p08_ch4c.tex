@@ -31,7 +31,7 @@
 \caption[PCMI dating at an unseen power]{Pellet-cladding gap closure at
 \SI{25}{\kilo\watt\per\metre}, a power absent from the surrogate's training set.
 The continuous curve is the surrogate prediction, the markers are the states
-computed by OFFBEAT. The zero crossing — the onset of PCMI — is predicted at
+computed by OFFBEAT. The zero crossing, the onset of PCMI, is predicted at
 \num{387} days against \num{370} computed, a deviation of
 \SI{4.4}{\percent}.}
 \label{fig:pcmi}
@@ -49,8 +49,7 @@ to reproduce an equilibrium temperature, but on its ability to \emph{date a
 safety event} by interpolating between operating conditions it has never seen.
 
 Two reservations nonetheless remain. The validation rests on twenty-five points,
-which is still few; and nothing guarantees validity \textbf{outside} the
-training domain — a surrogate extrapolates poorly by construction, as the first
+which is still few; and nothing guarantees validity \textbf{outside} the training domain; a surrogate extrapolates poorly by construction, as the first
 version demonstrated spectacularly. This is precisely why the uncertainty
 provided by the Gaussian process is systematically reported at the interface
 alongside the predicted value.
@@ -72,9 +71,9 @@ categories, plus two healthy cases serving as controls.
 The outcome of each case is classified along two deliberately
 \textbf{independent} axes:
 \begin{itemize}
-  \item \textbf{detected} — did a pattern from the knowledge base recognise the
+  \item \textbf{detected}, did a pattern from the knowledge base recognise the
     error, as opposed to falling back on the language model;
-  \item \textbf{repaired} — did the case eventually run.
+  \item \textbf{repaired}, did the case eventually run.
 \end{itemize}
 
 Separating these two axes is the point of the protocol: it is the ``detected but
@@ -113,7 +112,7 @@ Invalid dictionary entry & 3 & 2/3 & \textbf{1/3} & 1/3\\
 \end{tabularx}
 \end{table}
 
-The detection rate is reasonable — nine faults out of twelve are recognised by a
+The detection rate is reasonable: nine faults out of twelve are recognised by a
 pattern, the language model fallback having been called upon only twice. The
 repair rate, on the other hand, is very low: of the twelve injected faults,
 \textbf{only one} was repaired.
@@ -142,7 +141,7 @@ No correction in the base for this pattern & 0/8\\
 Self-healing therefore repairs \emph{exactly} the faults whose root cause falls
 within the scope of the available correction, and only those. The middle row is
 the most instructive: in those three cases the pattern is recognised, the
-diagnosis is displayed, the correction fires — and fails every time, consuming
+diagnosis is displayed, the correction fires, and fails every time, consuming
 the full budget of three attempts each time. The mechanism gives the appearance
 of working while it structurally cannot succeed.
 
@@ -172,8 +171,8 @@ table ending at \SI{1.26e8}{\second} would have required \textbf{eighteen}
 attempts for a budget of \textbf{three}: the correction could mathematically
 never succeed. It was replaced by a deterministic computation, which reads the
 time tables actually present in the case and targets an admissible value
-directly. After correction, this case — the only one whose root cause did fall
-within an available correction — goes from failure to success in two attempts.
+directly. After correction, this case, the only one whose root cause did fall
+within an available correction, goes from failure to success in two attempts.
 
 \subsection{A nuance about the ``successful'' failures}
 
@@ -183,7 +182,7 @@ mesher \emph{before} the solver starts: \texttt{blockMesh} refuses to build an
 impossible geometry. This is not a failure of self-healing, it is a safeguard
 doing its job. Counting these cases as failures, as a first version of the
 benchmark did, amounted to penalising the system for correctly rejecting an
-invalid input — hence the addition of this column.
+invalid input; hence the addition of this column.
 
 \subsection{Lesson}
 

@@ -1,6 +1,6 @@
 # Template : fuel_rod_1D_pwr
 
-Cas OFFBEAT de référence — barreau combustible **1D (1.5D)** type **PWR/REP**,
+Cas OFFBEAT de référence : barreau combustible **1D (1.5D)** type **PWR/REP**,
 UO2 enrichi à 4.5 %, gaine Zircaloy, historique de puissance et profil axial
 réalistes. Issu d'un cas validé (`test_auto_pwr_1D`).
 
@@ -54,7 +54,7 @@ Clés reconnues (mode `template`, JSON `params`) :
 
 ## Paramètres physiques par défaut
 
-- Géométrie : pastille UO2 rayon 4.5 mm, gaine 4.565–5.315 mm, hauteur 3 m.
+- Géométrie : pastille UO2 rayon 4.5 mm, gaine 4.565-5.315 mm, hauteur 3 m.
 - Maillage 1D : 30 cellules radiales (fuel) + 10 (clad), wedge 0.25°.
 - Puissance : 15 kW/m (plateau), profil axial 12 points dépendant du temps.
 - Durée : `endTime = 3.15e7 s` (~1 an), pas de temps adaptatif.

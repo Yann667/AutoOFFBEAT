@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-run_sim.py – Lancement direct d'une simulation OFFBEAT, SANS LLM.
+run_sim.py : Lancement direct d'une simulation OFFBEAT, SANS LLM.
 
 Enchaîne les trois outils du projet en ligne de commande :
     input_creator  ->  offbeat_executor  ->  data_processor
@@ -116,7 +116,7 @@ def main(argv=None) -> int:
     print(out)
     success = "succès" in out
     if not success:
-        print("\n[!] La simulation n'a pas abouti — post-traitement sauté.")
+        print("\n[!] La simulation n'a pas abouti : post-traitement sauté.")
         return 2
 
     # 3) DATA PROCESSOR

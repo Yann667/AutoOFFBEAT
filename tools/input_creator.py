@@ -1,5 +1,5 @@
 """
-input_creator.py – Génération de cas OpenFOAM/OFFBEAT.
+input_creator.py : Génération de cas OpenFOAM/OFFBEAT.
 
 Équivalent de l'input_creator d'AutoFLUKA (qui produisait des cartes .inp
 FLUKA). Ici, on s'appuie sur la structure réelle d'un cas OFFBEAT :
@@ -187,7 +187,7 @@ def _coerce_nombre(valeur):
 
     Un modele de langage cite volontiers ses arguments (`"4.5"` plutot que
     `4.5`). Sans cette normalisation, la valeur est ecrite telle quelle dans
-    rodDict — donc entre guillemets — et produit un litteral Python invalide
+    rodDict, donc entre guillemets, et produit un litteral Python invalide
     que rodMaker.py refuse ensuite, loin de la cause."""
     if isinstance(valeur, str):
         texte = valeur.strip()
@@ -298,7 +298,7 @@ class OffbeatInputCreatorTool(BaseTool):
             try:
                 p = json.loads(params)
             except json.JSONDecodeError as exc:
-                return f"ERREUR : params n'est pas un JSON valide – {exc}"
+                return f"ERREUR : params n'est pas un JSON valide : {exc}"
         if not isinstance(p, dict):
             return f"ERREUR : params doit décrire un objet, reçu {type(p).__name__}."
 

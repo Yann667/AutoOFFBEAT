@@ -1,5 +1,5 @@
 """
-llm_factory.py – Couche d'abstraction LLM pour AutoOFFBEAT.
+llm_factory.py : Couche d'abstraction LLM pour AutoOFFBEAT.
 
 Permet de basculer entre fournisseurs sans toucher au code des agents.
 Configuration via .env :
@@ -39,7 +39,7 @@ def get_llm(temperature: float = 0.0, provider: str | None = None) -> BaseChatMo
         )
 
     if provider == "gemini":
-        # Tier gratuit Google AI Studio – bon compromis pour l'usage courant.
+        # Tier gratuit Google AI Studio : bon compromis pour l'usage courant.
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
@@ -55,7 +55,7 @@ def get_llm(temperature: float = 0.0, provider: str | None = None) -> BaseChatMo
         # prompt systeme et les schemas des outils consomment a eux seuls
         # ~1900 tokens (47 %) AVANT le premier echange. Des qu'un resultat
         # d'outil s'y ajoute, la fenetre deborde et le modele part en
-        # glissement de contexte — l'agent semble alors « bloque » sur les
+        # glissement de contexte : l'agent semble alors « bloque » sur les
         # demandes en plusieurs etapes, alors qu'une requete simple repond en
         # une seconde. Mesure a l'appui, cf. rapport §4.
         return ChatOllama(

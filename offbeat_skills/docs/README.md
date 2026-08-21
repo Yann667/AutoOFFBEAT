@@ -11,9 +11,9 @@ consulter. Formats supportés : **`.md`, `.txt`, `.pdf`** (récursif).
 - Toute note interne sur les modèles matériaux, dictionnaires, etc.
 
 ## Amorce déjà présente
-- `offbeat_case_structure.md` — structure d'un cas OFFBEAT.
-- `offbeat_commands.md` — commandes d'exécution.
-- `HOWTO_ajouter_une_erreur.md` — méthode self-healing.
+- `offbeat_case_structure.md` : structure d'un cas OFFBEAT.
+- `offbeat_commands.md` : commandes d'exécution.
+- `HOWTO_ajouter_une_erreur.md` : méthode self-healing.
 
 ## (Ré)indexer après ajout
 Depuis la racine du projet, l'environnement OpenFOAM **non requis** :

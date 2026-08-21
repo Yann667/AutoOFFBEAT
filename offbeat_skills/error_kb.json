@@ -33,7 +33,7 @@
       { "file": "system/controlDict", "key": "deltaT",         "action": "divide_by_10" },
       { "file": "system/controlDict", "key": "adjustTimeStep", "action": "set", "value": "yes" }
     ],
-    "references": ["OpenFOAM User Guide §4.3 – Time Control"]
+    "references": ["OpenFOAM User Guide §4.3 : Time Control"]
   },
   {
     "id": "floating_point_exception",
@@ -60,7 +60,7 @@
       { "file": "system/fvSolution", "key": "tolerance", "action": "set", "value": "1e-06" },
       { "file": "system/fvSolution", "key": "relTol",    "action": "set", "value": "0.01"  }
     ],
-    "references": ["OpenFOAM User Guide §4.5 – Linear solvers"]
+    "references": ["OpenFOAM User Guide §4.5 : Linear solvers"]
   },
   {
     "id": "outer_loop_not_converged",
@@ -73,7 +73,7 @@
     "dict_patches": [
       { "file": "system/fvSolution", "key": "nOuterCorrectors", "action": "set", "value": "200" }
     ],
-    "references": ["OFFBEAT Theory Manual §3.2 – Thermo-mechanical coupling"]
+    "references": ["OFFBEAT Theory Manual §3.2 : Thermo-mechanical coupling"]
   },
   {
     "id": "invalid_geometry_inside_out",
@@ -103,7 +103,7 @@
     "fix_function": null,
     "fix_description": "Générer le maillage avec blockMesh (ou snappyHexMesh) avant de relancer : `blockMesh -case <case_dir>`.",
     "dict_patches": [],
-    "references": ["OpenFOAM User Guide §5.1 – Meshing with blockMesh"]
+    "references": ["OpenFOAM User Guide §5.1 : Meshing with blockMesh"]
   },
   {
     "id": "boundary_field_missing",
@@ -123,7 +123,7 @@
     "fix_function": null,
     "fix_description": "Utiliser l'outil input_creator pour (re)générer le cas complet, ou copier solverDict depuis offbeat_skills/templates/.",
     "dict_patches": [],
-    "references": ["OFFBEAT User Guide §2.1 – Required dictionaries"]
+    "references": ["OFFBEAT User Guide §2.1 : Required dictionaries"]
   },
   {
     "id": "negative_temperature",

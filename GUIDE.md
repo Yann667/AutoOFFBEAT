@@ -1,10 +1,10 @@
-# Guide – AutoOFFBEAT
+# Guide : AutoOFFBEAT
 
 Ce guide est en **deux parties** :
 
-- **Partie 1 — Faire tourner l'agent de base** (ci-dessous) : du test le plus
+- **Partie 1, Faire tourner l'agent de base** (ci-dessous) : du test le plus
   simple (chat seul, sans solveur) jusqu'au mode complet (OFFBEAT dans Docker).
-- **[Partie 2 — Développer le jumeau numérique](#partie-2--développer-le-jumeau-numérique-de-centrale-nucléaire)** :
+- **[Partie 2, Développer le jumeau numérique](#partie-2--développer-le-jumeau-numérique-de-centrale-nucléaire)** :
   passer de l'agent *réactif* actuel à un jumeau *prédictif* qui détecte les
   situations de danger et s'adapte aux données d'exploitation.
 
@@ -13,11 +13,11 @@ Ce guide est en **deux parties** :
 > émulateur par processus gaussien sont en place (voir
 > [README.md](README.md) et le rapport, chapitre 3). Ce qui reste ouvert n'est
 > plus le périmètre du développement mais la **validation des seuils de sûreté
-> avec l'encadrant** — préalable à toute exploitation des marges calculées.
+> avec l'encadrant**, préalable à toute exploitation des marges calculées.
 
 ---
 
-# Partie 1 — Faire tourner l'agent de base
+# Partie 1 : Faire tourner l'agent de base
 
 ---
 
@@ -33,7 +33,7 @@ Commence par **A** pour valider que l'agent répond, puis monte en niveau.
 
 ---
 
-## Niveau A — Faire parler l'agent (sans solveur)
+## Niveau A : Faire parler l'agent (sans solveur)
 
 ### 1. Aller dans le dossier
 
@@ -65,7 +65,7 @@ cp .env.example .env
 
 Puis ouvre `.env` et choisis **un** fournisseur :
 
-**Option 1 — Ollama (100 % local, gratuit, recommandé pour tester)**
+**Option 1, Ollama (100 % local, gratuit, recommandé pour tester)**
 ```ini
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=qwen2.5-coder:14b
@@ -79,7 +79,7 @@ ollama pull qwen2.5-coder:14b
 ollama serve   # laisse tourner dans un terminal séparé
 ```
 
-**Option 2 — Gemini (tier gratuit, juste une clé)**
+**Option 2, Gemini (tier gratuit, juste une clé)**
 ```ini
 LLM_PROVIDER=gemini
 GOOGLE_API_KEY=ta_cle_ici
@@ -87,7 +87,7 @@ GEMINI_MODEL=gemini-1.5-flash
 ```
 Clé : https://aistudio.google.com/app/apikey
 
-**Option 3 — Anthropic / Claude**
+**Option 3, Anthropic / Claude**
 ```ini
 LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=ta_cle_ici
@@ -119,12 +119,12 @@ find /tmp/rod_test
 ```
 
 > **Note :** au niveau A, l'outil `offbeat_executor` répondra qu'il ne
-> trouve pas le binaire `offbeat` — c'est normal, passe au niveau B ou C
+> trouve pas le binaire `offbeat`, c'est normal, passe au niveau B ou C
 > pour l'exécution réelle.
 
 ---
 
-## Niveau B — Exécuter réellement OFFBEAT (sans Docker)
+## Niveau B : Exécuter réellement OFFBEAT (sans Docker)
 
 À faire **seulement** si OpenFOAM + OFFBEAT sont installés localement
 (Linux/WSL).
@@ -168,7 +168,7 @@ Maintenant l'agent peut enchaîner : créer le cas → mailler (`blockMesh`)
 
 ---
 
-## Niveau C — Tout dans Docker (reproductible)
+## Niveau C : Tout dans Docker (reproductible)
 
 ### 1. Construire l'image
 ```bash
@@ -263,7 +263,7 @@ AutoOFFBEAT/
 ---
 ---
 
-# Partie 2 — Développer le jumeau numérique de centrale nucléaire
+# Partie 2 : Développer le jumeau numérique de centrale nucléaire
 
 > Cette partie décrit comment faire **évoluer** AutoOFFBEAT de l'agent *réactif*
 > actuel vers un jumeau numérique *prédictif*. Chaque étape (D1 → D5) se
@@ -272,12 +272,12 @@ AutoOFFBEAT/
 
 > **✅ État d'implémentation (crayon seul).** D1 à D5 sont **codés et testés**
 > pour un crayon combustible :
-> - **D1** [tools/safety_analyzer.py](tools/safety_analyzer.py) + [offbeat_skills/safety_kb.json](offbeat_skills/safety_kb.json) — statut 🟢/🟡/🔴, branché dans l'agent.
-> - **D2** `prognose()` dans le même module — extrapolation du franchissement.
-> - **D3** [tools/twin_monitor.py](tools/twin_monitor.py) — boucle d'assimilation (validée bout en bout).
+> - **D1** [tools/safety_analyzer.py](tools/safety_analyzer.py) + [offbeat_skills/safety_kb.json](offbeat_skills/safety_kb.json), statut 🟢/🟡/🔴, branché dans l'agent.
+> - **D2** `prognose()` dans le même module, extrapolation du franchissement.
+> - **D3** [tools/twin_monitor.py](tools/twin_monitor.py), boucle d'assimilation (validée bout en bout).
 > - **D4** panneau de sûreté live + **simulateur interactif à curseurs** dans
 >   [app.py](app.py) (barre latérale, jauges 🟢/🟡/🔴 mises à jour en ~ms).
-> - **D5** [tools/surrogate.py](tools/surrogate.py) — émulateur **2D** (puissance
+> - **D5** [tools/surrogate.py](tools/surrogate.py), émulateur **2D** (puissance
 >   × durée, 16 runs). Modèle par défaut = **processus gaussien** (kriging) :
 >   validation leave-one-out **R²≈0.999** (MAE ~9 K sur T), **incertitude ±**
 >   fournie, prédiction ~ms. Outil `surrogate_predict` branché + relié aux
@@ -312,7 +312,7 @@ Trois différences entre l'agent actuel et le jumeau visé :
 > **La nuance « temps réel ».** OFFBEAT est un solveur *batch* (minutes à heures)
 > et il n'existe pas de capteur branché en direct sur un crayon dans le cœur.
 > Un « temps réel » à la seconde n'a donc pas de sens ici. Ce qui est réaliste :
-> un jumeau **« à la mise à jour »** — dès qu'un nouvel historique
+> un jumeau **« à la mise à jour »**, dès qu'un nouvel historique
 > d'exploitation arrive, il re-simule et met à jour son pronostic. Le vrai temps
 > réel viendrait d'un **modèle réduit (surrogate)** entraîné sur OFFBEAT (voir
 > étape D5).
@@ -355,10 +355,10 @@ Le principe directeur : **on réutilise tout l'existant** (les 3 outils + le
 patron *déterministe-puis-LLM* du self-healing + le KB JSON éditable sans
 rebuild) et on ajoute 3 briques neuves (D1, D2, D3) + une extension GUI (D4).
 
-## 2.2 Les critères de sûreté — le cœur métier
+## 2.2 Les critères de sûreté : le cœur métier
 
 C'est le contenu physique du jumeau. Ce sont des **critères de conception
-publiés** (pas des correctifs inventés — cf. CLAUDE.md §6), mais leurs valeurs
+publiés** (pas des correctifs inventés, cf. CLAUDE.md §6), mais leurs valeurs
 exactes dépendent du crayon et du burnup : à **confirmer avec l'encadrant / la
 littérature**, d'où `validated: false` par défaut.
 
@@ -369,8 +369,8 @@ littérature**, d'où `validated: false` par défaut.
 | Déformation de gaine (PCMI) | déformation circonf. plastique < ~1 % | `epsilon`/`sigmaCyl` (θθ) | ✅ oui |
 | Fermeture du gap (début du PCMI) | garder une marge > 0 | largeur de gap | ✅ (géométrie) |
 | Pression interne (critère *no-liftoff*) | P_interne < P_caloporteur (~15,5 MPa PWR) | plénum / `gapGas` | ✅ si modèle plénum+FGR |
-| Oxydation de gaine (ECR, LOCA) | ECR < 17 % | — | ⚠️ selon le modèle activé |
-| DNBR (crise d'ébullition) | > 1,3 | — | ❌ **non** — thermohydraulique, c'est une **entrée** |
+| Oxydation de gaine (ECR, LOCA) | ECR < 17 % |, | ⚠️ selon le modèle activé |
+| DNBR (crise d'ébullition) | > 1,3 |, | ❌ **non**, thermohydraulique, c'est une **entrée** |
 
 > Les deux dernières lignes montrent la frontière : le DNBR relève de la couche
 > thermohydraulique *en amont* d'OFFBEAT. Le jumeau le **reçoit** comme donnée,
@@ -379,13 +379,13 @@ littérature**, d'où `validated: false` par défaut.
 
 ## 2.3 Ordre de construction (D1 → D5, un morceau à la fois)
 
-### Étape D1 — Analyseur de sûreté (la première brique, la plus rentable)
+### Étape D1 : Analyseur de sûreté (la première brique, la plus rentable)
 
 **But :** lire une simu terminée et dire, critère par critère, 🟢 sûr / 🟡
 proche du seuil / 🔴 franchi. Réutilise `data_processor` et **calque exactement**
 le patron du self-healing (KB JSON déterministe d'abord, LLM en repli).
 
-**Fichier neuf n°1 — `offbeat_skills/safety_kb.json`** (éditable SANS rebuild,
+**Fichier neuf n°1, `offbeat_skills/safety_kb.json`** (éditable SANS rebuild,
 monté en volume comme `error_kb.json`) :
 
 ```json
@@ -418,11 +418,11 @@ monté en volume comme `error_kb.json`) :
 ]
 ```
 
-**Fichier neuf n°2 — `tools/safety_analyzer.py`** (squelette, mêmes conventions
+**Fichier neuf n°2, `tools/safety_analyzer.py`** (squelette, mêmes conventions
 que les autres outils : `BaseTool` + `args_schema` Pydantic) :
 
 ```python
-"""safety_analyzer.py – Analyse de sûreté d'un cas OFFBEAT terminé.
+"""safety_analyzer.py : Analyse de sûreté d'un cas OFFBEAT terminé.
 Compare les pics des champs (T, contraintes, gap) aux seuils de
 offbeat_skills/safety_kb.json et attribue un statut 🟢/🟡/🔴 par critère.
 Patron identique au self-healing : déterministe (KB) d'abord, LLM en repli."""
@@ -498,7 +498,7 @@ Tu dois voir une ligne 🟢/🟡/🔴 par critère. **Ne pas passer à D2 tant q
 tourne pas.** Ensuite, brancher l'outil dans `agents/supervisor.py` (l'ajouter à
 la liste `tools`, comme les autres).
 
-### Étape D2 — Pronostic (la « prédiction »)
+### Étape D2 : Pronostic (la « prédiction »)
 
 **But :** ne pas seulement dire « on est à 85 % de la limite », mais **« au
 rythme actuel, la limite sera atteinte dans ~X »**. On exploite le fait qu'un run
@@ -529,9 +529,9 @@ def prognose(case_dir, field="T", limit=3113.0):
 
 **Test minimal D2 :** sur un run où T monte, vérifier que `t_cross` est cohérent
 (au-delà du dernier pas de temps). Affiner ensuite (tendance non linéaire, barre
-d'incertitude) — mais garder le squelette simple d'abord.
+d'incertitude), mais garder le squelette simple d'abord.
 
-### Étape D3 — Assimilation de données (l'« adaptation »)
+### Étape D3 : Assimilation de données (l'« adaptation »)
 
 **But :** quand de nouvelles données d'exploitation arrivent (un historique de
 puissance mis à jour, une nouvelle pression caloporteur), le jumeau **ré-écrit le
@@ -543,7 +543,7 @@ relancer, puis **`safety_analyzer`**. Squelette d'un `tools/twin_monitor.py` qui
 surveille un fichier de données et boucle :
 
 ```python
-"""twin_monitor.py – boucle d'assimilation 'a la mise a jour'.
+"""twin_monitor.py : boucle d'assimilation 'a la mise a jour'.
 Surveille un CSV d'exploitation ; a chaque changement : patch du cas,
 re-simulation, ré-analyse de sûreté. Ce N'EST PAS du temps réel a la
 seconde (OFFBEAT est batch) mais un jumeau qui se met a jour a chaque donnée."""
@@ -581,7 +581,7 @@ détecte le changement, relance, et ré-affiche les statuts. Commencer par un
 > limite de relances, et **ne pas empiler** les simulations (attendre la fin
 > d'un run avant d'en lancer un autre).
 
-### Étape D4 — Tableau de bord live (seulement à la fin)
+### Étape D4 : Tableau de bord live (seulement à la fin)
 
 Étendre `app.py` (déjà en Dash) avec un panneau d'état : des **jauges** par
 critère (couleur 🟢/🟡/🔴), la courbe de marge dans le temps, et le pronostic D2.
@@ -589,7 +589,7 @@ Un `dcc.Interval` qui rafraîchit le panneau en appelant `safety_analyzer` sur l
 cas courant suffit. **Ne pas commencer par là** (CLAUDE.md §4, §8 : l'interface
 en dernier).
 
-### Étape D5 — Montée en échelle & vrai temps réel
+### Étape D5 : Montée en échelle & vrai temps réel
 
 - **Crayon → assemblage.** Passer d'un crayon 1D à un assemblage demande un
   maillage plus lourd et beaucoup de calcul → c'est là qu'un **GPU / HPC**
@@ -598,7 +598,7 @@ en dernier).
   ML : surface de réponse / réseau) sur un jeu de runs OFFBEAT. Le surrogate
   répond en millisecondes → il permet un jumeau *réellement* temps réel, OFFBEAT
   servant de « vérité terrain » périodique. C'est une belle piste de recherche
-  pour le rapport, mais **après** que D1–D4 tournent.
+  pour le rapport, mais **après** que D1 à D4 tournent.
 
 ## 2.4 Contraintes techniques (à dire honnêtement dans le rapport)
 
@@ -608,7 +608,7 @@ en dernier).
   thermohydraulique sont des **entrées**, pas des couches résolues.
 - **Coût de calcul** : la montée en échelle (assemblage/cœur) impose GPU/HPC.
 - **Données d'exploitation** : il faut une **source** (mesures réelles ? données
-  synthétiques ? sortie d'un code amont ?) — à clarifier (voir §2.5).
+  synthétiques ? sortie d'un code amont ?), à clarifier (voir §2.5).
 
 ## 2.5 À valider avec l'encadrant avant de coder la Partie 2
 
@@ -652,13 +652,13 @@ AutoOFFBEAT/
 
 Commandes utiles :
 ```bash
-# D1/D2 — analyser la sûreté d'un cas simulé
+# D1/D2 : analyser la sûreté d'un cas simulé
 python -m tools.safety_analyzer /chemin/vers/cas
 
-# D3 — un cycle d'assimilation à partir d'un CSV d'exploitation
+# D3 : un cycle d'assimilation à partir d'un CSV d'exploitation
 python -m tools.twin_monitor --case-dir /chemin/cas --data-csv ops.csv --once
 
-# D5 — dataset 2D (grille puissance × durée), entraînement, prédiction instantanée
+# D5 : dataset 2D (grille puissance × durée), entraînement, prédiction instantanée
 python -m tools.surrogate build --lhgr 12000 20000 28000 36000 --end-time 2000 3500 5000 6500
 python -m tools.surrogate train
 python -m tools.surrogate predict --lhgr 28000 --end-time 4000

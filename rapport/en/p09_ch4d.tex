@@ -8,12 +8,12 @@ language, does the supervisor choose the right tool?
 \subsection{Protocol}
 
 Twenty-six requests were written, covering the six tools exposed to the agent,
-plus four requests for which \emph{no} tool should be called — a greeting, a
+plus four requests for which \emph{no} tool should be called: a greeting, a
 general-knowledge question, a note of thanks. Triggering a tool on these is a
 false positive just as much as a wrong choice is.
 
 The tools are not executed. They are bound to the model, and it is the
-\emph{intent} produced — the list of requested calls — that is recorded. This
+\emph{intent} produced, the list of requested calls, that is recorded. This
 protocol measures selection exactly, with no side effects: no case is created,
 no solver is launched. It takes one pass per request.
 
@@ -60,8 +60,8 @@ margins and tell me when the limit will be reached'', it calls the surrogate; on
 ``is there a risk of fuel melting?'', it calls nothing.
 
 The cause is not the model, but the descriptions supplied. Those of the safety
-analyser and of the surrogate promised exactly the same thing — safety margins,
-per-criterion status, PCMI, gap closure — without ever stating what really
+analyser and of the surrogate promised exactly the same thing (safety margins,
+per-criterion status, PCMI, gap closure) without ever stating what really
 distinguishes them. Yet that criterion is simple and unambiguous: \textbf{the
 analyser requires an already-simulated case on disk, whereas the surrogate takes
 only numerical parameters}.
@@ -70,7 +70,7 @@ only numerical parameters}.
 
 The two descriptions were rewritten to state this condition of use explicitly,
 and to name each other as alternatives not to be confused. No other change was
-made — neither to the model, nor to the tool code, nor to the requests.
+made: neither to the model, nor to the tool code, nor to the requests.
 
 The accuracy of the safety analyser rises from \SI{25}{\percent} to
 \SI{100}{\percent}, and the overall accuracy from \SI{77}{\percent} to
@@ -79,15 +79,14 @@ The accuracy of the safety analyser rises from \SI{25}{\percent} to
 The lesson goes beyond this particular case. In a tool-based architecture, a
 tool description is not documentation: it is the \emph{programming interface}
 through which the model decides. Two tools whose descriptions overlap are, from
-the model's point of view, indistinguishable — and no amount of model quality
+the model's point of view, indistinguishable, and no amount of model quality
 compensates for that ambiguity. It is also good news in terms of cost: eleven
 accuracy points were gained by rewriting two paragraphs, with no retraining and
 no change of model.
 
 The three remaining errors do not stem from this cause. Two concern wordings
-where the boundary is genuinely debatable — ``quickly estimate the maximum
-temperature'' may legitimately call either the surrogate or post-processing —
-and the third is a documentation call on a general-knowledge question, a benign
+where the boundary is genuinely debatable, since ``quickly estimate the maximum
+temperature'' may legitimately call either the surrogate or post-processing, and the third is a documentation call on a general-knowledge question, a benign
 false positive.
 
 \subsection{From selection to execution: a blind spot}
@@ -112,7 +111,7 @@ the loop.
 as freezes on multi-step requests, while a simple question was answered in one
 second. Measurement showed that the system prompt and the tool schemas alone
 consume \textbf{$\sim$\num{1900} tokens, that is \SI{47}{\percent} of the
-\num{4096}-token window} used by default — before any exchange. A single tool
+\num{4096}-token window} used by default, before any exchange. A single tool
 result was then enough to overflow it. The window was raised to \num{16384}
 tokens.
 
@@ -168,6 +167,6 @@ about \SI{33}{\percent} accuracy@1. This threshold serves as a lower reference.
 
 \subsection{A result below chance}
 
-The first campaign gives \SI{27}{\percent} accuracy@1 — that is, \textbf{worse
+The first campaign gives \SI{27}{\percent} accuracy@1, that is \textbf{worse
 than a random draw}. But the truly alarming indicator lies elsewhere: recall@4
 is also \SI{27}{\percent}, exactly the same value.

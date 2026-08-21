@@ -1,11 +1,11 @@
 """
-offbeat_executor.py – Outil d'exécution OFFBEAT avec self-healing.
+offbeat_executor.py : Outil d'exécution OFFBEAT avec self-healing.
 
 Équivalent du "Executor" d'AutoFLUKA : là où AutoFLUKA lance `rfluka`
 puis relit les logs pour ajuster le .inp et relancer, ici on lance le
 solveur `offbeat`, on parse `log.offbeat`, et on applique des
 corrections déterministes sur les dictionnaires OpenFOAM avant de
-relancer – jusqu'à MAX_RETRIES.
+relancer, jusqu'à MAX_RETRIES.
 
 Stratégie à deux étages (fidèle aux FLUKA Skills) :
   1. Base de connaissance déterministe (ERROR_KB) : erreurs connues
@@ -153,7 +153,7 @@ def fix_reduce_endtime(case_dir: Path) -> str:
     Le correctif est CALCULÉ à partir des tables du cas, et non appliqué par
     décréments aveugles. Une version antérieure retirait 1 % par tentative :
     mesuré sur le banc d'essai, ramener endTime=1.5e8 sous une table s'arrêtant
-    à 1.26e8 demandait 18 tentatives pour un budget de 3 — le correctif ne
+    à 1.26e8 demandait 18 tentatives pour un budget de 3 : le correctif ne
     pouvait donc jamais aboutir. On vise ici directement 99 % du dernier point
     tabulé, ce qui converge en une seule tentative."""
     current = _get_dict_entry(case_dir, "system/controlDict", "endTime")
@@ -358,7 +358,7 @@ class OffbeatExecutorTool(BaseTool):
     def _llm_fallback(self, log_tail: str, case_dir: Path) -> str:
         """Erreur inconnue : on demande un diagnostic au LLM de debug,
         enrichi si possible par la doc récupérée via le RAG.
-        (Pas d'application automatique – le superviseur décidera.)"""
+        (Pas d'application automatique : le superviseur décidera.)"""
         try:
             from config.llm_factory import get_debug_llm
             llm = get_debug_llm()
@@ -420,7 +420,7 @@ class OffbeatExecutorTool(BaseTool):
 
             # NB : OFFBEAT renvoie un code retour != 0 même sur un run
             # réussi, et termine par un marqueur ' end ' (minuscule) sur sa
-            # propre ligne — contrairement au ' End ' des solveurs OpenFOAM
+            # propre ligne, contrairement au ' End ' des solveurs OpenFOAM
             # standard. On se fie donc UNIQUEMENT à ce marqueur de fin.
             if re.search(r"(?im)^\s*end\s*$", log_text[-500:]):
                 report.append(f"Simulation terminée avec succès "

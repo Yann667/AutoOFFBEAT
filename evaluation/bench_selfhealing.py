@@ -1,5 +1,5 @@
 """
-bench_selfhealing.py — Banc d'essai quantitatif de l'auto-reparation.
+bench_selfhealing.py : Banc d'essai quantitatif de l'auto-reparation.
 
 But : mesurer, PAR CATEGORIE DE CAUSE RACINE, ce que la boucle de self-healing
 sait reellement resoudre. Les trois cas ponctuels documentes precedemment
@@ -80,7 +80,7 @@ def _set_lhgr(case: Path, value: float):
 # --------------------------------------------------------------------------
 # Catalogue de fautes, groupees par CATEGORIE DE CAUSE RACINE
 # --------------------------------------------------------------------------
-# Deux etiquettes a priori, volontairement DISTINCTES — c'est tout l'enjeu :
+# Deux etiquettes a priori, volontairement DISTINCTES, et c'est tout l'enjeu :
 #   correctif_kb    : error_kb.json propose-t-il un correctif pour ce motif ?
 #   cause_traitable : ce correctif peut-il, par nature, traiter la CAUSE RACINE ?
 # Un cas (correctif_kb=True, cause_traitable=False) est le coeur du probleme :

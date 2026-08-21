@@ -1,5 +1,5 @@
 """
-safety_analyzer.py – Analyse de surete d'un cas OFFBEAT (jumeau numerique, D1+D2).
+safety_analyzer.py : Analyse de surete d'un cas OFFBEAT (jumeau numerique, D1+D2).
 
 Brique 1 du jumeau numerique (cf. GUIDE.md Partie 2). Compare les pics des
 champs d'un crayon combustible (temperature, contraintes, deformation, gap,
@@ -109,7 +109,7 @@ def _candidate_meshes(dataset, zone: str = None):
     mettre 'internalMesh' avant la fusion casse la lecture de `gapWidth`, dont
     les valeurs utiles vivent sur les patches de frontiere (le volume porte une
     valeur sentinelle de 1e15). Le repli 'internalMesh' n'intervient donc que
-    lorsque la fusion ne porte pas le champ — exactement le cas multi-regions —
+    lorsque la fusion ne porte pas le champ, exactement le cas multi-regions,
     ce qui rend ce correctif purement additif."""
     out = []
     if zone:
@@ -169,14 +169,14 @@ def _evaluate_rule(dataset, rule: dict):
     - **limite scalaire** (`limit`) : comportement historique, on reduit le
       champ puis on compare a la constante.
     - **limite en CHAMP** (`limit_field`) : la limite est elle-meme un champ
-      calcule par le solveur — typiquement `sigmaY`, la limite d'ecoulement,
+      calcule par le solveur, typiquement `sigmaY`, la limite d'ecoulement,
       qui depend de la temperature, de l'irradiation et du burnup selon le
       modele materiau configure. Le rapport est alors calcule POINT PAR POINT
       puis reduit, ce qui est la seule facon correcte de proceder : le pic de
       contrainte et le minimum de limite ne sont pas au meme endroit.
 
     Le second mode garantit en outre que le critere de surete evalue la meme
-    limite que celle effectivement appliquee par la simulation — l'ecart entre
+    limite que celle effectivement appliquee par la simulation : l'ecart entre
     les deux etait de 100 MPa avant cette correction."""
     field = rule["field"]
     comp = rule.get("component")

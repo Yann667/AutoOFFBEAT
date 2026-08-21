@@ -29,7 +29,7 @@ offbeat_skills/.rag_index/
 *:Zone.Identifier
 
 # NB : offbeat_skills/.surrogate/ (dataset + modèle entraîné) est VOLONTAIREMENT
-# suivi — il évite de relancer 16 simulations OFFBEAT sur la nouvelle machine.
+# suivi : il évite de relancer 16 simulations OFFBEAT sur la nouvelle machine.
 
 # ── Handoff / transcripts de session (non pertinents pour le dépôt) ───────────
 handoff/

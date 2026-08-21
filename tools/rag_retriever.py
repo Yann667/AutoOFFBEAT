@@ -1,5 +1,5 @@
 """
-rag_retriever.py – Assistant documentaire (RAG) pour AutoOFFBEAT.
+rag_retriever.py : Assistant documentaire (RAG) pour AutoOFFBEAT.
 
 Équivalent de l'assistant RAG d'AutoFLUKA, porté sur la doc OFFBEAT/OpenFOAM.
 Ingère les documents de offbeat_skills/docs/ (Markdown, txt, PDF), les indexe

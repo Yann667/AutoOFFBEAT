@@ -89,7 +89,7 @@ First, the rod reaches \textbf{thermal equilibrium within a few thousand
 seconds}. At the two longest durations of the plan, the temperatures differ by
 only a few tenths of a kelvin (table~\ref{tab:saturation}): these levels are
 duplicates. Of the four duration values, only two carried information, and the
-regression problem was in fact almost one-dimensional — power alone sufficed to
+regression problem was in fact almost one-dimensional: power alone sufficed to
 predict the output. The high $R^2$ was therefore mostly measuring how easy the
 problem was.
 
@@ -118,8 +118,8 @@ carries information.}
 
 Second and above all, the reference simulation runs to \SI{6.3e7}{\second}, that
 is about \textbf{ten thousand times} beyond the upper bound of the training
-domain. Yet the phenomena that matter for safety — swelling, creep, gap closure,
-PCMI — unfold precisely over these long time scales, entirely absent from the
+domain. Yet the phenomena that matter for safety (swelling, creep, gap closure,
+PCMI) unfold precisely over these long time scales, entirely absent from the
 design of experiments. The surrogate was therefore modelling only the
 \emph{initial thermal transient}, while the dashboard's interactive simulator
 implied that it was predicting safety margins.

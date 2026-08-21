@@ -1,5 +1,5 @@
 """
-data_processor.py – Post-traitement des résultats OFFBEAT via pyvista.
+data_processor.py : Post-traitement des résultats OFFBEAT via pyvista.
 
 Équivalent du data_processor d'AutoFLUKA (qui décodait les _fort.xx
 FLUKA) : ici on lit les fichiers VTK/foam produits par OFFBEAT et on
@@ -278,11 +278,11 @@ class DataProcessorInput(BaseModel):
         default="summary",
         description=(
             "Type d'analyse :\n"
-            "  axial_T      – profil axial de température (champ T)\n"
-            "  radial_T     – profil radial de T au plan médian\n"
-            "  axial_stress – profil axial de sigmaHoop (contrainte de cerclage)\n"
-            "  peak_T       – température de gaine maximale (PCT)\n"
-            "  summary      – exécute axial_T + radial_T + peak_T"
+            "  axial_T      : profil axial de température (champ T)\n"
+            "  radial_T     : profil radial de T au plan médian\n"
+            "  axial_stress : profil axial de sigmaHoop (contrainte de cerclage)\n"
+            "  peak_T       : température de gaine maximale (PCT)\n"
+            "  summary      : exécute axial_T + radial_T + peak_T"
         ),
     )
     time_step: str = Field(

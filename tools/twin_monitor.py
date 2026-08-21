@@ -1,5 +1,5 @@
 """
-twin_monitor.py – Boucle d'assimilation de donnees du jumeau numerique (D3).
+twin_monitor.py : Boucle d'assimilation de donnees du jumeau numerique (D3).
 
 Brique 3 du jumeau numerique (cf. GUIDE.md Partie 2). Fait le lien entre des
 donnees d'exploitation (historique de puissance, conditions caloporteur...) et

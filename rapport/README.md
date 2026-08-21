@@ -1,4 +1,4 @@
-# Rapport PRe — AutoOFFBEAT
+# Rapport PRe : AutoOFFBEAT
 
 Premier jet du rapport de stage, structuré selon `CONTENU DU RAPPORT_PRe.pdf`
 et calqué sur `Rapport_Modele_PRe.pdf`.
@@ -8,7 +8,7 @@ et calqué sur `Rapport_Modele_PRe.pdf`.
 | Fichier | Langue | Pages |
 |---|---|---|
 | `rapport_PRe.tex` | français | 52 |
-| `rapport_PRe_EN.tex` | **anglais — version à rendre** | 52 |
+| `rapport_PRe_EN.tex` | **anglais, version à rendre** | 52 |
 
 La version anglaise est assemblée depuis `en/p01…p16.tex` (un fichier par
 partie). **Toute correction doit être faite dans `en/`**, puis réassemblée :
@@ -70,18 +70,18 @@ la page de titre et les pieds de page se mettent à jour partout.
 | `\tuteurENSTA`, `\tuteurOrganisme` | noms des tuteurs |
 | `\dateDebut`, `\dateFin` | dates du stage |
 | `\mentionConfidentialite` | mention exacte (affichée en rouge) |
-| `\titreRapport`, `\sousTitreRapport` | titre proposé — **à retravailler** |
+| `\titreRapport`, `\sousTitreRapport` | titre proposé, **à retravailler** |
 
 Vérifier aussi `\monNom` / `\monPrenom` (pré-remplis « BUTEL / Yann »).
 
-### 2. Logos — fait
+### 2. Logos (fait)
 
 `Logo_ENSTA.png` et `Logo_SPEIT.png` sont dans ce dossier et chargés via
 `\graphicspath{{Figures/}{./}}`.
 
 ### 3. Passages marqués en rouge
 
-Chercher `\color{red}` dans le source — chaque occurrence signale un passage
+Chercher `\color{red}` dans le source : chaque occurrence signale un passage
 à personnaliser ou à vérifier :
 
 - note de (non) confidentialité : choisir parmi les trois variantes ;
@@ -130,10 +130,10 @@ Les consignes valorisent explicitement l'exposé des erreurs et fausses routes
 « accompagné d'une réflexion montrant vos progrès ». Le rapport s'appuie
 là-dessus dans deux sections qui sont ses plus originales :
 
-- **§4.3** — les trois plantages provoqués délibérément, dont **deux échecs**
+- **§4.3** : les trois plantages provoqués délibérément, dont **deux échecs**
   du self-healing, avec l'analyse de *pourquoi* il échoue (limite de nature :
   motif ≠ cause racine) ;
-- **§5.2** — l'approximation « conservative » qui ne l'était pas, et le
+- **§5.2** : l'approximation « conservative » qui ne l'était pas, et le
   recul sur l'usage d'un assistant de programmation.
 
 C'est probablement l'angle le plus défendable à l'oral : ne pas présenter un

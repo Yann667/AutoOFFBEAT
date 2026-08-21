@@ -1,5 +1,5 @@
 """
-supervisor.py – Agent superviseur d'AutoOFFBEAT (langchain 1.x).
+supervisor.py : Agent superviseur d'AutoOFFBEAT (langchain 1.x).
 
 Migré vers la nouvelle API LangGraph : `create_agent` remplace le couple
 `create_tool_calling_agent` + `AgentExecutor` de langchain 0.3, et la
@@ -30,21 +30,21 @@ SYSTEM_PROMPT = """Tu es AutoOFFBEAT, un assistant expert en performance
 du combustible nucléaire avec le solveur OFFBEAT (basé sur OpenFOAM).
 
 Tes capacités, via tes outils :
-1. input_creator – créer un cas OpenFOAM/OFFBEAT en partant d'un template
+1. input_creator : créer un cas OpenFOAM/OFFBEAT en partant d'un template
    validé des offbeat_skills (ex. fuel_rod_1D_pwr) et en surchargeant les
    paramètres demandés (puissance linéique, rayons/hauteurs du barreau,
    durée de simulation, enrichissement…).
-2. offbeat_executor – mailler le cas (rodMaker.py + blockMesh) puis lancer
+2. offbeat_executor : mailler le cas (rodMaker.py + blockMesh) puis lancer
    le solveur `offbeat`, surveiller log.offbeat, et tenter une
    auto-réparation en cas de crash (self-healing).
-3. data_processor – post-traiter les résultats (champs T, contraintes,
+3. data_processor : post-traiter les résultats (champs T, contraintes,
    déformations) via pyvista et produire des profils/figures/JSON.
-4. safety_analyzer – analyser la SÛRETÉ d'un crayon simulé (jumeau numérique) :
+4. safety_analyzer : analyser la SÛRETÉ d'un crayon simulé (jumeau numérique) :
    comparer T, contraintes/déformations de gaine, gap et oxydation aux seuils
    de conception et renvoyer un statut 🟢/🟡/🔴 par critère, avec un pronostic
    (quand un seuil sera franchi). À utiliser pour détecter une situation de
    danger (fusion combustible, PCMI, rupture de gaine).
-5. surrogate_predict – (si disponible) prédire INSTANTANÉMENT les marges de
+5. surrogate_predict : (si disponible) prédire INSTANTANÉMENT les marges de
    sûreté pour une puissance linéique donnée, sans relancer le solveur. À
    utiliser pour les questions « et si la puissance était de X W/m ? ».
 
@@ -74,7 +74,7 @@ def build_supervisor():
     ]
 
     # Outil RAG optionnel : ajouté seulement s'il est prêt (index construit +
-    # modèle d'embeddings dispo). S'il échoue, l'agent démarre sans lui —
+    # modèle d'embeddings dispo). S'il échoue, l'agent démarre sans lui,
     # le RAG ne doit jamais empêcher le fonctionnement de base.
     try:
         from tools.rag_retriever import get_knowledge_tool

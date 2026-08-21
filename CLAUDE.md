@@ -1,8 +1,8 @@
-# CLAUDE.md — AutoOFFBEAT (agent OFFBEAT de base)
+# CLAUDE.md : AutoOFFBEAT (agent OFFBEAT de base)
 
 > Fichier d'instructions projet pour un assistant de code (Claude Code / agent).
 >
-> **Périmètre — mis à jour.** Ce fichier décrivait initialement le seul agent de
+> **Périmètre : mis à jour.** Ce fichier décrivait initialement le seul agent de
 > base, les volets « jumeau numérique » étant explicitement exclus. Ils ont été
 > ouverts par la suite et sont désormais implémentés (§1). L'ordre de
 > construction du §4 reste la trace de la progression suivie, et les
@@ -23,22 +23,22 @@ Objectif du stage selon l'encadrant : *« build an agent on nuclear fuel
 performance code OFFBEAT »*. L'agent de base est le tronc commun et la priorité.
 
 ### Ce que fait l'agent de base (3 outils)
-1. **Input Creator** — génère/modifie un cas OpenFOAM/OFFBEAT (répertoires
+1. **Input Creator** : génère/modifie un cas OpenFOAM/OFFBEAT (répertoires
    `0/`, `constant/`, `system/`) depuis un template ou de zéro.
-2. **Executor** — lance le solveur `offbeat` via `subprocess`, lit `log.offbeat`,
+2. **Executor** : lance le solveur `offbeat` via `subprocess`, lit `log.offbeat`,
    et applique une boucle de **self-healing** en cas de crash.
-3. **Data Processor** — post-traite les résultats via `pyvista`.
+3. **Data Processor** : post-traite les résultats via `pyvista`.
 
 Le superviseur LangChain oriente ces outils selon la demande de l'utilisateur.
 
 ### Extensions ajoutées ensuite (jumeau numérique + évaluation)
-4. **Safety Analyzer** (`tools/safety_analyzer.py`) — évalue les critères de
+4. **Safety Analyzer** (`tools/safety_analyzer.py`) : évalue les critères de
    sûreté de `offbeat_skills/safety_kb.json`, par zone de maillage.
-5. **Surrogate** (`tools/surrogate.py`) — émulateur par processus gaussien
+5. **Surrogate** (`tools/surrogate.py`) : émulateur par processus gaussien
    (noyau de Matérn), prédiction + incertitude.
-6. **Twin Monitor** (`tools/twin_monitor.py`) — surveillance, pronostic de
+6. **Twin Monitor** (`tools/twin_monitor.py`) : surveillance, pronostic de
    franchissement de seuil, tableau de bord.
-7. **RAG Retriever** (`tools/rag_retriever.py`) — assistant documentaire.
+7. **RAG Retriever** (`tools/rag_retriever.py`) : assistant documentaire.
    L'embedding DOIT être multilingue : le corpus est bilingue.
 
 `evaluation/` contient trois bancs d'essai réexécutables (auto-réparation,
@@ -49,7 +49,7 @@ sélection d'outils, qualité de la recherche documentaire) avec leurs résultat
 ## 2. Stack technique (à respecter)
 
 - **Python** 3.11+
-- **LangChain 1.x** (pas la 0.3.x). Utiliser `create_agent` — PAS l'ancien couple
+- **LangChain 1.x** (pas la 0.3.x). Utiliser `create_agent`, PAS l'ancien couple
   `create_tool_calling_agent` + `AgentExecutor` (parti dans `langchain-classic`).
 - **LLM agnostique** : le code ne doit jamais coder en dur un fournisseur. Tout
   passe par une fabrique pilotée par `.env` (`LLM_PROVIDER` = `anthropic` |
@@ -58,7 +58,7 @@ sélection d'outils, qualité de la recherche documentaire) avec leurs résultat
   par la variable d'env `OFFBEAT_BIN`.
 - **pyvista** pour le post-traitement (lecture VTK / `.foam`).
 - **Interface** : à terme Dash ou Streamlit (comme AutoFLUKA). NE PAS commencer
-  par l'interface — la garder pour la fin.
+  par l'interface, la garder pour la fin.
 
 ### Environnement de développement
 - Développer **sous WSL2** (Ubuntu), pas Windows natif : OFFBEAT/OpenFOAM se
@@ -66,7 +66,7 @@ sélection d'outils, qualité de la recherche documentaire) avec leurs résultat
   sur le système de fichiers Windows monté.
 - Garder le projet ET les cas de simulation dans le home WSL (`~/...`), jamais
   sous `/mnt/c/...`.
-- Travailler dans un `venv` Python. **Docker n'est PAS requis pour développer** —
+- Travailler dans un `venv` Python. **Docker n'est PAS requis pour développer**,
   il viendra plus tard, seulement pour empaqueter un livrable reproductible.
 
 ---
@@ -106,21 +106,21 @@ Chaque dossier de package a un `__init__.py`.
 Construire **un seul morceau à la fois**, en le testant avant de passer au suivant.
 Le piège à éviter absolument : tout construire en parallèle.
 
-- [ ] **Étape 0 — Setup.** Créer l'arborescence, le `venv`, `requirements.txt`,
+- [ ] **Étape 0 : Setup.** Créer l'arborescence, le `venv`, `requirements.txt`,
       les `__init__.py`, le `.env` depuis `.env.example`, et `.gitignore`
       (incluant `.env`).
-- [ ] **Étape 1 — Executor seul.** Faire fonctionner `offbeat_executor.py` sur un
+- [ ] **Étape 1 : Executor seul.** Faire fonctionner `offbeat_executor.py` sur un
       vrai cas OFFBEAT, SANS superviseur ni interface. Un script de test qui
       instancie l'outil et appelle `_run("/chemin/cas")`. Vérifier que
       `subprocess` lance le solveur et que `log.offbeat` est bien parsé.
-- [ ] **Étape 2 — Self-healing.** Provoquer un crash connu (ex. `deltaT` trop
+- [ ] **Étape 2 : Self-healing.** Provoquer un crash connu (ex. `deltaT` trop
       grand → dépassement du nombre de Courant) et vérifier que la boucle détecte,
       corrige le `controlDict`, et relance. Alimenter `error_kb.json` (voir §6).
-- [ ] **Étape 3 — Superviseur.** Brancher `supervisor.py` (LangChain 1.x,
+- [ ] **Étape 3 : Superviseur.** Brancher `supervisor.py` (LangChain 1.x,
       `create_agent`) avec UN SEUL outil (l'executor). Tester en CLI.
-- [ ] **Étape 4 — Input Creator.** Ajouter l'outil de génération de cas.
-- [ ] **Étape 5 — Data Processor.** Ajouter le post-traitement pyvista.
-- [ ] **Étape 6 — Interface.** Dash/Streamlit, seulement une fois le reste stable.
+- [ ] **Étape 4 : Input Creator.** Ajouter l'outil de génération de cas.
+- [ ] **Étape 5 : Data Processor.** Ajouter le post-traitement pyvista.
+- [ ] **Étape 6 : Interface.** Dash/Streamlit, seulement une fois le reste stable.
 
 À chaque étape : ne pas avancer tant que l'étape courante ne tourne pas et n'a
 pas de test minimal.
@@ -131,13 +131,13 @@ pas de test minimal.
 
 - Tous les outils sont des `BaseTool` LangChain avec un `args_schema` Pydantic.
   (Note : le passage à `create_agent` en LangChain 1.x change l'état de l'agent,
-  pas le schéma des outils — les `BaseModel` d'`args_schema` restent valides.)
+  pas le schéma des outils ; les `BaseModel` d'`args_schema` restent valides.)
 - La boucle de self-healing ne doit JAMAIS crasher elle-même : tout appel LLM ou
   édition de fichier dans cette boucle est dans un `try/except`.
 - Éviter les dépendances lourdes inutiles (ex. pas besoin de PyFoam : l'édition
   des dictionnaires OpenFOAM se fait par regex pour rester léger en conteneur).
 - Le code doit rester modulaire et importable indépendamment de l'interface.
-- Docstrings en clair sur chaque outil — elles servent de description à l'agent.
+- Docstrings en clair sur chaque outil : elles servent de description à l'agent.
 
 ---
 

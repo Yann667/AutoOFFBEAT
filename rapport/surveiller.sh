@@ -46,15 +46,15 @@ compiler() {
 
     printf "[%s] " "$(date +%H:%M:%S)"
     if [ "$erreurs" -gt 0 ]; then
-        printf "\033[31mECHEC\033[0m — %s erreur(s)\n" "$erreurs"
+        printf "\033[31mECHEC\033[0m : %s erreur(s)\n" "$erreurs"
         grep -a -A 2 '^!' "$OUT/veille.log" | head -8 | sed 's/^/    /'
     else
-        printf "\033[32mOK\033[0m — %s pages en %.1fs\n" "${pages:-?}" \
+        printf "\033[32mOK\033[0m : %s pages en %.1fs\n" "${pages:-?}" \
                "$(echo "$t1 - $t0" | bc)"
     fi
 }
 
-echo "Surveillance de $SRC — Ctrl+C pour arreter."
+echo "Surveillance de $SRC. Ctrl+C pour arreter."
 echo "Le PDF est dans $OUT/${SRC%.tex}.pdf ; ouvre-le dans une visionneuse"
 echo "qui recharge automatiquement (l'apercu VS Code, ou SumatraPDF)."
 echo

@@ -1,4 +1,4 @@
-# AutoOFFBEAT – image Docker
+# AutoOFFBEAT : image Docker
 #
 # Base : OpenFOAM 2406 (openfoam.com) + OFFBEAT compilé depuis les sources
 # Équivalent du conteneur AutoFLUKA, où le mount FLUKA est remplacé par

@@ -1,4 +1,4 @@
-# AutoOFFBEAT — explication complète du code
+# AutoOFFBEAT : explication complète du code
 
 > **Couverture.** Ce document décrit l'agent de base : fabrique de modèles,
 > `input_creator`, `offbeat_executor`, `data_processor`, `rag_retriever`,
@@ -39,7 +39,7 @@ solveur OFFBEAT, se réparer en cas d'erreur, et te montrer les résultats.
 
 ---
 
-## 1. `.env` et `.env.example` — les réglages
+## 1. `.env` et `.env.example` : les réglages
 
 `.env.example` est un *modèle* (sans secret) ; tu le copies en `.env` et tu
 remplis. Les réglages clés :
@@ -54,7 +54,7 @@ remplis. Les réglages clés :
 
 ---
 
-## 2. `requirements.txt` — la liste des bibliothèques
+## 2. `requirements.txt` : la liste des bibliothèques
 
 Simple liste des « boîtes à outils » Python à installer
 (`pip install -r requirements.txt`) : l'interface (dash), l'IA (langchain,
@@ -63,7 +63,7 @@ langgraph, les connecteurs ollama/gemini/anthropic), le post-traitement
 
 ---
 
-## 3. `config/llm_factory.py` — la « fabrique » d'IA
+## 3. `config/llm_factory.py` : la « fabrique » d'IA
 
 **Rôle** : fournir le bon modèle d'IA selon le `.env`, sans que le reste du code
 ait à savoir lequel. Comme un adaptateur universel.
@@ -75,12 +75,12 @@ ait à savoir lequel. Comme un adaptateur universel.
 - **`get_supervisor_llm()`** : raccourci = le modèle du superviseur (le cerveau
   principal). Appelle `get_llm(temperature=0)`.
 - **`get_debug_llm()`** : le modèle pour analyser les crashs. Peut être un
-  fournisseur différent (`DEBUG_LLM_PROVIDER`) — utile pour mettre un gros
+  fournisseur différent (`DEBUG_LLM_PROVIDER`), utile pour mettre un gros
   modèle sur le debug et un petit sur le reste.
 
 ---
 
-## 4. `tools/input_creator.py` — l'outil qui CRÉE un cas de simulation
+## 4. `tools/input_creator.py` : l'outil qui CRÉE un cas de simulation
 
 **Rôle** : fabriquer un dossier de cas OFFBEAT complet, en copiant un *template*
 validé puis en remplaçant quelques paramètres demandés (puissance, géométrie…).
@@ -116,7 +116,7 @@ La classe **`OffbeatInputCreatorTool`** (l'outil vu par l'agent) :
 
 ---
 
-## 5. `tools/offbeat_executor.py` — l'outil qui LANCE le solveur (+ self-healing)
+## 5. `tools/offbeat_executor.py` : l'outil qui LANCE le solveur (+ self-healing)
 
 **Rôle** : mailler le cas, lancer `offbeat`, lire le log, et se réparer tout seul
 en cas de crash. C'est le cœur « intelligent » du projet.
@@ -175,7 +175,7 @@ Fonctions d'aide :
 
 ---
 
-## 6. `tools/data_processor.py` — l'outil qui LIT les résultats et fait les figures
+## 6. `tools/data_processor.py` : l'outil qui LIT les résultats et fait les figures
 
 **Rôle** : ouvrir les résultats de la simulation et en extraire des profils
 (température, contrainte…), plus générer des images PNG.
@@ -205,7 +205,7 @@ Fonctions d'aide :
 
 ---
 
-## 7. `tools/rag_retriever.py` — l'assistant documentaire (RAG)
+## 7. `tools/rag_retriever.py` : l'assistant documentaire (RAG)
 
 **Rôle** : permettre à l'agent de *chercher dans la documentation* OFFBEAT.
 « RAG » = on récupère des passages pertinents et on les donne au LLM.
@@ -229,7 +229,7 @@ Fonctions d'aide :
 
 ---
 
-## 8. `agents/supervisor.py` — le « chef d'orchestre »
+## 8. `agents/supervisor.py` : le « chef d'orchestre »
 
 **Rôle** : assembler le LLM + les 4 outils en un agent qui décide quoi faire.
 
@@ -253,7 +253,7 @@ sa réponse.
 
 ---
 
-## 9. `app.py` — l'interface web (Dash)
+## 9. `app.py` : l'interface web (Dash)
 
 **Rôle** : la page web de chat sur `http://localhost:8000`.
 
@@ -274,7 +274,7 @@ sa réponse.
 
 ---
 
-## 10. `run_sim.py` — lancer une simulation SANS l'IA
+## 10. `run_sim.py` : lancer une simulation SANS l'IA
 
 **Rôle** : un script en ligne de commande qui enchaîne les 3 outils directement,
 sans passer par le LLM. Utile pour tester le « moteur » de façon fiable et rapide.
@@ -291,7 +291,7 @@ python run_sim.py --case-dir /tmp/demo --lhgr 20000 --end-time 3600
 
 ---
 
-## 11. `offbeat_skills/` — le savoir-faire du projet
+## 11. `offbeat_skills/` : le savoir-faire du projet
 
 - **`templates/fuel_rod_1D_pwr/`** : un cas OFFBEAT de référence complet
   (géométrie `rodDict`, dictionnaires, conditions initiales). `input_creator`
@@ -307,7 +307,7 @@ python run_sim.py --case-dir /tmp/demo --lhgr 20000 --end-time 3600
 
 ---
 
-## 12. `Dockerfile` — l'emballage reproductible
+## 12. `Dockerfile` : l'emballage reproductible
 
 **Rôle** : construire une image contenant OpenFOAM + OFFBEAT + le code Python,
 pour lancer AutoOFFBEAT n'importe où sans réinstaller. C'est pour la

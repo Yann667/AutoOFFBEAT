@@ -7,8 +7,8 @@ onto a single source.
 \subsection{Diagnosis: a cross-lingual failure}
 
 Examining the corpus provides the explanation. It is \textbf{bilingual}, and the
-split is clear-cut: the two files that actually document OFFBEAT — the structure
-of a case and the list of commands — are in \textbf{English}, since they come
+split is clear-cut: the two files that actually document OFFBEAT (the structure
+of a case and the list of commands) are in \textbf{English}, since they come
 from the code repository; the documents added by the project are in
 \textbf{French}.
 
@@ -39,8 +39,8 @@ English $\rightarrow$ English documents & 9/11 (\SI{82}{\percent}) &
 
 \subsection{Correction and re-measurement}
 
-The natural fix is not to translate the documentation — it belongs to the
-upstream repository and would have to be maintained at every version upgrade —
+The natural fix is not to translate the documentation, which belongs to the
+upstream repository and would have to be maintained at every version upgrade,
 but to replace the embedding model with a \textbf{multilingual} one, which
 projects a French text and its English translation to the same place in the
 vector space. The corpus and the index were rebuilt identically, only the
@@ -71,8 +71,8 @@ document among its four excerpts. The multilingual model has become the
 project's default.
 
 This case completes the two preceding ones and forms a pattern with them: none
-of these three failures — overlapping tool descriptions, degenerate training
-domain, cross-lingual retrieval — was visible without measurement, and each was
+of these three failures (overlapping tool descriptions, degenerate training
+domain, cross-lingual retrieval) was visible without measurement, and each was
 fixed without rewriting any application code. What was missing was not
 technique, but \emph{instrumentation}.
 
@@ -88,8 +88,7 @@ revealed two defects of the same nature, and suggested a deeper improvement.
 The cladding yield strength was set to \SI{350}{\mega\pascal} in the criteria
 base. Yet the template configures the plasticity model with a limit of
 \SI{250}{\mega\pascal}. The safety criterion was therefore evaluating the stress
-computed by the solver \emph{against a limit that the very same solver does not
-apply} — a discrepancy of \SI{100}{\mega\pascal}, that is \SI{40}{\percent}. On
+computed by the solver \emph{against a limit that the very same solver does not apply}, a discrepancy of \SI{100}{\mega\pascal}, that is \SI{40}{\percent}. On
 the reference case, the reported margin thus went from \SI{32}{\percent} in
 reality to \SI{23}{\percent} as displayed.
 
@@ -108,7 +107,7 @@ the minimum of the limit are not at the same location; comparing the maximum of
 one with the minimum of the other yields a result that corresponds to no point of
 the rod. On a test case built for the purpose, the naive criterion concludes
 \SI{83}{\percent} of the limit where the correct computation gives
-\SI{150}{\percent} — that is, a missed exceedance.
+\SI{150}{\percent}, that is a missed exceedance.
 
 The main benefit is architectural: the criterion now \emph{automatically}
 inherits any temperature, irradiation or burnup dependence that the material
@@ -125,7 +124,7 @@ The decomposition of the strains on the reference case
 \centering
 \caption[Decomposition of the cladding strain]{Decomposition of the
 circumferential cladding strain at end of cycle. The PCMI criterion was reading
-the total, whereas its statement bears on the plastic component alone — which is
+the total, whereas its statement bears on the plastic component alone, which is
 exactly zero.}
 \label{tab:deformations}
 \begin{tabularx}{0.9\textwidth}{@{}Xcc@{}}
@@ -144,7 +143,7 @@ Thermal (\texttt{epsTh}) & \num{2.31e-3} & yes\\
 
 The criterion was therefore reporting \SI{18}{\percent} of a limit whose measured
 quantity is in reality at \SI{0}{\percent}. The error erred on the conservative
-side — total strain bounds plastic strain from above — but it measured the wrong
+side, since total strain bounds plastic strain from above, but it measured the wrong
 quantity, and above all it masked the essential point: the irreversible strain
 actually present is the \textbf{creep} strain, almost twice the reported total,
 and no criterion was monitoring it.

@@ -1,5 +1,5 @@
 """
-app.py – GUI Dash d'AutoOFFBEAT.
+app.py : GUI Dash d'AutoOFFBEAT.
 
 Structure identique à autofluka_app.py :
   - fenêtre de chat + dcc.Store pour l'historique côté client
@@ -99,7 +99,7 @@ app.layout = html.Div([
         # ── Barre latérale : sûreté du crayon (jumeau numérique, D4) ────
         html.Div([
             html.H3("🛡️ Sûreté du crayon", style={"margin": "0 0 4px"}),
-            html.P("Jumeau numérique — marges de sûreté du cas simulé.",
+            html.P("Jumeau numérique : marges de sûreté du cas simulé.",
                    style={"margin": "0 0 12px", "color": "#888",
                           "fontSize": "0.8em"}),
             dcc.Input(
@@ -127,7 +127,7 @@ app.layout = html.Div([
             html.Hr(style={"margin": "18px 0", "border": "none",
                            "borderTop": "1px solid #e0e0e0"}),
             html.H3("🎛️ Simulateur instantané", style={"margin": "0 0 4px"}),
-            html.P("Prédiction émulateur (sans solveur) — bouge les curseurs.",
+            html.P("Prédiction émulateur (sans solveur) : bouge les curseurs.",
                    style={"margin": "0 0 12px", "color": "#888",
                           "fontSize": "0.8em"}),
             html.Label("Puissance linéique (W/m)", style={
@@ -195,7 +195,7 @@ def _encode_image(path: str) -> str | None:
 _STATUS_COLOR = {"🟢": "#188038", "🟡": "#f9ab00", "🔴": "#d93025", "⚪": "#9aa0a6"}
 _CRIT_LABEL = {
     "fuel_centerline_melt":      "Fusion combustible (T cœur)",
-    "cladding_hoop_strain_pcmi": "PCMI — déformation plastique",
+    "cladding_hoop_strain_pcmi": "PCMI : déformation plastique",
     "cladding_hoop_stress":      "Contrainte gaine (hoop)",
     "gap_closure_pcmi_onset":    "Fermeture du gap",
     "cladding_permanent_strain": "Déformation permanente (fluage)",
@@ -213,8 +213,8 @@ def _gauge_row(crit: dict):
     else:
         unit = crit["unit"] if crit["unit"] != "-" else ""
         detail = (f"{crit['value']:.4g} {unit} / {crit['limit']:.4g} {unit} "
-                  f"— {ratio*100:.0f}% du seuil")
-        bar_pct = max(0, min(ratio * 100, 100))     # borne 0–100 %
+                  f"({ratio*100:.0f}% du seuil)")
+        bar_pct = max(0, min(ratio * 100, 100))     # borne 0-100 %
 
     children = [
         html.Div([
@@ -252,9 +252,9 @@ def render_safety_panel(case_dir: str):
                       style={"fontSize": "0.8em", "color": "#d93025"})
 
     overall = report["overall"]
-    banner_txt = {"🔴": "DANGER — critère franchi",
-                  "🟡": "VIGILANCE — proche du seuil",
-                  "🟢": "SÛR — dans les marges"}[overall]
+    banner_txt = {"🔴": "DANGER : critère franchi",
+                  "🟡": "VIGILANCE : proche du seuil",
+                  "🟢": "SÛR : dans les marges"}[overall]
     banner = html.Div(f"{overall} {banner_txt}", style={
         "background": _STATUS_COLOR[overall], "color": "#fff",
         "padding": "8px 10px", "borderRadius": "8px", "fontWeight": "600",
@@ -285,7 +285,7 @@ def _surrogate_row(crit: dict):
             html.Span("●", style={"color": color, "marginRight": "6px"}),
             html.Span(label, style={"fontWeight": "600", "fontSize": "0.85em"}),
         ]),
-        html.Div(f"{crit['predicted']:.4g}{unc} {unit} — {ratio*100:.0f}% du seuil",
+        html.Div(f"{crit['predicted']:.4g}{unc} {unit} ({ratio*100:.0f}% du seuil)",
                  style={"fontSize": "0.75em", "color": "#555",
                         "margin": "2px 0 4px"}),
         html.Div(html.Div(style={"width": f"{bar_pct}%", "height": "6px",

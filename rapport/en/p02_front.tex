@@ -147,8 +147,8 @@ Nuclear fuel performance simulation relies on codes whose use remains
 restricted to specialists. This research project consisted in designing
 \textbf{AutoOFFBEAT}, a conversational agent based on a large language model,
 which automates the simulation workflows of the \textbf{OFFBEAT} code (built on
-OpenFOAM): a supervisor orchestrates domain tools — case generation, execution,
-post-processing, safety analysis — and a self-healing loop diagnoses solver
+OpenFOAM): a supervisor orchestrates domain tools (case generation, execution,
+post-processing, safety analysis) and a self-healing loop diagnoses solver
 crashes from an editable knowledge base. The system was then extended towards a
 \textbf{digital twin} of a fuel rod, including a Gaussian-process surrogate that
 predicts pellet-cladding gap closure within \SI{4.4}{\percent}, in
@@ -158,7 +158,7 @@ stress-testing} of the system: a benchmark of twelve injected faults shows that
 self-healing only handles crashes whose root cause the available correction
 actually addresses, and evaluating the decision layer raises tool-selection
 accuracy from \SI{77}{\percent} to \SI{88}{\percent}. These measurements exposed
-fourteen defects, none of which raised any visible error — including a confusion
+fourteen defects, none of which raised any visible error, among them a confusion
 between cladding and pellet temperature (\SI{830}{\kelvin} discrepancy) and a
 surrogate validated over a degenerate domain.
 
@@ -179,7 +179,7 @@ la mise en \oe uvre reste réservée à des spécialistes. Ce projet de recherch
 consisté à concevoir \textbf{AutoOFFBEAT}, un agent conversationnel fondé sur un
 grand modèle de langage, qui automatise les chaînes de calcul du code
 \textbf{OFFBEAT} (bâti sur OpenFOAM)~: un superviseur orchestre des outils de
-domaine — génération de cas, exécution, post-traitement, analyse de sûreté — et
+domaine (génération de cas, exécution, post-traitement, analyse de sûreté) et
 une boucle d'auto-réparation diagnostique les plantages du solveur à partir
 d'une base de connaissance éditable. Le système a ensuite été étendu vers un
 \textbf{jumeau numérique} de crayon combustible, incluant un émulateur par
@@ -191,7 +191,7 @@ injectées montre que l'auto-réparation ne traite que les plantages dont la cau
 racine relève du correctif disponible, et l'évaluation de la couche de décision
 porte l'exactitude de sélection des outils de \SI{77}{\percent} à
 \SI{88}{\percent}. Ces mesures ont révélé quatorze défauts dont aucun ne
-provoquait d'erreur visible — dont une confusion entre température de gaine et
+provoquait d'erreur visible, dont une confusion entre température de gaine et
 de pastille (\SI{830}{\kelvin} d'écart) et un émulateur validé sur un domaine
 dégénéré.
 

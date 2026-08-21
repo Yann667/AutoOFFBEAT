@@ -13,7 +13,7 @@
     "diagnosis": "Marge a la fusion du combustible : le centre de la pastille est le point le plus chaud du crayon.",
     "note": "3113.15 K = fusion UO2 non irradie (Brassfield 1968). La limite BAISSE avec le burnup. DEUX correlations publiees coexistent : MATPRO (FHYPRP) -3.2 K/GWj/tU, et FRAPCON-4.0/FRAPTRAN-2.0 (PHYPRP) -0.5 K/GWj/tU, soit ftmelt = 3113.15 - 5*Bu/10000 (Bu en MWj/tU). La seconde SUPERSEDE la premiere : revision proposee par Popov et al. (2000) d'apres Adamson et al. (1985) et Komatsu et al. Retenir -0.5 K/GWj/tU. Ecart des deux correlations a 50 GWj/tU : 135 K. Ref : PNNL-19417 Rev. 2 (2015).",
     "references": [
-      "Brassfield (1968) — fusion UO2 non irradie 3113.15 K",
+      "Brassfield (1968), fusion UO2 non irradie 3113.15 K",
       "Luscher, Geelhood & Porter, PNNL-19417 Rev. 2 (2015), §2.1 PHYPRP",
       "Popov et al. (2000) ; Adamson et al. (1985) ; Komatsu et al."
     ]
@@ -50,7 +50,7 @@
     "warning_fraction": 0.8,
     "criterion": "Contrainte circonferentielle (hoop) sous la limite d'ecoulement de la gaine.",
     "diagnosis": "Marge a la plastification de la gaine (Zircaloy).",
-    "note": "Compare desormais la contrainte hoop au CHAMP sigmaY calcule par OFFBEAT, point par point (limit_field). sigmaY porte la limite d'ecoulement reellement appliquee par le modele materiau, avec ses dependances en temperature / irradiation / burnup. AVANT : constante figee a 350 MPa alors que le solverDict du gabarit applique 250 MPa — le critere verifiait une limite que la simulation n'utilisait pas (marge annoncee 23 % au lieu de 32 %). Le repli scalaire vaut 250 MPa, aligne sur le gabarit. RESERVE : le gabarit configure plasticStrainVsYieldStress avec un seul point (0, 250e6), donc sigmaY est CONSTANT et ne depend pas encore de la temperature. Enrichir cette table (cf. PNNL-19417, sous-programme CMLIMT) est une decision physique a prendre avec l'encadrant ; le critere en heritera automatiquement.",
+    "note": "Compare desormais la contrainte hoop au CHAMP sigmaY calcule par OFFBEAT, point par point (limit_field). sigmaY porte la limite d'ecoulement reellement appliquee par le modele materiau, avec ses dependances en temperature / irradiation / burnup. AVANT : constante figee a 350 MPa alors que le solverDict du gabarit applique 250 MPa : le critere verifiait une limite que la simulation n'utilisait pas (marge annoncee 23 % au lieu de 32 %). Le repli scalaire vaut 250 MPa, aligne sur le gabarit. RESERVE : le gabarit configure plasticStrainVsYieldStress avec un seul point (0, 250e6), donc sigmaY est CONSTANT et ne depend pas encore de la temperature. Enrichir cette table (cf. PNNL-19417, sous-programme CMLIMT) est une decision physique a prendre avec l'encadrant ; le critere en heritera automatiquement.",
     "references": [
       "Limite d'ecoulement lue dans le champ sigmaY du solveur",
       "PNNL-19417 Rev. 2 (2015), sous-programme CMLIMT : correlations Zircaloy"

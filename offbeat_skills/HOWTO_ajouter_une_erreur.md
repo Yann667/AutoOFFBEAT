@@ -25,7 +25,7 @@ Architecture du self-healing (pour comprendre où on agit) :
 
 ---
 
-## Étape 1 — Partir d'un cas qui marche
+## Étape 1 : Partir d'un cas qui marche
 
 ```bash
 rm -rf /tmp/crash_demo
@@ -35,7 +35,7 @@ python run_sim.py --case-dir /tmp/crash_demo --no-run
 
 ---
 
-## Étape 2 — Provoquer un crash (recettes)
+## Étape 2 : Provoquer un crash (recettes)
 
 Une modification = un type de crash. Exemples :
 
@@ -58,7 +58,7 @@ offbeat > log.offbeat 2>&1     # va planter (core dumped)
 
 ---
 
-## Étape 3 — Lire le log et IDENTIFIER la signature réelle
+## Étape 3 : Lire le log et IDENTIFIER la signature réelle
 
 ```bash
 tail -40 log.offbeat
@@ -80,14 +80,14 @@ tail -40 log.offbeat
 
 ❌ **Piège** : la ligne de démarrage
 `trapFpe: Floating point exception trapping enabled` est **bénigne** (elle dit
-juste que le piégeage est actif). Ne JAMAIS baser un motif dessus — c'est
+juste que le piégeage est actif). Ne JAMAIS baser un motif dessus : c'est
 exactement ce qui causait un faux diagnostic « FPE ». Le `_diagnose` ancre
 désormais la recherche sur le **bloc fatal** ou la **trace `sigHandler`**, ce
 qui exclut cette bannière.
 
 ---
 
-## Étape 4 — Extraire un motif regex stable
+## Étape 4 : Extraire un motif regex stable
 
 Règles pour un bon motif :
 - Prendre une sous-chaîne **distinctive** du message ou de la trace.
@@ -107,16 +107,16 @@ Exemples de motifs validés :
 
 ---
 
-## Étape 5 — Choisir (ou écrire) le correctif
+## Étape 5 : Choisir (ou écrire) le correctif
 
 Trois cas de figure :
 
 **(a) Un correctif existant convient** → utiliser son nom dans `fix_function`.
 Correctifs disponibles (clés de `FIX_REGISTRY` dans `offbeat_executor.py`) :
-- `fix_reduce_timestep` — divise `deltaT` par 10 + pas de temps adaptatif
-- `fix_relax_solver` — assouplit tolérances de `fvSolution`
-- `fix_increase_outer_iterations` — augmente `nOuterCorrectors`
-- `fix_clean_restart` — nettoie les pas de temps (restart propre)
+- `fix_reduce_timestep` : divise `deltaT` par 10 + pas de temps adaptatif
+- `fix_relax_solver` : assouplit tolérances de `fvSolution`
+- `fix_increase_outer_iterations` : augmente `nOuterCorrectors`
+- `fix_clean_restart` : nettoie les pas de temps (restart propre)
 
 **(b) Aucun correctif automatique sûr** → `"fix_function": null`. L'erreur sera
 **diagnostiquée** et une suggestion (`fix_description`) affichée, sans réparation
@@ -142,7 +142,7 @@ FIX_REGISTRY = {
 
 ---
 
-## Étape 6 — Ajouter l'entrée dans error_kb.json
+## Étape 6 : Ajouter l'entrée dans error_kb.json
 
 Ouvrir `offbeat_skills/error_kb.json` et ajouter un objet. Mettre les motifs les
 plus **spécifiques en premier** (la première correspondance gagne) :
@@ -166,9 +166,9 @@ Aucun rebuild nécessaire : `offbeat_executor` recharge le JSON au démarrage.
 
 ---
 
-## Étape 7 — Tester
+## Étape 7 : Tester
 
-**Test 1 — le motif matche le vrai log :**
+**Test 1 : le motif matche le vrai log :**
 ```bash
 python3 -c "
 from tools.offbeat_executor import OffbeatExecutorTool
@@ -179,7 +179,7 @@ print('Diagnostic :', e['id'] if e else 'INCONNU')
 ```
 Doit afficher l'`id` de ta nouvelle entrée (et non `INCONNU`).
 
-**Test 2 — self-healing de bout en bout** (si correctif automatique) :
+**Test 2 : self-healing de bout en bout** (si correctif automatique) :
 ```bash
 python3 -c "
 from tools.offbeat_executor import OffbeatExecutorTool

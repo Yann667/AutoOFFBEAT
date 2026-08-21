@@ -1,12 +1,12 @@
 """
-bench_tool_selection.py — Le superviseur choisit-il le bon outil ?
+bench_tool_selection.py : Le superviseur choisit-il le bon outil ?
 
 Le rapport mesure la chaine physique (solveur, emulateur) et la boucle de
 reparation, mais RIEN ne mesurait jusqu'ici la couche LLM elle-meme : face a
 une demande en francais, l'agent appelle-t-il l'outil pertinent ?
 
 Methode : on n'execute PAS les outils. On lie les outils au modele
-(`bind_tools`) et on lit l'intention — la liste `tool_calls` produite. Cela
+(`bind_tools`) et on lit l'intention, la liste `tool_calls` produite. Cela
 mesure exactement la selection, sans effet de bord (aucun cas cree, aucun
 solveur lance) et en une seule passe par requete.
 
