@@ -1,0 +1,211 @@
+%==============================================================================
+% CHAPTER 2
+%==============================================================================
+\chapter{Architecture of the AutoOFFBEAT agent}
+\markboth{Chapter 2 — Architecture of the AutoOFFBEAT agent}{}
+
+\section{Overview}
+
+The architecture adopted is that of a single supervisor orchestrating
+specialised tools (figure~\ref{fig:archi}). The user expresses a request in
+natural language in a web interface. The supervisor, built on a language model,
+selects and chains the necessary tools. Each tool performs a concrete action and
+returns a textual report that the model interprets.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.55cm and 0.7cm,
+  box/.style={draw,rounded corners=2pt,align=center,font=\small,
+              minimum height=0.95cm,inner sep=4pt},
+  % font=\footnotesize: "offbeat\_executor" in \small exceeds 2.9 cm and
+  % overlaps the neighbouring box.
+  tool/.style={box,fill=blue!5,draw=cClad!70,text width=2.9cm,
+               font=\footnotesize},
+  kb/.style={box,fill=orange!8,draw=cFuel!70,text width=2.7cm,font=\scriptsize},
+  sup/.style={box,fill=gray!10,draw=black!60,text width=4.6cm},
+  ext/.style={box,fill=none,draw=black!45,dashed,text width=2.9cm},
+  fl/.style={-{Latex[length=2mm]},draw=black!65},
+  ]
+
+  \node[box,text width=3.6cm,fill=green!5,draw=green!45!black] (user)
+    {User\\{\scriptsize natural-language request}};
+  \node[sup,below=0.7cm of user] (sup)
+    {\textbf{LLM supervisor}\\{\scriptsize selects and chains the tools}};
+
+  \node[tool,below=1.5cm of sup,xshift=-4.9cm] (t1)
+    {\texttt{input\_creator}\\{\scriptsize builds the case}};
+  \node[tool,below=1.5cm of sup,xshift=-1.65cm] (t2)
+    {\texttt{offbeat\_executor}\\{\scriptsize meshes, runs,\\ \textbf{repairs}}};
+  \node[tool,below=1.5cm of sup,xshift=1.65cm] (t3)
+    {\texttt{data\_processor}\\{\scriptsize post-processes}};
+  \node[tool,below=1.5cm of sup,xshift=4.9cm] (t4)
+    {\texttt{safety\_analyzer}\\{\scriptsize safety margins}};
+
+  \node[ext,below=1.35cm of t2] (solver)
+    {OFFBEAT solver\\{\scriptsize OpenFOAM}};
+  \node[ext,below=1.35cm of t3] (vtk)
+    {VTK fields\\{\scriptsize $T$, $\sigma$, gap}};
+
+  \node[kb,left=0.55cm of solver,xshift=-0.4cm] (errkb)
+    {\texttt{error\_kb.json}\\{\scriptsize crash patterns}};
+  \node[kb,right=0.55cm of vtk,xshift=0.4cm] (safekb)
+    {\texttt{safety\_kb.json}\\{\scriptsize safety thresholds}};
+
+  \draw[fl] (user) -- (sup);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t1.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t2.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t3.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t4.north);
+  \draw[fl] (t2) -- (solver);
+  \draw[fl] (t3) -- (vtk);
+  \draw[fl] (errkb) -- (t2);
+  \draw[fl] (safekb) -- (t4);
+  \draw[fl,dashed] (solver.east) -- (vtk.west);
+\end{tikzpicture}
+\caption[AutoOFFBEAT architecture]{Architecture of AutoOFFBEAT.}
+\label{fig:archi}
+\end{figure}
+
+Three principles underpin this architecture.
+
+\textbf{The language model does not compute.} Every physical quantity comes
+from the solver or from \textbf{deterministic} post-processing. This separation
+guarantees that the validity of the results does not depend on the reliability
+of the language model, which could otherwise hallucinate values.
+
+\textbf{Deterministic first, model as fallback.} Wherever a diagnosis can be
+obtained from an explicit rule (an error pattern, a quantified threshold), that
+rule takes precedence. The language model only intervenes on failure, and its
+opinion is never applied automatically.
+
+\textbf{Domain knowledge lives outside the code.} Error patterns and safety
+criteria are stored in editable JSON files. A domain user can enrich the base
+without touching the code or rebuilding anything.
+
+\section{The language model factory}
+
+So as not to tie the project to a particular provider, access to the language
+model goes through a single factory driven by a configuration file. Three
+providers are supported: fully local execution through Ollama, and two remote
+services. The rest of the code is unaware of which one is in use.
+
+This choice had two beneficial consequences. First, the whole development could
+be carried out \textbf{at no inference cost}, with a seven-billion-parameter
+model running locally. Second, the factory distinguishes the supervisor model
+from the \textit{debugging} model: it becomes possible to entrust routine
+routing to a small, fast model and crash analysis to a more capable one.
+
+\section{The domain tools}
+
+\subsection{Case generation}
+
+Generating a complete OFFBEAT case from scratch is not realistic. The solver's
+main dictionary alone runs to several hundred lines of coupled models, and a
+language model would inevitably produce invalid combinations. The strategy
+adopted is therefore that of the \textbf{template}: the tool copies a validated
+reference case, then substitutes only the requested parameters.
+
+A mapping table associates understandable names (linear heat rate, pellet
+radius, simulated duration) with the actual locations in the case files. This
+method is essential: it gives the language model a stable and restricted
+vocabulary, without requiring it to know the syntax of OpenFOAM dictionaries.
+This matters all the more because a local model with few parameters is used,
+which can quickly make mistakes. The complete list of exposed parameters is
+given in appendix~\ref{ann:cas}.
+
+Two templates are currently available: a one-dimensional PWR rod, used for all
+the results in this report, and a two-dimensional axisymmetric $(r,z)$ rod taken
+from the OFFBEAT verification cases. The latter was validated end to end
+(creation, parameter application, meshing, execution and safety analysis), which
+confirmed that the mesh-region-based processing does not depend on the
+dimensionality of the case.
+
+\subsection{Solver execution}
+
+The execution tool chains mesh generation and then the solver run, relying on a
+maximum-duration safeguard so that a diverging simulation cannot block the
+system indefinitely. It first checks that the target directory really is an
+OpenFOAM case, and analyses the run log afterwards.
+
+\subsection{Post-processing}
+
+Post-processing reads the solver outputs in VTK format and extracts the useful
+quantities: axial and radial temperature profiles, hoop stress, maximum cladding
+temperature. It also produces figures. One subtlety, which turned out to be a
+significant source of errors (§\ref{sec:bugs}), lies in the organisation of the
+data: the complete mesh contains both the pellet and the cladding, and an
+extremum computed over the whole domain does not necessarily say anything about
+the region of interest.
+
+\section{Self-healing}
+\label{sec:selfhealing}
+
+This is the agent's most distinctive contribution. When the solver crashes, the
+execution tool attempts to diagnose the cause and remedy it. It implements a
+two-stage strategy, shown in figure~\ref{fig:selfheal}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.5cm,
+  b/.style={draw,rounded corners=2pt,align=center,font=\small,
+            minimum height=0.85cm,inner sep=4pt,text width=3.4cm},
+  d/.style={draw,diamond,aspect=2.4,align=center,font=\scriptsize,
+            inner sep=1pt,text width=2.3cm},
+  fl/.style={-{Latex[length=2mm]},draw=black!65,font=\scriptsize},
+  ]
+  \node[b,fill=blue!5] (run) {Run the solver};
+  \node[d,below=of run,fill=gray!8] (ok) {success?};
+  \node[b,below=1.0cm of ok,fill=green!8,draw=green!45!black] (done)
+    {Results ready};
+  \node[d,right=1.5cm of ok,fill=gray!8] (match) {known pattern?};
+  \node[b,above=1.0cm of match,fill=orange!8,draw=cFuel] (fix)
+    {Apply the correction\\{\scriptsize knowledge base}};
+  \node[b,right=1.6cm of match,fill=red!5,draw=cAlert] (llm)
+    {Diagnosis by the model\\{\scriptsize proposed, not applied}};
+  \node[b,below=1.0cm of llm,fill=gray!8] (stop)
+    {Stop: user\\ intervention required};
+
+  \draw[fl] (run) -- (ok);
+  \draw[fl] (ok) -- node[left]{yes} (done);
+  \draw[fl] (ok) -- node[above]{no} (match);
+  \draw[fl] (match) -- node[right]{yes} (fix);
+  \draw[fl] (fix.north) -- ++(0,0.35) -| node[pos=0.25,above]
+    {retry ($\leq 3$)} (run.north);
+  \draw[fl] (match) -- node[above]{no} (llm);
+  \draw[fl] (llm) -- (stop);
+\end{tikzpicture}
+\caption[Self-healing loop]{Self-healing loop. Deterministic pattern-based
+diagnosis is attempted first; the language model only intervenes as a last
+resort and its diagnosis is never applied automatically.}
+\label{fig:selfheal}
+\end{figure}
+
+The first stage matches the run log against a pattern base. Each entry
+associates a regular expression with a plain-language diagnosis and a scripted
+correction (reduce the time step, clean the written time directories to force a
+clean restart, adjust the simulated duration). This mechanism is fast, free and
+reproducible.
+
+The second stage only intervenes if no pattern matches: the end of the log is
+then submitted to the language model for interpretation. Crucially, this
+diagnosis is \textbf{presented to the user but never applied automatically}: a
+human must have the final say on error-sensitive actions.
+
+The number of attempts is capped at three. Chapter~4 shows that this
+architecture succeeds on the numerical errors it was designed to handle, but
+reaches its limits when faced with \textit{physical} errors. This is one of the
+main lessons of the internship.
+
+\section{The documentary assistant}
+
+A final tool, optional and similar to the one in AutoFLUKA, makes the OFFBEAT
+documentation available to the agent through semantic search
+(\textit{retrieval-augmented generation}). Documents are split into chunks,
+embedded by a local embedding model, and indexed. The agent can thereby answer
+documentation questions by quoting real excerpts rather than producing plausible
+but unverified statements. This tool is designed to disable itself silently if
+unavailable: it must never prevent basic operation.
+
+\clearpage

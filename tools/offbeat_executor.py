@@ -123,20 +123,59 @@ def fix_clean_restart(case_dir: Path) -> str:
     return "redémarrage propre requis"
 
 
+def _last_tabulated_time(case_dir: Path) -> float | None:
+    """Dernier instant réellement tabulé dans les tables temporelles du cas.
+
+    endTime doit rester sous le dernier point de CHAQUE table (historique de
+    puissance, profil axial, pression système) : c'est la table qui s'arrête le
+    plus tôt qui contraint. On retourne donc le MINIMUM des derniers points."""
+    fins = []
+    for rel in ("constant/axialProfile", "constant/systemPressure",
+                "constant/solverDict"):
+        f = case_dir / rel
+        if not f.exists():
+            continue
+        m = re.search(r"timePoints\s*\(([^)]*)\)", f.read_text(), flags=re.S)
+        if not m:
+            continue
+        vals = [float(v) for v in re.findall(r"[-+0-9.eE]+", m.group(1))]
+        if vals:
+            fins.append(max(vals))
+    return min(fins) if fins else None
+
+
 def fix_reduce_endtime(case_dir: Path) -> str:
-    """Réduit endTime de 1 % pour le ramener SOUS le dernier point tabulé
-    de l'historique de puissance/profil axial. OFFBEAT plante (nextTimeMarker)
-    quand endTime atteint exactement le dernier marqueur temporel : il n'y a
-    alors plus de marqueur suivant pour piloter le pas de temps adaptatif."""
+    """Ramène endTime SOUS le dernier point tabulé de l'historique de puissance.
+    OFFBEAT plante (nextTimeMarker) quand endTime atteint ou dépasse le dernier
+    marqueur temporel : il n'y a alors plus de marqueur suivant pour piloter le
+    pas de temps adaptatif.
+
+    Le correctif est CALCULÉ à partir des tables du cas, et non appliqué par
+    décréments aveugles. Une version antérieure retirait 1 % par tentative :
+    mesuré sur le banc d'essai, ramener endTime=1.5e8 sous une table s'arrêtant
+    à 1.26e8 demandait 18 tentatives pour un budget de 3 — le correctif ne
+    pouvait donc jamais aboutir. On vise ici directement 99 % du dernier point
+    tabulé, ce qui converge en une seule tentative."""
     current = _get_dict_entry(case_dir, "system/controlDict", "endTime")
-    if current:
-        try:
-            new_end = float(current) * 0.99
-            if _edit_dict_entry(case_dir, "system/controlDict", "endTime", f"{new_end:g}"):
-                return f"endTime réduit : {current} -> {new_end:g} (sous le dernier point tabulé)"
-        except ValueError:
-            pass
-    return "controlDict introuvable ou endTime absent"
+    if not current:
+        return "controlDict introuvable ou endTime absent"
+    try:
+        cur_val = float(current)
+    except ValueError:
+        return f"endTime non numérique ('{current}') : correctif inapplicable"
+
+    fin = _last_tabulated_time(case_dir)
+    if fin is not None and cur_val >= fin:
+        new_end = fin * 0.99
+        origine = f"dernier point tabulé {fin:g}"
+    else:
+        # Aucune table lisible : repli sur l'ancien comportement (décrément).
+        new_end = cur_val * 0.99
+        origine = "aucune table lisible, décrément de 1 %"
+
+    if _edit_dict_entry(case_dir, "system/controlDict", "endTime", f"{new_end:g}"):
+        return f"endTime réduit : {current} -> {new_end:g} ({origine})"
+    return "échec de l'écriture de endTime dans controlDict"
 
 
 # Registre nom -> fonction de correctif. Les FONCTIONS restent en Python

@@ -1,0 +1,105 @@
+%==============================================================================
+% CONCLUSION
+%==============================================================================
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+\markboth{Conclusion}{Conclusion}
+
+\section*{Summary of the work}
+
+This research project has resulted in a working system, \textbf{AutoOFFBEAT},
+which makes it possible to drive the fuel performance code OFFBEAT from requests
+expressed in natural language. The agent creates computational cases from
+validated templates, runs the solver, attempts to repair certain crashes
+automatically, post-processes the results and evaluates safety margins against
+design criteria.
+
+The system was then extended towards a fuel rod digital twin: monitoring of
+safety criteria, prognosis of threshold crossing, dashboard, and a
+Gaussian-process surrogate returning the results of a simulation within a few
+milliseconds, with an associated uncertainty and a fidelity verified by
+cross-validation.
+
+A reference simulation over a two-year irradiation cycle made it possible to
+verify that the complete chain reproduces the expected physical behaviour, in
+particular the closure of the pellet-cladding gap and the associated switch of
+the cladding stress from compression to tension. The surrogate, rebuilt over a
+realistic irradiation domain, predicts the date of that closure to within
+\SI{4.4}{\percent} for a power it has never encountered, in \SI{2}{\milli\second}
+instead of \SI{36}{\second}.
+
+The second strand of the work, less expected at the outset, is the
+\textbf{measured stress-testing of the system}. A fault-injection benchmark
+quantified the actual reach of self-healing; an evaluation of the decision layer
+measured, then improved by eleven points, the accuracy of tool selection. Both
+benchmarks are re-runnable and delivered with the code: they constitute a
+non-regression harness for the rest of the project.
+
+\section*{What I learned}
+
+Three lessons seem to me worth retaining.
+
+The first is a matter of physics. I was discovering fuel performance entirely at
+the start of the internship. Understanding that the pellet-cladding gap governs
+both the thermal and the mechanical behaviour of the rod, and being able to read
+the signature of contact in simulation curves, is the clearest technical gain.
+
+The second concerns the software architecture of systems built on language
+models. The principle that structures the whole project — the model orchestrates,
+it does not compute; deterministic first, model as fallback — carries well beyond
+OFFBEAT.
+
+The third is methodological, and is perhaps the most important. The most
+dangerous defects encountered were not crashes but wrong results that did not
+look wrong. No automatic tool flagged them; they were found by confronting a
+numerical value with a physical expectation. A safety computation chain is not
+validated by checking that it runs, but by checking that what it produces makes
+sense.
+
+This third point admits a corollary I had not anticipated: a validation metric
+can itself be misleading. The surrogate displayed a coefficient of determination
+above $0.998$, obtained by a rigorous method, over a domain that did not cover
+the real problem. Checking that a model is well fitted and checking that it is
+fitted to the right question are two distinct operations, and only the second
+falls to physical judgement.
+
+\section*{Outlook}
+
+Several concrete follow-ups stand out, in order of priority.
+
+\textbf{Validate the safety thresholds.} The criteria currently written into the
+knowledge base are marked as unvalidated. Confirming them with the supervisor
+and the literature is the prerequisite to any serious use of the safety analysis.
+
+\textbf{Settle the scope.} Moving from the single rod to the assembly changes the
+nature of the problem and remains an open question.
+
+\textbf{Shift the effort from repair to validation.} The analysis of chapter~4
+shows that validating inputs before execution is more reliable than enriching the
+base of crash patterns. A first geometric validation was added; it could be
+extended systematically to all the exposed parameters.
+
+\textbf{Extend the surrogate.} The surrogate covers only two parameters. Since
+its reconstruction over a realistic domain showed that a design of twenty-five
+simulations fits in half an hour, adding a third variable — the initial gap
+geometry, for instance — is now within reach. The code is written for an
+arbitrary number of variables.
+
+\textbf{Make time-step self-healing reliable.} The benchmark showed that the fix
+is undone by the solver's adaptive controller; acting on the maximum time step
+rather than on the initial one is an identified and localised correction.
+
+\textbf{Complete the validation of the thresholds.} The correlation for the
+decrease of the melting temperature with burnup was settled at the end of the
+internship by returning to the literature: the value carried by the project came
+from the MATPRO correlation, since superseded in the reference codes
+(appendix~\ref{ann:safetykb}). The same approach remains to be carried out on the
+three other criteria, including the yield strength of Zircaloy, strongly
+temperature-dependent and for the moment given as a single value.
+
+\textbf{Extend the tool-selection benchmark.} The current twenty-six requests
+were enough to reveal a major ambiguity between two descriptions. A broader set,
+and above all multi-step requests, would allow the chaining of tools to be
+evaluated rather than the first call alone.
+
+\clearpage

@@ -1,0 +1,188 @@
+This equality is the sign of a structural failure. With four excerpts retrieved
+and four documents in the corpus, recall@4 ought to be close to
+\SI{100}{\percent}. That it equals accuracy@1 means the four excerpts
+\emph{always come from the same document}: retrieval systematically collapses
+onto a single source.
+
+\subsection{Diagnosis: a cross-lingual failure}
+
+Examining the corpus provides the explanation. It is \textbf{bilingual}, and the
+split is clear-cut: the two files that actually document OFFBEAT — the structure
+of a case and the list of commands — are in \textbf{English}, since they come
+from the code repository; the documents added by the project are in
+\textbf{French}.
+
+Yet the agent is driven in French. The embedding model in use then matches
+French questions to French documents, irrespective of their content. The OFFBEAT
+documentation proper is never reached.
+
+The control experiment removes all doubt: the same questions asked in English
+correctly retrieve the English documents.
+
+\begin{table}[htbp]
+\centering
+\caption[Effect of language on retrieval]{Effect of the question language on
+documentary retrieval, with corpus and model unchanged. The retrieval mechanism
+works; it is crossing the language barrier that fails.}
+\label{tab:rag-langue}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Question language} & \textbf{Accuracy@1} & \textbf{Recall@4}\\
+\midrule
+French $\rightarrow$ English documents & \textcolor{cAlert}{\textbf{0/11}} &
+  \textcolor{cAlert}{\textbf{0/11}}\\
+English $\rightarrow$ English documents & 9/11 (\SI{82}{\percent}) &
+  \textbf{11/11 (\SI{100}{\percent})}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Correction and re-measurement}
+
+The natural fix is not to translate the documentation — it belongs to the
+upstream repository and would have to be maintained at every version upgrade —
+but to replace the embedding model with a \textbf{multilingual} one, which
+projects a French text and its English translation to the same place in the
+vector space. The corpus and the index were rebuilt identically, only the
+embedding model changing.
+
+\begin{table}[htbp]
+\centering
+\caption[Documentary retrieval quality]{Documentary retrieval quality before and
+after switching to a multilingual embedding model. Corpus, questions and
+chunking identical.}
+\label{tab:rag}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Indicator} & \textbf{Initial model} & \textbf{Multilingual model}\\
+\midrule
+Accuracy@1 & \SI{27}{\percent} & \textbf{\SI{87}{\percent}}\\
+Recall@4 & \SI{27}{\percent} & \textbf{\SI{100}{\percent}}\\
+\midrule
+Case structure & 0/6 & \textbf{6/6}\\
+Commands & 0/5 & 3/5 (recall@4: 5/5)\\
+Adding an error entry & 4/4 & 4/4\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Recall@4 reaches \SI{100}{\percent}: the agent now always receives the right
+document among its four excerpts. The multilingual model has become the
+project's default.
+
+This case completes the two preceding ones and forms a pattern with them: none
+of these three failures — overlapping tool descriptions, degenerate training
+domain, cross-lingual retrieval — was visible without measurement, and each was
+fixed without rewriting any application code. What was missing was not
+technique, but \emph{instrumentation}.
+
+\section{Confronting the criterion with what the solver computes}
+\label{sec:seuils}
+
+In the architecture adopted, safety thresholds are simple constants written in a
+JSON file. Checking these constants against the physical model actually solved
+revealed two defects of the same nature, and suggested a deeper improvement.
+
+\subsection{A criterion checking a limit the simulation does not use}
+
+The cladding yield strength was set to \SI{350}{\mega\pascal} in the criteria
+base. Yet the template configures the plasticity model with a limit of
+\SI{250}{\mega\pascal}. The safety criterion was therefore evaluating the stress
+computed by the solver \emph{against a limit that the very same solver does not
+apply} — a discrepancy of \SI{100}{\mega\pascal}, that is \SI{40}{\percent}. On
+the reference case, the reported margin thus went from \SI{32}{\percent} in
+reality to \SI{23}{\percent} as displayed.
+
+The fix does not consist in copying across the right constant, since that would
+reproduce the same risk of drift. OFFBEAT writes the yield strength as a
+\textbf{field}, \texttt{sigmaY}, cell by cell: the criteria base was therefore
+extended so that a limit may designate a field (\texttt{limit\_field}) rather
+than a constant. The ratio to the limit is then computed \emph{point by point}
+and only then reduced:
+\[
+  \max_{x}\ \frac{|\sigma_{\theta\theta}(x)|}{\sigma_Y(x)}
+\]
+
+This point-by-point computation is not a cosmetic refinement. The stress peak and
+the minimum of the limit are not at the same location; comparing the maximum of
+one with the minimum of the other yields a result that corresponds to no point of
+the rod. On a test case built for the purpose, the naive criterion concludes
+\SI{83}{\percent} of the limit where the correct computation gives
+\SI{150}{\percent} — that is, a missed exceedance.
+
+The main benefit is architectural: the criterion now \emph{automatically}
+inherits any temperature, irradiation or burnup dependence that the material
+model may come to carry, without a single value having to be maintained twice.
+
+\subsection{A criterion measuring something other than what it claimed}
+
+The PCMI criterion states a limit on the \textbf{plastic} circumferential
+strain. It was in fact reading \texttt{epsilonCyl}, the \textbf{total} strain.
+The decomposition of the strains on the reference case
+(table~\ref{tab:deformations}) shows the extent of the misunderstanding.
+
+\begin{table}[htbp]
+\centering
+\caption[Decomposition of the cladding strain]{Decomposition of the
+circumferential cladding strain at end of cycle. The PCMI criterion was reading
+the total, whereas its statement bears on the plastic component alone — which is
+exactly zero.}
+\label{tab:deformations}
+\begin{tabularx}{0.9\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Component} & \textbf{Maximum value} & \textbf{Reversible?}\\
+\midrule
+Total (\texttt{epsilonCyl}, read by the old criterion) & \num{1.81e-3} & ---\\
+\midrule
+Plastic (\texttt{epsilonP}) & \textbf{exactly 0} & no\\
+Creep (\texttt{epsilonCreepEq}) & \num{3.55e-3} & no\\
+Elastic (\texttt{epsEl}) & \num{1.03e-3} & yes\\
+Thermal (\texttt{epsTh}) & \num{2.31e-3} & yes\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The criterion was therefore reporting \SI{18}{\percent} of a limit whose measured
+quantity is in reality at \SI{0}{\percent}. The error erred on the conservative
+side — total strain bounds plastic strain from above — but it measured the wrong
+quantity, and above all it masked the essential point: the irreversible strain
+actually present is the \textbf{creep} strain, almost twice the reported total,
+and no criterion was monitoring it.
+
+The PCMI criterion now reads the plastic strain, in accordance with its
+statement, and a separate criterion was added for creep strain. Whether the
+\SI{1}{\percent} design criterion bears on plasticity alone or on total
+permanent strain remains an open question and is among the points to be settled
+with the supervisor.
+
+\subsection{Knock-on effect on the surrogate}
+
+These corrections had a consequence that only a systematic check could reveal.
+The surrogate of chapter~3 records its target quantities \emph{through} the
+criteria base: making the PCMI criterion conform to its statement therefore
+brought one of its three targets down to zero, plastic strain being null in
+nominal operation. The target would have been degenerate, with no variation to
+learn.
+
+The surrogate now targets creep strain, and the design of experiments was
+rebuilt accordingly. The outcome is better than before: creep accumulates
+monotonically, where the total strain was non-monotonic, and the
+cross-validation coefficient of determination rises from $0.9535$ to
+$\mathbf{0.9905}$ (table~\ref{tab:surrogate}). The correct quantity turns out to
+be the easier one to learn as well. The prediction of the gap closure date, the
+main result of section~\ref{sec:validation-emulateur}, is unchanged.
+
+This is one more illustration of the coupling between components believed to be
+independent: a correctness fix in the threshold base silently invalidated a
+learning target two layers away. It was detected only because every change was
+followed by an end-to-end check.
+
+\section{Correctness defects identified and fixed}
+\label{sec:bugs}
+
+A second form of stress-testing proved at least as fruitful: no longer
+provoking crashes, but confronting obtained results with expected ones. Fourteen
+defects were identified in this way, \textbf{none of which raised any visible
+error} (table~\ref{tab:bugs}). These are \textit{correctness} errors, silent by
+nature, and therefore particularly worrying in a safety context: the system was
+producing plausible, correctly formatted, and wrong numbers.

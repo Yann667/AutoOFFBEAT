@@ -1,0 +1,2997 @@
+\documentclass[12pt,a4paper,french]{report}
+
+%------------------------------------------------------------------ encodage --
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+% lmodern AVANT mathptmx : fournit des polices Type1 en encodage T1 pour le
+% sans-serif et la chasse fixe. Sans lui, LaTeX se rabat sur les polices EC,
+% qui sont des BITMAPS a generer par Metafont — lent (plusieurs dizaines de
+% secondes sur un conteneur Overleaf sans cache) et de mauvaise qualite a
+% l'impression. mathptmx, charge ensuite, conserve Times pour le corps du
+% texte comme l'exigent les consignes.
+\usepackage{lmodern}
+\usepackage{mathptmx}          % Times (police demandée par les consignes)
+\usepackage{textcomp}
+
+%--------------------------------------------------------------- mise en page --
+% Consignes PRe : 2,5 cm à gauche ; 2 cm à droite, en haut et en bas.
+\usepackage[left=2.5cm,right=2cm,top=2cm,bottom=2cm,headheight=15pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{setspace}
+\singlespacing                 % interligne simple
+\setlength{\parindent}{1.5cm}  % alinéas en retrait de 1,5 cm
+\setlength{\parskip}{0.4em}
+
+%---------------------------------------------------------------- graphiques --
+\usepackage{graphicx}
+% Les images sont cherchees dans Figures/ PUIS a cote du .tex. Cette double
+% recherche evite d'avoir a deplacer les logos selon l'environnement : que tu
+% les places dans Figures/ ou directement dans le dossier du rapport, la
+% compilation les trouve — en local comme sur Overleaf.
+\graphicspath{{Figures/}{./}}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,calc,fit,backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,},group-separator={\,},per-mode=symbol}
+
+%-------------------------------------------------------------------- divers --
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{url}
+% xurl : autorise la coupure des URL longues. Sans lui, les adresses de la
+% bibliographie debordent dans la marge (jusqu'a 71 pt mesures).
+% A charger APRES hyperref.
+\usepackage{xurl}
+% xltabular : longtable + colonne X. La colonne X vient de tabularx et
+% n'existe PAS dans longtable seul — le glossaire debordait alors de 248 pt.
+\usepackage{xltabular}
+
+\newcommand{\monNom}{BUTEL}
+\newcommand{\monPrenom}{Yann}
+\newcommand{\maSpecialite}{STIC}
+\newcommand{\maPromotion}{2027}
+\newcommand{\anneeScolaire}{2025-2026}
+\newcommand{\organisme}{SPEIT}
+\newcommand{\adresseOrganisme}{Minhang Campus, No.800, Dongchuan Road}
+\newcommand{\tuteurENSTA}{PARICAUD Patrice}
+\newcommand{\tuteurOrganisme}{GONG Helin}
+\newcommand{\dateDebut}{13/04/2026}
+\newcommand{\dateFin}{01/07/2026}
+
+\newcommand{\mentionConfidentialite}{Rapport non confidentiel}
+\newcommand{\titreRapport}{Agent conversationnel pour la simulation
+  de combustible nucléaire}
+\newcommand{\sousTitreRapport}{Automatisation du code de performance
+  combustible OFFBEAT et jumeau numérique d'un crayon REP}
+%==============================================================================
+
+%------------------------------------------------- styles de titres (consignes)
+% 22 pt gras pour les chapitres, 14 pt gras pour les parties,
+% 12 pt gras-italique pour les sous-parties.
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\fontsize{22}{26}\selectfont}
+  {\chaptertitlename\ \thechapter}{10pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{30pt}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{14}{17}\selectfont}
+  {\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{18pt}{8pt}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\itshape\fontsize{12}{15}\selectfont}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\itshape\fontsize{12}{15}\selectfont}
+  {\thesubsubsection}{1em}{}
+
+%--------------------------------------------------------- en-têtes/pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\itshape\bfseries\small\titreRapport}
+\fancyfoot[C]{%
+  \footnotesize\itshape \monNom{} \monPrenom{} / \organisme{} /\\
+  \textcolor{red}{\bfseries\mentionConfidentialite}%
+}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\footskip}{40pt}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[C]{\itshape\bfseries\small\titreRapport}
+  \fancyfoot[C]{%
+    \footnotesize\itshape \monNom{} \monPrenom{} / \organisme{} /\\
+    \textcolor{red}{\bfseries\mentionConfidentialite}}
+  \fancyfoot[R]{\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+}
+
+% Notes de bas de page en Times 10 (consignes)
+\renewcommand{\footnotesize}{\fontsize{10}{12}\selectfont}
+
+% Légendes de figures : sous l'illustration, numérotées (consignes §IX)
+\captionsetup{font=small,labelfont={bf},labelsep=colon,justification=centering}
+
+% Couleurs des figures (cohérentes dans tout le rapport)
+\definecolor{cFuel}{HTML}{C1541F}     % pastille (chaud)
+\definecolor{cClad}{HTML}{1F5FA8}     % gaine (froid)
+\definecolor{cAlert}{HTML}{B02418}    % franchissement de seuil
+\definecolor{cGrid}{HTML}{BFBFBF}
+
+\begin{document}
+
+%==============================================================================
+% 1. PAGE DE TITRE
+%==============================================================================
+\begin{titlepage}
+\pagenumbering{arabic}
+\thispagestyle{empty}
+
+
+\noindent
+\raisebox{-0.5\height}{\includegraphics[height=1.1cm]{Figures/Logo_ENSTA.png}}%
+\hfill
+\raisebox{-0.5\height}{\includegraphics[height=2.1cm]{Figures/Logo_SPEIT.png}}%
+
+\begin{center}
+
+\vspace{0.4cm}
+
+{\Large\bfseries Projet de Recherche (PRe)\par}
+
+{\large\bfseries Spécialité : \maSpecialite\par}
+{\large\bfseries Année scolaire : \anneeScolaire\par}
+
+\vspace{1cm}
+
+{\fontsize{20}{24}\selectfont\bfseries \titreRapport\par}
+\vspace{0.4cm}
+{\large\bfseries \sousTitreRapport\par}
+
+\vspace{1cm}
+
+% Illustration de couverture (facultative) : la figure la plus parlante du
+% rapport est le profil radial de température du crayon (figure 4.3).
+\framebox[0.8\textwidth][c]{\rule{0pt}{4.5cm}%
+  \begin{minipage}{0.75\textwidth}\centering
+  \textsf{\color{gray}Illustration (facultative)}\\[2pt]
+  {\footnotesize\color{gray}p.\,ex. le profil radial de température
+  (figure~\ref{fig:radial}) ou l'organigramme de l'agent
+  (figure~\ref{fig:archi})}
+  \end{minipage}}
+
+\vspace{1.0cm}
+
+{\color{red}\fbox{\begin{minipage}{0.85\textwidth}\centering
+  {\large\bfseries Mention de confidentialité}\\[2pt]
+  {\small\bfseries \mentionConfidentialite\\}
+\end{minipage}}}
+
+\vspace{1.0cm}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+  \raggedright\large\bfseries Auteur : \monPrenom{} \monNom
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \raggedleft\large\bfseries Promotion : \maPromotion
+\end{minipage}
+
+\vspace{0.8cm}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+  \raggedright\bfseries Tuteur ENSTA Paris :\\ \tuteurENSTA
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \raggedleft\bfseries Tuteur organisme d'accueil :\\ \tuteurOrganisme
+\end{minipage}
+
+\vspace{0.9cm}
+
+{\bfseries Stage effectué du \dateDebut{} au \dateFin\par}
+
+\vspace{0.5cm}
+
+\noindent\begin{minipage}{\textwidth}\centering\bfseries
+  Organisme d'accueil : \organisme\\
+  Adresse : \adresseOrganisme
+\end{minipage}
+
+\end{center}
+\end{titlepage}
+
+%==============================================================================
+% 2. PAGE DE GARDE VIERGE
+%==============================================================================
+\thispagestyle{empty}
+\mbox{}
+\clearpage
+
+%==============================================================================
+% 3. NOTE DE (NON) CONFIDENTIALITÉ
+%==============================================================================
+\thispagestyle{empty}
+\chapter*{Note de non confidentialité}
+\addcontentsline{toc}{chapter}{Note de non confidentialité}
+
+\vspace{1cm}
+
+\noindent Le présent document est \textbf{non confidentiel}. Il peut donc être
+consultable en ligne par tous, par la communauté ENSTA Paris. Le document sera
+archivé au format électronique par la bibliothèque de l'ENSTA Paris.
+
+\vspace{1.5cm}
+
+\noindent
+travail non confidentiel : « le document est non confidentiel. Il peut donc être consultable en ligne par tous »
+
+
+
+\vspace{2cm}
+
+\noindent\textit{L'attestation de non confidentialité signée par le tuteur de
+l'organisme d'accueil est jointe à ce rapport.}
+
+\clearpage
+
+%==============================================================================
+% 4. REMERCIEMENTS
+%==============================================================================
+\thispagestyle{empty}
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+\vspace{0.5cm}
+
+
+Je tiens à remercier Monsieur \tuteurOrganisme, pour m'avoir
+accueilli au sein de \organisme{}, m'a proposé un sujet
+ouvert et pluridisciplinaire et a pu répondre à mes besoins.
+
+Je remercie également Monsieur \tuteurENSTA, qui m'a accordé de son temps pour ce stage.
+\clearpage
+
+%==============================================================================
+% 5. RÉSUMÉ / ABSTRACT
+%==============================================================================
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé -- Abstract}
+
+\noindent
+La simulation de performance du combustible nucléaire repose sur des codes dont
+la mise en oeuvre reste réservée à des spécialistes. Ce projet de recherche a
+consisté à concevoir \textbf{AutoOFFBEAT}, un agent conversationnel fondé sur un
+grand modèle de langage, qui automatise les chaînes de calcul du code
+\textbf{OFFBEAT} (bâti sur OpenFOAM)~: un superviseur orchestre des outils de
+domaine — génération de cas, exécution, post-traitement, analyse de sûreté — et
+une boucle d'auto-réparation diagnostique les plantages du solveur à partir
+d'une base de connaissance éditable. Le système a ensuite été étendu vers un
+\textbf{jumeau numérique} de crayon combustible, incluant un émulateur par
+processus gaussien qui prédit la date de fermeture du jeu pastille-gaine à
+\SI{4.4}{\percent} près, en \SI{2}{\milli\second} au lieu de \SI{36}{\second},
+pour une puissance absente de son apprentissage. Le second volet du travail est
+la \textbf{mise à l'épreuve mesurée} du système~: un banc de douze fautes
+injectées montre que l'auto-réparation ne traite que les plantages dont la cause
+racine relève du correctif disponible, et l'évaluation de la couche de décision
+porte l'exactitude de sélection des outils de \SI{77}{\percent} à
+\SI{88}{\percent}. Ces mesures ont révélé quatorze défauts dont aucun ne provoquait
+d'erreur visible — dont une confusion entre température de gaine et de pastille
+(\SI{830}{\kelvin} d'écart) et un émulateur validé sur un domaine dégénéré.
+
+\vspace{0.35cm}
+\noindent\textbf{\underline{Mots-clés :}}\\[2pt]
+Performance combustible nucléaire ; OFFBEAT ; OpenFOAM ; agent LLM ;
+jumeau numérique ; analyse de sûreté ; interaction pastille-gaine (PCMI) ;
+modèle réduit ; processus gaussien.
+
+\vspace{0.55cm}
+
+\section*{Abstract}
+
+\noindent
+Nuclear fuel performance simulation relies on codes whose use remains restricted
+to specialists. This research project consisted in designing
+\textbf{AutoOFFBEAT}, a conversational agent based on a large language model,
+which automates the simulation workflows of the \textbf{OFFBEAT} code (built on
+OpenFOAM): a supervisor orchestrates domain tools — case generation, execution,
+post-processing, safety analysis — and a self-healing loop diagnoses solver
+crashes from an editable knowledge base. The system was then extended towards a
+\textbf{digital twin} of a fuel rod, including a Gaussian-process surrogate that
+predicts pellet-cladding gap closure within \SI{4.4}{\percent}, in
+\SI{2}{\milli\second} instead of \SI{36}{\second}, for a linear power absent
+from its training set. The second part of the work is the \textbf{measured
+stress-testing} of the system: a benchmark of twelve injected faults shows that
+self-healing only handles crashes whose root cause the available correction
+actually addresses, and evaluating the decision layer raises tool-selection
+accuracy from \SI{77}{\percent} to \SI{88}{\percent}. These measurements exposed
+fourteen defects, none of which raised any visible error — including a confusion
+between cladding and pellet temperature (\SI{830}{\kelvin} discrepancy) and a
+surrogate validated over a degenerate domain.
+
+\vspace{0.35cm}
+\noindent\textbf{\underline{Keywords:}}\\[2pt]
+Nuclear fuel performance ; OFFBEAT ; OpenFOAM ; LLM agent ; digital twin ;
+safety analysis ; pellet-cladding mechanical interaction (PCMI) ;
+surrogate model ; Gaussian process.
+
+\clearpage
+
+%==============================================================================
+% 6. TABLE DES MATIÈRES
+%==============================================================================
+\renewcommand{\contentsname}{Table des matières}
+% Profondeur limitee aux sections : avec les sous-sections, la table
+% occupait trois pages.
+\setcounter{tocdepth}{1}
+\tableofcontents
+\clearpage
+
+%==============================================================================
+% 7. TABLE DES ILLUSTRATIONS ET ANNEXES
+%==============================================================================
+\renewcommand{\listfigurename}{Table des figures}
+\listoffigures
+\addcontentsline{toc}{chapter}{Table des figures}
+\clearpage
+
+\renewcommand{\listtablename}{Liste des tableaux}
+\listoftables
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\clearpage
+
+\chapter*{Table des annexes}
+\addcontentsline{toc}{chapter}{Table des annexes}
+\noindent
+\begin{tabularx}{\textwidth}{@{}lXr@{}}
+\toprule
+\textbf{N\textsuperscript{o}} & \textbf{Titre} & \textbf{Page}\\
+\midrule
+Annexe A & Environnement logiciel et procédure d'installation
+           & \pageref{ann:install}\\
+Annexe B & Structure d'un cas OFFBEAT et paramètres exposés par l'agent
+           & \pageref{ann:cas}\\
+Annexe C & Base de connaissance des erreurs (\texttt{error\_kb.json})
+           & \pageref{ann:errkb}\\
+Annexe D & Base de connaissance des critères de sûreté
+           (\texttt{safety\_kb.json}) & \pageref{ann:safetykb}\\
+Annexe E & Jeu de données d'entraînement de l'émulateur
+           & \pageref{ann:dataset}\\
+Annexe F & Catalogue des fautes du banc d'essai d'auto-réparation
+           & \pageref{ann:bench}\\
+Annexe G & Exemple déroulé : une session complète de l'agent
+           & \pageref{ann:session}\\
+\bottomrule
+\end{tabularx}
+
+\clearpage
+
+%==============================================================================
+% 8. INTRODUCTION
+%==============================================================================
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+\markboth{Introduction}{Introduction}
+
+\section*{Contexte du stage}
+
+Dans une centrale nucléaire, la gestion du crayon de combustible conditionne la sécurité de l'installation. C'est un
+tube de quelques mètres, constitué d'un empilement de pastilles d'oxyde
+d'uranium enfermées dans une gaine métallique. Ce crayon doit être utilisé plusieurs années dans des conditions extrême — température de plus de \SI{1000}{\kelvin},
+irradiation intense, gonflement du combustible, fluage de la gaine,... Prédire son
+évolution est donc primordial pour diminuer les risques au maximum.
+
+\textbf{OFFBEAT} (\textit{OpenFOAM Fuel BEhavior Analysis Tool}) est un des codes de calcul dédiés à ce domaine. Développé principalement au Laboratoire de sûreté des réacteurs de
+l'EPFL, au Paul Scherrer Institut et à Texas A\&M University, il est bâti sur la
+bibliothèque open-source OpenFOAM et résout, en volumes finis, le couplage
+thermique et mécanique d'un crayon en une, deux ou trois dimensions~[1].
+Sa mise en \oe uvre suit la logique d'OpenFOAM~: un cas de calcul est une
+arborescence de fichiers-dictionnaires que l'utilisateur doit savoir écrire, un
+maillage à générer, un solveur à lancer en ligne de commande, et des sorties au
+format VTK à post-traiter. Le problème principal d'OFFBEAT est que cette chaîne de tâches est
+puissante mais peu accessible.
+
+\section*{Sujet et objectif}
+
+L'objectif fixé au début du stage était de \textit{« construire un agent sur le
+code de performance combustible nucléaire OFFBEAT »}. Il s'agissait donc de
+concevoir un système capable de faire le lien entre une demande formulée en
+langage naturel et l'exécution effective d'une simulation OFFBEAT, en
+s'inspirant du projet open-source \textbf{AutoFLUKA}~[3], qui
+applique cette idée au code de transport de particules FLUKA.
+
+Le projet a été mené en deux temps. Un premier consistait à construire l'\textbf{agent de base}~: un superviseur fondé
+sur un grand modèle de langage, orchestrant des outils de domaine capables de
+créer un cas, de lancer le solveur, de réparer automatiquement certains
+plantages et de post-traiter les résultats. Dans un deuxième temps, il a été question d'étendre le système vers un \textbf{jumeau numérique} du crayon
+combustible. Ainsi il fallait surveiller en temps réel les critères de sûreté, prédire les franchissements de seuil, et restituer des
+prédictions instantanées par modèle réduit.
+
+\section*{Plan du rapport}
+
+Le rapport suit la progression du travail. Le \textbf{chapitre~1} présente le
+contexte scientifique et technique~: la physique du crayon combustible, le code
+OFFBEAT, et les principes des agents fondés sur des modèles de langage. Le \textbf{chapitre~2} décrit
+l'architecture de l'agent de base et détaille ses composants, en particulier la
+boucle d'auto-réparation qui en constitue la contribution la plus originale. Le
+\textbf{chapitre~3} expose l'extension vers le jumeau numérique, à travers les
+cinq briques développées. Le \textbf{chapitre~4} rassemble les résultats~: une
+simulation de référence sur un cycle d'irradiation complet, la validation de
+l'émulateur, et surtout la mise à l'épreuve systématique des capacités
+d'auto-diagnostic de l'agent. Le \textbf{chapitre~5} revient sur les difficultés
+rencontrées et les fausses routes, dont l'analyse a nourri plusieurs
+corrections importantes, et présente le planning du stage. La conclusion s'intéresse aux différentes pistes de poursuite.
+
+\clearpage
+
+%==============================================================================
+% CHAPITRE 1
+%==============================================================================
+\chapter{Contexte scientifique et technique}
+\markboth{Chapitre 1 — Contexte scientifique et technique}{}
+
+\section{La physique du crayon combustible}
+
+\subsection{Anatomie et sollicitations}
+
+Un crayon combustible de réacteur à eau pressurisée (REP) est un tube de
+Zircaloy, appelé \textit{gaine}, d'environ \SI{9.5}{\milli\metre} de diamètre
+extérieur et de quelques mètres de long, dans lequel est empilée une colonne de
+pastilles cylindriques d'oxyde d'uranium ($\mathrm{UO_2}$). Entre la pastille et
+la gaine subsiste initialement un jeu radial de quelques
+dizaines de micromètres, rempli d'hélium sous pression.
+
+Ce gap est essentiel dans le comportement du crayon. Il
+constitue en effet une résistance thermique avant que la chaleur n'atteigne la gaine. On observe alors un gradient de température radial de l'ordre de plusieurs
+centaines de kelvins entre le centre de la pastille et sa périphérie.
+
+Sous irradiation, plusieurs phénomènes couplés modifient cette géométrie~:
+\begin{itemize}
+  \item la \textbf{densification} puis le \textbf{gonflement} du combustible,
+    sous l'effet des produits de fission solides et gazeux ;
+  \item la \textbf{relocalisation} des fragments de pastille fissurée ;
+  \item le \textbf{fluage} de la gaine, qui se déforme lentement sous la
+    pression du caloporteur (environ \SI{15.5}{\mega\pascal} en REP) ;
+  \item le \textbf{relâchement des gaz de fission} (xénon, krypton), qui
+    dégrade la conductivité du gap et fait monter la pression interne.
+\end{itemize}
+
+L'effet combiné est une \textbf{fermeture progressive du gap}. Lorsque le
+contact s'établit, la pastille charge mécaniquement la gaine~: c'est
+l'\textbf{interaction pastille-gaine} (PCMI, \textit{pellet-cladding mechanical
+interaction}).
+
+\subsection{Les critères de sûreté}
+
+La conception d'un crayon s'appuie sur des critères de sûreté chiffrés. Le
+tableau~\ref{tab:criteres} récapitule ceux qui sont pertinents ici, en
+distinguant explicitement ceux qu'un code de performance combustible calcule de
+ceux qui relèvent d'autres disciplines. Cette distinction s'est révélée
+primordiale pour la mise en place du jumeau numérique (§\ref{sec:cadrage}).
+
+\begin{table}[htbp]
+\centering
+\caption[Critères de sûreté et couverture par OFFBEAT]{Critères de sûreté du crayon combustible et couverture par OFFBEAT.
+Les valeurs indiquées sont des ordres de grandeur de conception, à confirmer
+selon le crayon et le taux de combustion considérés.}
+\label{tab:criteres}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.1cm}
+                                >{\raggedright\arraybackslash}p{3.9cm}
+                                X
+                                c@{}}
+\toprule
+\textbf{Critère} & \textbf{Limite indicative} & \textbf{Grandeur} &
+\textbf{OFFBEAT}\\
+\midrule
+Fusion à c\oe ur de pastille & $T < \SI{3113}{\kelvin}$ ($\mathrm{UO_2}$
+  frais ; décroît avec le burnup) & Température maximale & oui\\
+Température de gaine (PCT, critère LOCA) & $< \SI{1477}{\kelvin}$
+  (\SI{1204}{\celsius}) & Température dans la gaine & si transitoire modélisé\\
+Déformation de gaine (PCMI) & déformation circonférentielle
+  $< \SI{1}{\percent}$ & Déformation $\theta\theta$ & oui\\
+Fermeture du gap & marge $>0$ & Largeur de gap & oui\\
+Pression interne (\textit{no-liftoff}) & $< P_{\text{caloporteur}}$
+  ($\approx\SI{15.5}{\mega\pascal}$) & Pression plénum & si modèle FGR activé\\
+Oxydation de gaine (ECR) & $< \SI{17}{\percent}$ & Épaisseur d'oxyde &
+  selon modèle\\
+Crise d'ébullition (DNBR) & $> 1{,}3$ & --- & \textbf{non} (entrée)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+NB : le DNBR relève de la thermohydraulique du
+c\oe ur, en dehors du domaine d'OFFBEAT. Pour le code, c'est une condition aux limites.
+
+\section{Le code OFFBEAT}
+
+\subsection{Positionnement parmi les codes de performance combustible}
+
+Pour la simulation de performance combustible on observe deux générations de codes différentes  :
+
+La première rassemble des codes dits \textbf{1,5D}, qui discrétisent le
+crayon en tranches axiales indépendantes couplées seulement par le plénum et
+la pression interne. \textbf{FRAPCON} et son pendant transitoire
+\textbf{FRAPTRAN}, et
+\textbf{TRANSURANUS}, solution européenne,
+appartiennent à cette catégorie~[4, 5]. Leur avantage est la rapidité et la
+robustesse~: ils sont validés sur de très larges bases expérimentales et
+restent les outils de référence pour les études de dimensionnement. Leur limite
+est géométrique~: une fissuration azimutale, une arête de pastille ou un
+gradient non axisymétrique leur échappent par construction.
+
+La seconde génération est \textbf{multidimensionnelle}. \textbf{BISON},
+\textbf{ALCYONE}, solution française, et \textbf{OFFBEAT} en font partie. Ces codes
+résolvent le crayon en deux ou trois dimensions et accèdent donc aux effets
+locaux, au prix d'un coût de calcul très supérieur (de l'ordre de trois ordres
+de grandeur par rapport à un code 1,5D).
+
+OFFBEAT occupe dans ce paysage une position particulière, et c'est ce qui
+justifie son choix ici~: il est \textbf{multidimensionnel}, \textbf{open
+source}, et bâti sur OpenFOAM, une bibliothèque populaire. Des comparaisons
+code-à-code montrent par ailleurs un bon accord entre OFFBEAT et BISON~[2].
+
+\subsection{Principe de résolution}
+
+OFFBEAT résout, sur un maillage non structuré, le couplage entre~:
+\begin{itemize}
+  \item un \textbf{problème thermique} : conduction dans la pastille et la
+    gaine, transfert à travers le gap par conduction gazeuse et rayonnement ;
+  \item un \textbf{problème mécanique} : élasticité, plasticité et fluage, en
+    formulation volumes finis centrée sur les cellules ;
+  \item des \textbf{modèles de comportement} : burnup, gonflement,
+    densification, relâchement des gaz de fission, contact pastille-gaine.
+\end{itemize}
+
+Un cas OFFBEAT hérite de la structure d'un cas OpenFOAM~: un répertoire
+"0/" pour les champs initiaux, "constant/" pour les propriétés
+et les modèles, "system/" pour le contrôle du calcul. S'y ajoute un
+fichier "rodDict", propre à OFFBEAT, qui décrit la géométrie du crayon
+par blocs et à partir duquel un script génère le maillage. Le détail de cette
+arborescence est reporté en annexe~\ref{ann:cas}. Rien dans cette chaîne n'est
+tolérant à l'erreur. Quelque soit la source du plantage, les logs n'indiquent pas de cause physique.
+physique.
+
+\section{Agents fondés sur des modèles de langage}
+
+\subsection{Principe : superviseur et outils}
+
+Un \textit{agent} au sens des grands modèles de langage n'est pas un modèle
+qui répond à des questions, mais un modèle auquel on donne la capacité
+d'\textbf{agir}. Le mécanisme, dit \textit{tool calling}, consiste à décrire au
+modèle un ensemble de fonctions disponibles (leurs nom, rôle, arguments). Face à une demande, le modèle ne produit alors pas du texte mais un
+appel structuré~: quel outil invoquer, avec quels paramètres. Le programme
+exécute l'appel et lui retourne le résultat, sur lequel il poursuit son
+raisonnement. On a alors une succession d'appels pour parvenir à répondre à la requête initiale.
+
+Ce schéma présente un intérêt majeur dans un contexte scientifique~: le modèle
+de langage ne calcule rien lui-même. Il n'invente ni température, ni contrainte.
+Il décide quel programme lancer et interprète ce que ce programme renvoie. La
+physique reste intégralement dans le solveur.
+
+\subsection{Travaux voisins et point de départ}
+
+Le travail le plus voisin est \textbf{AutoFLUKA}~[3], publié fin
+\num{2024}, qui automatise les chaînes de simulation Monte-Carlo du code de
+transport de particules FLUKA (un superviseur bâti sur LangChain, des outils de
+domaine (génération de fichiers d'entrée, exécution, post-traitement), une
+boucle d'auto-réparation en cas de plantage, et un assistant documentaire par
+recherche sémantique). Ce sont les mêmes motivations qu'AutoFLUKA qui animent ce travail ici : la courbe d'apprentissage d'un code de calcul
+scientifique élevée, les chaînes sont chronophages et sujettes à l'erreur
+humaine.
+
+AutoOFFBEAT reprend donc l'ossature d'AutoFLUKA, en
+substituant la partie FLUKA par des features OFFBEAT. Grâce à cette aide pour l'implémentation, le travail a pu être concentré sur ce qui a trait au combustible nucléaire, à savoir le contenu physique des
+bases de connaissance. A noter trois différences à souligner délimitant les deux travaux.
+Le \textbf{domaine}. FLUKA est un code de transport, ses grandeurs de
+sortie sont des taux de comptage et des fluences. OFFBEAT est un code
+thermomécanique dont les sorties sont des champs continus comparables à des
+\textbf{critères de sûreté chiffrés}. Cette différence rend possible une feature absente d'AutoFLUKA~: l'analyse automatique des marges
+de sûreté, avec sa base de seuils éditable.
+
+La \textbf{prédiction}. AutoFLUKA reste réactif~: il exécute et
+post-traite. L'extension vers le jumeau numérique développée ici (chapitre~3),
+en particulier l'émulateur par processus gaussien, permet de répondre à des
+questions sans relancer le solveur.
+
+L'\textbf{évaluation}. La littérature sur ces agents rapporte
+essentiellement des études de cas réussies. Une part importante du présent
+travail a consisté à mesurer les limites du système. De la
+portée réelle de l'auto-réparation, à la justesse de la sélection d'outils (chapitre~4).
+
+\section{Périmètre retenu}
+
+Le périmètre a été fixé de la manière suivante~:
+\begin{itemize}
+  \item l'agent de base est la priorité, et se construit \textbf{une brique à
+    la fois}, chacune testée avant de passer à la suivante ;
+  \item le code doit rester \textbf{indépendant du fournisseur de modèle de
+    langage}, afin de pouvoir fonctionner intégralement en local et sans coût ;
+  \item le volet jumeau numérique n'est engagé qu'une fois l'agent de base
+    stable ;
+  \item l'échelle retenue est le \textbf{crayon seul}.
+\end{itemize}
+
+\clearpage
+
+%==============================================================================
+% CHAPITRE 2
+%==============================================================================
+\chapter{Architecture de l'agent AutoOFFBEAT}
+\markboth{Chapitre 2 — Architecture de l'agent AutoOFFBEAT}{}
+
+\section{Vue d'ensemble}
+
+L'architecture retenue est celle d'un superviseur unique orchestrant des outils
+spécialisés (figure~\ref{fig:archi}). L'utilisateur formule une demande en
+langage naturel (en français) dans une interface web. Le superviseur, fondé sur un modèle de
+langage, sélectionne et enchaîne les outils nécessaires. Chaque outil réalise
+une action concrète et retourne un compte rendu textuel que le modèle
+interprète.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.55cm and 0.7cm,
+  box/.style={draw,rounded corners=2pt,align=center,font=\small,
+              minimum height=0.95cm,inner sep=4pt},
+  % font=\footnotesize : « offbeat\_executor » en \small depasse 2.9 cm et
+  % chevauche la boite voisine.
+  tool/.style={box,fill=blue!5,draw=cClad!70,text width=2.9cm,
+               font=\footnotesize},
+  kb/.style={box,fill=orange!8,draw=cFuel!70,text width=2.7cm,font=\scriptsize},
+  sup/.style={box,fill=gray!10,draw=black!60,text width=4.6cm},
+  ext/.style={box,fill=none,draw=black!45,dashed,text width=2.9cm},
+  fl/.style={-{Latex[length=2mm]},draw=black!65},
+  ]
+
+  \node[box,text width=3.6cm,fill=green!5,draw=green!45!black] (user)
+    {Utilisateur\\{\scriptsize demande en langage naturel}};
+  \node[sup,below=0.7cm of user] (sup)
+    {\textbf{Superviseur LLM}\\{\scriptsize sélectionne et enchaîne les outils}};
+
+  \node[tool,below=1.5cm of sup,xshift=-4.9cm] (t1)
+    {\texttt{input\_creator}\\{\scriptsize crée le cas}};
+  \node[tool,below=1.5cm of sup,xshift=-1.65cm] (t2)
+    {\texttt{offbeat\_executor}\\{\scriptsize maille, exécute,\\ \textbf{répare}}};
+  \node[tool,below=1.5cm of sup,xshift=1.65cm] (t3)
+    {\texttt{data\_processor}\\{\scriptsize post-traite}};
+  \node[tool,below=1.5cm of sup,xshift=4.9cm] (t4)
+    {\texttt{safety\_analyzer}\\{\scriptsize marges de sûreté}};
+
+  \node[ext,below=1.35cm of t2] (solver)
+    {Solveur OFFBEAT\\{\scriptsize OpenFOAM}};
+  \node[ext,below=1.35cm of t3] (vtk)
+    {Champs VTK\\{\scriptsize $T$, $\sigma$, gap}};
+
+  \node[kb,left=0.55cm of solver,xshift=-0.4cm] (errkb)
+    {\texttt{error\_kb.json}\\{\scriptsize motifs de plantage}};
+  \node[kb,right=0.55cm of vtk,xshift=0.4cm] (safekb)
+    {\texttt{safety\_kb.json}\\{\scriptsize seuils de sûreté}};
+
+  \draw[fl] (user) -- (sup);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t1.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t2.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t3.north);
+  \draw[fl] (sup.south) -- ++(0,-0.35) -| (t4.north);
+  \draw[fl] (t2) -- (solver);
+  \draw[fl] (t3) -- (vtk);
+  \draw[fl] (errkb) -- (t2);
+  \draw[fl] (safekb) -- (t4);
+  \draw[fl,dashed] (solver.east) -- (vtk.west);
+\end{tikzpicture}
+\caption[Organigramme d'AutoOFFBEAT]{Organigramme d'AutoOFFBEAT.}
+\label{fig:archi}
+\end{figure}
+
+Les rois principes de cette architecture sont :
+
+\textbf{Le modèle de langage ne calcule pas.} Toute grandeur physique provient
+du solveur ou d'un post-traitement \textbf{déterministe}. Cette séparation garantit que
+la validité des résultats ne dépend pas de la fiabilité du modèle de langage qui pourrait notamment halluciner des valeurs.
+
+\textbf{Le déterministe d'abord, le modèle en repli.} Partout où un diagnostic
+peut être obtenu par une règle explicite (un motif d'erreur, un seuil chiffré)
+cette règle est prioritaire. Le modèle de langage n'intervient qu'en
+cas d'échec, et son avis n'est jamais appliqué automatiquement.
+
+\textbf{La connaissance métier vit hors du code.} Les motifs d'erreur et les
+critères de sûreté sont stockés dans des fichiers JSON éditables. Un
+utilisateur du domaine peut enrichir la base sans toucher au code ni
+reconstruire quoi que ce soit.
+
+\section{La fabrique de modèles de langage}
+
+Afin de ne pas lier le projet à un fournisseur particulier, l'accès au modèle
+de langage passe par une fabrique unique, pilotée par un fichier de
+configuration. Trois fournisseurs sont pris en charge~: une exécution
+entièrement locale via Ollama, et deux services distants. Le reste du code
+ignore lequel est utilisé.
+
+Ce choix a eu deux conséquences bénéfiques. D'une part, l'ensemble du
+développement a pu être mené \textbf{sans aucun coût d'inférence}, avec un
+modèle de sept milliards de paramètres exécuté localement. D'autre part, la
+fabrique distingue le modèle du superviseur de celui du \textit{débogage}~: il
+devient possible de confier le routage courant à un petit modèle rapide et
+l'analyse des plantages à un modèle plus capable.
+
+\section{Les outils de domaine}
+
+\subsection{Génération de cas}
+
+Générer un cas OFFBEAT complet à partir de rien n'est pas réaliste. Le
+dictionnaire principal du solveur compte à lui seul plusieurs centaines de
+lignes de modèles couplés, et un modèle de langage produirait inévitablement des
+combinaisons invalides. La stratégie retenue est donc celle du
+\textbf{gabarit}~: l'outil copie un cas de référence validé, puis y substitue
+les seuls paramètres demandés.
+
+Une table de correspondance associe des noms compréhensibles (puissance
+linéique, rayon de pastille, durée de simulation) aux emplacements réels dans
+les fichiers du cas. Cette méthode est essentielle, elle donne au modèle de
+langage un vocabulaire stable et restreint, sans qu'il ait à connaître la
+syntaxe des dictionnaires OpenFOAM. C'est d'autant plus important qu'on utilise un modèle local avec peu de paramètres qui peut rapidement faire des erreurs. La liste complète des paramètres exposés
+figure en annexe~\ref{ann:cas}.
+
+Deux gabarits sont actuellement disponibles~: un crayon REP en une dimension,
+utilisé pour l'ensemble des résultats de ce rapport, et un crayon
+axisymétrique bidimensionnel $(r,z)$ repris des cas de vérification
+d'OFFBEAT. Le second a été validé de bout en bout (création, application des
+paramètres, maillage, exécution et analyse de sûreté) ce qui a permis de
+vérifier que les traitements par région du maillage ne dépendent pas de la
+dimension du cas.
+
+\subsection{Exécution du solveur}
+
+L'outil d'exécution enchaîne la génération du maillage puis le lancement du
+solveur, en s'appuyant sur un garde-fou de durée maximale afin qu'une
+simulation divergente ne bloque pas indéfiniment le système. Il valide au
+préalable que le répertoire cible est bien un cas OpenFOAM, et analyse le
+journal d'exécution.
+
+\subsection{Post-traitement}
+
+Le post-traitement lit les sorties du solveur au format VTK et en extrait les
+grandeurs utiles~: profils axial et radial de température, contrainte de
+cerclage, température maximale de gaine. Il produit également des figures.
+Une subtilité, qui s'est révélée être une source d'erreurs importante
+(§\ref{sec:bugs}) tient à l'organisation des données~: le maillage complet
+contient à la fois la pastille et la gaine, et un extremum calculé sur
+l'ensemble du domaine ne renseigne pas nécessairement sur la région visée.
+
+\section{L'auto-réparation}
+\label{sec:selfhealing}
+
+C'est la contribution la plus caractéristique de l'agent. Lorsque le solveur
+plante, l'outil d'exécution tente de
+diagnostiquer la cause et d'y remédier. Il met en place une stratégie à deux étages
+illustrée figure~\ref{fig:selfheal}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.5cm,
+  b/.style={draw,rounded corners=2pt,align=center,font=\small,
+            minimum height=0.85cm,inner sep=4pt,text width=3.4cm},
+  d/.style={draw,diamond,aspect=2.4,align=center,font=\scriptsize,
+            inner sep=1pt,text width=2.3cm},
+  fl/.style={-{Latex[length=2mm]},draw=black!65,font=\scriptsize},
+  ]
+  \node[b,fill=blue!5] (run) {Lancer le solveur};
+  \node[d,below=of run,fill=gray!8] (ok) {succès ?};
+  \node[b,below=1.0cm of ok,fill=green!8,draw=green!45!black] (done)
+    {Résultats prêts};
+  \node[d,right=1.5cm of ok,fill=gray!8] (match) {motif connu ?};
+  \node[b,above=1.0cm of match,fill=orange!8,draw=cFuel] (fix)
+    {Appliquer le correctif\\{\scriptsize base de connaissance}};
+  \node[b,right=1.6cm of match,fill=red!5,draw=cAlert] (llm)
+    {Diagnostic par le modèle\\{\scriptsize proposé, non appliqué}};
+  \node[b,below=1.0cm of llm,fill=gray!8] (stop)
+    {Arrêt~: intervention\\ de l'utilisateur};
+
+  \draw[fl] (run) -- (ok);
+  \draw[fl] (ok) -- node[left]{oui} (done);
+  \draw[fl] (ok) -- node[above]{non} (match);
+  \draw[fl] (match) -- node[right]{oui} (fix);
+  \draw[fl] (fix.north) -- ++(0,0.35) -| node[pos=0.25,above]
+    {relance ($\leq 3$)} (run.north);
+  \draw[fl] (match) -- node[above]{non} (llm);
+  \draw[fl] (llm) -- (stop);
+\end{tikzpicture}
+\caption[Boucle d'auto-réparation]{Boucle d'auto-réparation. Le diagnostic déterministe par motif est
+tenté en premier~; le modèle de langage n'intervient qu'en dernier recours et
+son diagnostic n'est jamais appliqué automatiquement.}
+\label{fig:selfheal}
+\end{figure}
+
+Le premier étage confronte le journal d'exécution à une base de motifs. Chaque
+entrée associe une expression régulière à un diagnostic en clair et à un
+correctif scripté (réduire le pas de temps, nettoyer les pas de temps écrits
+pour forcer un redémarrage propre, ajuster la durée simulée). Ce mécanisme est
+rapide, gratuit et reproductible.
+
+Le second étage n'intervient que si aucun motif ne correspond~: la fin du
+journal est alors soumise au modèle de langage pour interprétation. Point
+majeur, ce diagnostic est \textbf{présenté à l'utilisateur mais jamais
+appliqué automatiquement}~: l'humain doit avoir le dernier mot sur des actions sensibles à l'erreur.
+
+Le nombre de tentatives est plafonné à trois. Le chapitre~4 montre que cette
+architecture réussit sur les erreurs numériques qu'elle a été conçue pour
+traiter, mais atteint ses limites face aux erreurs \textit{physique}. C'est un des enseignements majeurs du stage.
+
+\section{L'assistant documentaire}
+
+Un dernier outil, optionnel et similaire à AutoFLUKA, met à disposition de l'agent la documentation
+d'OFFBEAT par recherche sémantique (\textit{retrieval-augmented generation}).
+Les documents sont découpés, vectorisés par un modèle d'embeddings local, et
+indexés. L'agent peut ainsi répondre à des questions de documentation en citant
+des extraits réels plutôt qu'en produisant des affirmations plausibles mais non
+vérifiées. Cet outil est conçu pour se désactiver silencieusement s'il n'est pas
+disponible~: il ne doit jamais empêcher le fonctionnement de base.
+
+\clearpage
+
+%==============================================================================
+% CHAPITRE 3
+%==============================================================================
+\chapter{De l'agent réactif au jumeau numérique}
+\markboth{Chapitre 3 — De l'agent réactif au jumeau numérique}{}
+
+\section{Cadrage : ce qu'est et ce que n'est pas ce jumeau}
+\label{sec:cadrage}
+
+Il convient dans un premier temps d'éclaircir ce que l'on entend par "jumeau numérique de centrale". Un jumeau
+numérique complet de centrale gérerait la multiphysique complexe derrière. C'est-à-dire qu'il couplerait la neutronique, la thermohydraulique et la performance combustible.
+Il serait ainsi capable de prédire l'état d'un crayon combustible à partir de l'état du c\oe ur, et inversement. Or OFFBEAT ne
+traite que la performance combustible. On s'attache donc ici à produire le jumeau numérique d'un crayon de combustible. Ce qui se trouve hors du domaine traité sera considéré comme condition aux limites.
+
+La deuxième limite concerne le « temps réel ». OFFBEAT est un solveur par lots,
+dont une exécution prend de quelques secondes à plusieurs heures, et il
+n'existe pas de capteur mesurant en direct l'état d'un crayon dans le c\oe ur.
+En pratique on n'a pas de temps réel mais une actualisation de l'état par mises à jour~: à chaque nouvel historique
+d'exploitation, le système re-simule et actualise son pronostic. Le véritable
+temps réel ne peut venir que d'un \textbf{modèle réduit}, d'où la brique~D5.
+
+Le tableau~\ref{tab:agent-vs-twin} résume le déplacement opéré.
+
+\begin{table}[htbp]
+\centering
+\caption[Agent de base et jumeau numérique]{Différences entre l'agent de base et le jumeau numérique visé.}
+\label{tab:agent-vs-twin}
+\begin{tabularx}{0.95\textwidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Agent de base} & \textbf{Jumeau numérique}\\
+\midrule
+\textbf{Quand} & après une simulation terminée & à chaque nouvelle donnée\\
+\textbf{Quoi} & crée, exécute, post-traite & + surveille des seuils de sûreté\\
+\textbf{Comportement} & réactif (répare un plantage survenu) &
+  prédictif (annonce un danger avant qu'il survienne)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{D1 — L'analyseur de sûreté}
+
+La première brique lit une simulation terminée et attribue, critère par
+critère, un statut~: sûr, proche du seuil, ou franchi. Elle calque exactement le
+patron de l'auto-réparation — une base de connaissance JSON éditable, un
+traitement déterministe, un repli optionnel par le modèle de langage pour
+expliquer en clair les critères en dépassement.
+
+Chaque critère décrit le champ à lire, la réduction à appliquer (maximum,
+minimum, valeur de plus grande amplitude), la région du maillage concernée, la
+limite et son sens — la grandeur doit-elle rester en-dessous ou au-dessus du
+seuil. Ce dernier point s'est révélé plus délicat qu'il n'y paraît~: la largeur
+de gap est le seul critère dont le danger est une valeur \textit{trop petite},
+et ce cas particulier a été à l'origine d'un défaut détecté tardivement
+(§\ref{sec:bugs}).
+
+Il faut souligner que les seuils actuellement inscrits dans la base sont des
+\textbf{valeurs indicatives}, explicitement marquées comme non validées. Ce sont
+des critères de conception publiés, non des valeurs inventées, mais leur valeur
+exacte dépend du crayon et du taux de combustion~: leur validation avec
+l'encadrant constitue l'une des suites directes de ce travail.
+
+\section{D2 — Le pronostic}
+
+La deuxième brique exploite le fait qu'une simulation écrit plusieurs pas de
+temps. Pour chaque critère non vert, l'évolution temporelle du pic est extraite,
+une tendance linéaire est ajustée, et l'instant de franchissement du seuil est
+extrapolé.
+
+La règle de prudence adoptée est de ne rien annoncer lorsque la tendance
+n'évolue pas vers la limite~: si la grandeur s'en éloigne, ou si elle est
+stationnaire, le pronostic le dit explicitement plutôt que de produire une
+extrapolation dénuée de sens. Cette extrapolation reste évidemment un premier
+ordre, valable tant que les phénomènes en jeu n'ont pas de rupture de régime.
+
+\section{D3 — L'assimilation de données}
+
+La troisième brique ferme la boucle~: un fichier d'historique d'exploitation
+est surveillé, sa dernière ligne représentant l'état courant. À chaque mise à
+jour, le cas est réécrit avec les nouveaux paramètres, les pas de temps
+antérieurs sont nettoyés, la simulation est relancée et l'analyse de sûreté est
+rejouée. C'est ce cycle qui donne son sens à l'expression « à la mise à jour ».
+
+\section{D4 — Le tableau de bord}
+
+L'interface web a été étendue d'un panneau de sûreté~: des jauges par critère,
+mises à jour périodiquement, indiquant la valeur courante, la limite et la
+proportion du seuil atteinte. S'y ajoute un simulateur interactif à curseurs,
+décrit ci-après.
+
+\section{D5 — L'émulateur}
+
+\subsection{Motivation et principe}
+
+Le tableau de bord met en évidence une tension~: l'analyse est instantanée, mais
+elle porte sur une simulation déjà exécutée. Explorer un scénario nouveau — que
+se passe-t-il si la puissance augmente de dix pour cent~? — impose de relancer
+le solveur.
+
+La brique D5 lève cette limite par un \textbf{modèle réduit}
+(\textit{surrogate}). Un plan d'expériences est construit en croisant deux
+paramètres, la puissance linéique et la durée d'irradiation. Pour chaque
+combinaison, une simulation OFFBEAT complète est lancée et trois grandeurs de
+sûreté sont relevées~; un modèle statistique est ensuite ajusté sur ce jeu de
+données.
+
+Le choix du domaine d'échantillonnage s'est révélé être la décision la plus
+lourde de conséquences de toute cette brique. Une première version balayait des
+durées de quelques milliers de secondes, ce qui rendait le plan d'expériences
+peu coûteux ; le chapitre~\ref{sec:validation-emulateur} montre que cette
+apparente économie invalidait en réalité l'émulateur pour la seule question qui
+compte, et qu'il a fallu reconstruire entièrement le jeu de données sur des
+durées d'irradiation réalistes.
+
+\subsection{Choix du processus gaussien}
+
+Le modèle retenu est un \textbf{processus gaussien} (krigeage), avec un noyau de
+Matérn. Ce choix, préféré à une régression polynomiale, se justifie par deux
+propriétés adaptées au très petit nombre de points disponibles~:
+
+\begin{itemize}
+  \item le processus gaussien \textbf{interpole} les points d'apprentissage, ce
+    qui est cohérent lorsque ceux-ci proviennent d'un code déterministe et non
+    de mesures bruitées ;
+  \item il fournit une \textbf{incertitude} en chaque point de prédiction. Cette
+    barre d'erreur est remontée jusqu'à l'interface~: l'utilisateur voit non
+    seulement la valeur prédite mais la confiance qu'il peut lui accorder, ce
+    qui est indispensable dès lors qu'on remplace un calcul de sûreté par une
+    approximation.
+\end{itemize}
+
+La validation est faite par \textit{leave-one-out}~: chaque point est prédit par
+un modèle réajusté sur tous les autres. C'est une mesure honnête de la capacité
+de généralisation, bien plus significative qu'un coefficient d'ajustement sur
+quelques dizaines de points. Les résultats sont présentés au chapitre suivant,
+où l'on verra qu'une validation honnête sur le plan statistique peut néanmoins
+induire en erreur si le domaine échantillonné n'est pas, lui, physiquement
+pertinent.
+
+\clearpage
+
+%==============================================================================
+% CHAPITRE 4
+%==============================================================================
+\chapter{Résultats et mise à l'épreuve}
+\markboth{Chapitre 4 — Résultats et mise à l'épreuve}{}
+
+Ce chapitre rassemble les résultats obtenus. Il s'organise en trois temps~: le
+comportement physique restitué par une simulation de référence, la validation
+quantitative de l'émulateur, puis la mise à l'épreuve délibérée des capacités
+d'auto-diagnostic de l'agent.
+
+\section{Vérification du solveur contre des solutions analytiques}
+\label{sec:verification}
+
+Avant d'exploiter les résultats de la chaîne outillée, il convient d'établir
+que le solveur sur lequel elle repose est lui-même correct. Tous les résultats
+présentés ensuite dans ce chapitre relèvent en effet de la \emph{cohérence
+interne}~: le solveur est cohérent avec lui-même, l'émulateur est cohérent avec
+le solveur. Aucun ne confronte la chaîne à une vérité extérieure.
+
+OFFBEAT distribue à cet effet une suite de cas de vérification dont certains
+possèdent une \textbf{solution analytique fermée}. Trois d'entre eux, couvrant
+trois physiques distinctes, ont été exécutés dans l'environnement de ce stage
+et confrontés à leur solution de référence (tableau~\ref{tab:verif}).
+
+\begin{table}[htbp]
+\centering
+\caption[Vérification contre des solutions analytiques]{Vérification du solveur contre des solutions analytiques, exécutée
+dans l'environnement du stage (OpenFOAM v2506, OFFBEAT branche \textit{master}).
+Les indicateurs sont ceux définis par les scripts de vérification fournis avec
+le code.}
+\label{tab:verif}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}Xl@{}}
+\toprule
+\textbf{Cas de vérification} & \textbf{Physique éprouvée} &
+\textbf{Écart à l'analytique}\\
+\midrule
+Expansion d'un cylindre épais &
+  Mécanique élastoplastique~; contrainte radiale en paroi interne,
+  \num{150} points comparés &
+  \SI{1.02}{\percent} (max)\newline \SI{0.82}{\percent} (moyen)\\
+\addlinespace
+Redistribution de porosité &
+  Migration de porosité sous gradient thermique &
+  \SI{0.064}{\percent} ($t=\SI{180}{\second}$)\newline
+  \SI{0.16}{\percent} ($t=\SI{360}{\second}$)\\
+\addlinespace
+Redistribution des actinides &
+  Diffusion thermique des actinides, solution analytique de Clément &
+  \num{5.4e-3}~\% (Pu)\newline \num{3.2e-3}~\% (Am)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+L'accord est bon sur les trois cas~: au pire un pour cent sur le cas mécanique,
+qui est aussi le plus exigeant puisqu'il fait intervenir un front de
+plastification, et des écarts de l'ordre du millième de pour cent sur les deux
+cas de physique combustible.
+
+Ce résultat n'établit pas la validité de l'agent — il établit celle du solveur
+qu'il pilote, et donc que les erreurs éventuellement observées en aval sont
+imputables à la chaîne outillée et non au c\oe ur de calcul. C'est précisément
+la séparation dont on a besoin pour interpréter les défauts de justesse de la
+section~\ref{sec:bugs}~: aucun d'eux ne venait d'OFFBEAT.
+
+\vspace{0.2cm}
+\noindent
+\textit{Remarque.} Un quatrième cas de la suite (chauffage laser) n'a pas pu
+être exécuté~: il échoue à la lecture de ses propres dictionnaires sous
+OpenFOAM v2506. Il s'agit d'une incompatibilité entre ce cas et cette version
+d'OpenFOAM, indépendante du travail présenté ici, mais qui illustre la fragilité
+des suites de vérification face aux montées de version.
+
+\section{Simulation de référence sur un cycle d'irradiation}
+
+\subsection{Configuration}
+
+Le cas de référence est un crayon REP soumis à une puissance linéique de
+\SI{25}{\kilo\watt\per\metre} sur une durée simulée de
+\SI{6.3e7}{\second}, soit environ deux ans. La géométrie est celle du gabarit
+de référence~: rayon de pastille \SI{4.5}{\milli\metre}, rayon intérieur de
+gaine \SI{4.565}{\milli\metre}, soit un jeu initial de
+\SI{65}{\micro\metre}. Sept états ont été écrits au cours du calcul.
+
+\subsection{Évolution thermique}
+
+La figure~\ref{fig:temp} présente l'évolution des températures maximales de la
+pastille et de la gaine.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=6.2cm,
+  xlabel={Temps d'irradiation [jours]},
+  ylabel={Température maximale [K]},
+  xmin=0, xmax=760, ymin=250, ymax=1600,
+  grid=major, grid style={cGrid!60,very thin},
+  legend pos=north east, legend style={font=\scriptsize,draw=black!30},
+  label style={font=\small}, tick label style={font=\scriptsize},
+  every axis plot/.append style={thick,mark size=1.6pt},
+]
+\addplot[color=cFuel,mark=*] coordinates {
+  (170.0,1361.75) (354.1,1385.75) (456.9,1488.66)
+  (590.2,1444.20) (710.9,1461.03) (729.2,1467.29)};
+\addlegendentry{Pastille (c\oe ur)}
+\addplot[color=cClad,mark=square*] coordinates {
+  (0,300.0) (170.0,639.09) (354.1,637.71) (456.9,641.51)
+  (590.2,637.90) (710.9,637.39) (729.2,637.39)};
+\addlegendentry{Gaine (PCT)}
+\end{axis}
+\end{tikzpicture}
+\caption[Températures maximales pastille et gaine]{Évolution des températures maximales de la pastille et de la gaine au
+cours du cycle. L'écart d'environ \SI{800}{\kelvin} entre les deux courbes
+correspond à la chute de température à travers le jeu pastille-gaine et le
+combustible.}
+\label{fig:temp}
+\end{figure}
+
+La température de gaine reste remarquablement stable, autour de
+\SI{637}{\kelvin}, ce qui est cohérent~: elle est imposée pour l'essentiel par
+le caloporteur. La température à c\oe ur de pastille, en revanche, croît de
+\SI{1362}{\kelvin} à \SI{1467}{\kelvin}, traduisant la dégradation progressive
+de la conductivité du combustible sous irradiation.
+
+\subsection{Fermeture du gap et basculement de la contrainte}
+
+Le résultat le plus intéressant apparaît en confrontant l'évolution du jeu
+pastille-gaine à celle de la contrainte de cerclage
+(figure~\ref{fig:gap-stress}).
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=5.4cm,
+  xlabel={Temps [jours]}, ylabel={Largeur de gap [\si{\micro\metre}]},
+  xmin=0, xmax=760, ymin=-11, ymax=13,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\scriptsize}, tick label style={font=\scriptsize},
+  title style={font=\scriptsize\bfseries}, title={(a) Jeu pastille-gaine},
+]
+\addplot[color=cAlert,thick,mark=*,mark size=1.6pt] coordinates {
+  (170.0,10.097) (354.1,0.370) (456.9,-1.959)
+  (590.2,-5.251) (710.9,-7.703) (729.2,-7.997)};
+\addplot[black!55,dashed,thick,domain=0:760,forget plot] {0};
+\node[font=\tiny,anchor=west,text=black!65] at (axis cs:250,1.8) {contact};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=5.4cm,
+  xlabel={Temps [jours]},
+  ylabel={Contrainte de cerclage [MPa]},
+  xmin=0, xmax=760, ymin=-60, ymax=100,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\scriptsize}, tick label style={font=\scriptsize},
+  title style={font=\scriptsize\bfseries},
+  title={(b) Contrainte $\sigma_{\theta\theta}$ (gaine)},
+]
+\addplot[color=cClad,thick,mark=square*,mark size=1.6pt] coordinates {
+  (170.0,-43.01) (354.1,-38.23) (456.9,-31.33)
+  (590.2,28.79) (710.9,71.59) (729.2,79.11)};
+\addplot[black!55,dashed,thick,domain=0:760,forget plot] {0};
+\node[font=\tiny,anchor=east,text=black!65] at (axis cs:740,-16) {compression};
+\node[font=\tiny,anchor=east,text=black!65] at (axis cs:740,16) {traction};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\caption[Fermeture du jeu et contrainte de cerclage]{Fermeture du jeu pastille-gaine (a) et contrainte de cerclage dans la
+gaine (b). Le changement de signe de la contrainte coïncide avec
+l'établissement du contact~: la gaine, d'abord comprimée par le caloporteur,
+est ensuite mise en traction par la pastille.}
+\label{fig:gap-stress}
+\end{figure}
+
+La lecture conjointe de ces deux courbes constitue une validation qualitative
+du comportement du modèle. Tant que le jeu reste ouvert, la gaine est
+\textbf{comprimée} par la pression du caloporteur — la contrainte est négative,
+de l'ordre de \SI{-43}{\mega\pascal}. Le jeu se referme aux alentours du
+\numrange{354}{457}\textsuperscript{e} jour~; la contrainte devient alors
+\textbf{positive} et croît jusqu'à \SI{79}{\mega\pascal}. C'est exactement la
+signature du PCMI~: la pastille, en gonflant, met la gaine en traction. Le
+pronostic automatique (brique~D2) situe le franchissement du seuil de fermeture
+autour de \SI{2.33e7}{\second}, soit au tiers du cycle, ce qui est cohérent avec
+la courbe.
+
+\subsection{Profils spatiaux}
+
+Le profil radial de température en fin de cycle (figure~\ref{fig:radial})
+illustre la chute de température à travers le crayon.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.8\textwidth, height=6cm,
+  xlabel={Rayon [mm]}, ylabel={Température [K]},
+  xmin=0, xmax=5.5, ymin=550, ymax=1450,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\small}, tick label style={font=\scriptsize},
+]
+\addplot[color=cFuel,thick,mark=*,mark size=1.1pt] coordinates {
+ (0.000,1364.72) (0.177,1363.20) (0.354,1359.85) (0.531,1354.77)
+ (0.709,1347.98) (0.886,1339.50) (1.063,1317.51) (1.240,1304.03)
+ (1.417,1288.93) (1.594,1272.23) (1.772,1253.94) (1.949,1234.10)
+ (2.126,1189.82) (2.303,1165.44) (2.480,1139.58) (2.657,1112.27)
+ (2.835,1083.52) (3.012,1021.70) (3.189,988.64) (3.366,954.10)
+ (3.543,918.03) (3.720,880.42) (3.898,841.25) (4.075,758.22)
+ (4.252,714.04) (4.429,667.23) (4.606,633.91) (4.783,626.42)
+ (4.961,615.55) (5.138,608.53) (5.315,601.68)};
+\draw[black!45,dashed] (axis cs:4.5,550) -- (axis cs:4.5,1450);
+\node[font=\tiny,anchor=south west,black!65,rotate=90]
+  at (axis cs:4.52,700) {gap / gaine};
+\node[font=\tiny,anchor=north west,black!65] at (axis cs:0.15,1340)
+  {pastille};
+\end{axis}
+\end{tikzpicture}
+\caption[Profil radial de température]{Profil radial de température au plan médian en fin de cycle. La chute
+d'environ \SI{760}{\kelvin} entre le c\oe ur de la pastille
+(\SI{1365}{\kelvin}) et la périphérie de la gaine (\SI{602}{\kelvin}) est
+dominée par la faible conductivité du combustible et par la résistance
+thermique du jeu.}
+\label{fig:radial}
+\end{figure}
+
+\subsection{Bilan des marges de sûreté}
+
+Le tableau~\ref{tab:marges} donne l'état final évalué par la brique~D1.
+
+\begin{table}[htbp]
+\centering
+\caption[Marges de sûreté en fin de cycle]{Marges de sûreté en fin de cycle, après les corrections de la
+section~\ref{sec:seuils}. Les seuils restent indicatifs et leur validation
+avec l'encadrant reste à faire.}
+\label{tab:marges}
+\begin{tabularx}{0.95\textwidth}{@{}Xrrc@{}}
+\toprule
+\textbf{Critère} & \textbf{Valeur} & \textbf{Limite} & \textbf{Statut}\\
+\midrule
+Température à c\oe ur de pastille & \SI{1467}{\kelvin} & \SI{3113}{\kelvin}
+  & sûr (\SI{47}{\percent})\\
+Déformation plastique de gaine (PCMI) & \num{0} &
+  \SI{1.00}{\percent} & sûr (\SI{0}{\percent})\\
+Déformation de fluage de gaine & \SI{0.36}{\percent} &
+  \SI{1.00}{\percent} & sûr (\SI{36}{\percent})\\
+Contrainte de cerclage de gaine & \SI{79.1}{\mega\pascal} &
+  \SI{250}{\mega\pascal} & sûr (\SI{32}{\percent})\\
+Jeu pastille-gaine & \SI{-8.0}{\micro\metre} & \SI{5.0}{\micro\metre}
+  & \textcolor{cAlert}{\textbf{franchi}}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent
+La limite en contrainte n'est pas ici une constante~: elle est lue dans le champ
+\texttt{sigmaY} calculé par le solveur, et la valeur reportée est celle au point
+le plus sollicité (section~\ref{sec:seuils}).
+
+Le crayon reste donc largement dans les marges sur tous les critères
+thermomécaniques, mais le contact pastille-gaine est établi. Ce résultat est
+attendu pour un crayon en fin de deuxième cycle et n'a rien d'alarmant en soi~:
+il signifie que le régime de fonctionnement a changé de nature, ce qui est
+précisément l'information qu'un jumeau numérique doit remonter.
+
+\section{Validation de l'émulateur}
+\label{sec:validation-emulateur}
+
+\subsection{Un premier domaine d'apprentissage trompeur}
+
+La première version de l'émulateur avait été entraînée sur seize simulations
+croisant quatre puissances linéiques et quatre durées comprises entre
+\SIrange{2000}{6500}{\second}. Sa validation \textit{leave-one-out} donnait des
+coefficients de détermination supérieurs à $0{,}998$ sur les trois grandeurs
+suivies. Le résultat paraissait excellent.
+
+Il ne l'était pas. Deux constats, faits en confrontant ce domaine à la
+simulation de référence de la section précédente, l'ont invalidé.
+
+D'abord, le crayon atteint son \textbf{équilibre thermique dès quelques
+milliers de secondes}. Aux deux durées les plus longues du plan, les
+températures ne diffèrent plus que de quelques dixièmes de kelvin
+(tableau~\ref{tab:saturation})~: ces niveaux sont des doublons. Sur les quatre
+valeurs de durée, deux seulement portaient de l'information, et le problème de
+régression était en réalité quasi unidimensionnel — la puissance suffisait à
+prédire la sortie. Le $R^2$ élevé mesurait donc surtout la facilité du
+problème.
+
+\begin{table}[htbp]
+\centering
+\caption[Saturation thermique du premier domaine]{Saturation thermique dans le premier domaine d'apprentissage~:
+au-delà de \SI{5000}{\second}, la durée simulée n'apporte plus d'information.}
+\label{tab:saturation}
+\begin{tabularx}{0.8\textwidth}{@{}Xrrr@{}}
+\toprule
+\textbf{Puissance linéique} & \textbf{$T$ à \SI{5000}{\second}} &
+\textbf{$T$ à \SI{6500}{\second}} & \textbf{Écart}\\
+\midrule
+\SI{12}{\kilo\watt\per\metre} & \SI{1036.19}{\kelvin} & \SI{1036.24}{\kelvin}
+  & \SI{0.05}{\kelvin}\\
+\SI{20}{\kilo\watt\per\metre} & \SI{1389.24}{\kelvin} & \SI{1389.35}{\kelvin}
+  & \SI{0.11}{\kelvin}\\
+\SI{28}{\kilo\watt\per\metre} & \SI{1787.59}{\kelvin} & \SI{1787.76}{\kelvin}
+  & \SI{0.17}{\kelvin}\\
+\SI{36}{\kilo\watt\per\metre} & \SI{2186.04}{\kelvin} & \SI{2186.20}{\kelvin}
+  & \SI{0.16}{\kelvin}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Ensuite et surtout, la simulation de référence tourne jusqu'à
+\SI{6.3e7}{\second}, soit environ \textbf{dix mille fois} au-delà de la borne
+supérieure du domaine d'apprentissage. Or les phénomènes qui intéressent la
+sûreté — gonflement, fluage, fermeture du jeu, PCMI — se déploient précisément
+sur ces échelles de temps longues, totalement absentes du plan d'expériences.
+L'émulateur ne modélisait donc que le \emph{transitoire thermique initial},
+alors que le simulateur interactif du tableau de bord laissait entendre qu'il
+prédisait des marges de sûreté.
+
+\subsection{Reconstruction sur un domaine physiquement pertinent}
+
+Le plan d'expériences a été entièrement refait sur des durées d'irradiation
+réalistes, de \SIrange{7.9e6}{6.3e7}{\second} (environ trois mois à deux ans),
+croisées avec cinq puissances linéiques de \SIrange{12}{36}{\kilo\watt\per\metre},
+soit \num{25} simulations OFFBEAT complètes, toutes menées à terme.
+
+Cette reconstruction n'a été rendue possible que par la compilation locale du
+solveur~: une simulation de deux ans coûte \SI{36}{\second} de calcul, si bien
+que le plan complet tient en une trentaine de minutes.
+
+Le gain est visible dans les données elles-mêmes. Dans le nouveau domaine, la
+largeur de gap minimale \textbf{change de signe}, passant de
+\SI{+32}{\micro\metre} à \SI{-13}{\micro\metre} selon les conditions~:
+l'émulateur peut désormais apprendre la fermeture du jeu, donc l'entrée en
+PCMI. La déformation circonférentielle devient elle aussi non monotone et
+change de signe, traduisant le fluage de la gaine vers l'intérieur avant que la
+pastille ne la repousse.
+
+La figure~\ref{fig:parite} confronte les valeurs prédites par validation
+croisée \textit{leave-one-out} aux valeurs calculées par OFFBEAT sur ce nouveau
+domaine.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.62\textwidth, height=6.4cm,
+  xlabel={Température maximale calculée par OFFBEAT [K]},
+  ylabel={Prédiction de l'émulateur [K]},
+  xmin=600, xmax=2300, ymin=600, ymax=2300,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\small}, tick label style={font=\scriptsize},
+  legend pos=north west, legend style={font=\scriptsize,draw=black!30},
+]
+\addplot[only marks,mark=*,mark size=1.9pt,color=cFuel] coordinates {
+ (970.82,988.19) (940.09,943.55) (930.02,937.54) (949.74,934.82)
+ (936.31,959.21) (1186.41,1189.97) (1139.58,1132.33) (1120.10,1097.81)
+ (1142.00,1158.28) (1160.16,1146.84) (1401.84,1387.86) (1328.92,1322.66)
+ (1295.66,1313.92) (1405.90,1402.35) (1417.85,1424.59) (1614.18,1597.11)
+ (1515.43,1563.43) (1556.00,1542.81) (1717.76,1710.48) (1733.75,1741.45)
+ (1845.99,1895.67) (1830.40,1767.51) (1848.80,1895.07) (2061.84,2025.93)
+ (2079.84,2075.28)};
+\addlegendentry{25 simulations}
+\addplot[black!55,dashed,thick,domain=850:2200] {x};
+\addlegendentry{$y=x$}
+\end{axis}
+\end{tikzpicture}
+\caption[Diagramme de parité de l'émulateur]{Diagramme de parité de l'émulateur pour la température maximale, en
+validation \textit{leave-one-out} sur le domaine d'irradiation réaliste. Chaque
+point est prédit par un modèle réajusté sur les vingt-quatre autres.
+Le coefficient de détermination vaut $R^2 = 0{,}9951$.}
+\label{fig:parite}
+\end{figure}
+
+Le tableau~\ref{tab:surrogate} compare la qualité obtenue sur les deux
+domaines.
+
+\begin{table}[htbp]
+\centering
+\caption[Qualité de l'émulateur sur les deux domaines]{Qualité de l'émulateur en validation \textit{leave-one-out} sur les
+deux domaines d'apprentissage. La dégradation apparente traduit un problème
+devenu réellement bidimensionnel et non monotone, non une régression de la
+méthode.}
+\label{tab:surrogate}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Grandeur prédite} &
+\textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ domaine court\\
+ (\SIrange{2}{6.5}{\kilo\second})\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ domaine réaliste\\
+ (3 mois à 2 ans)\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}Erreur\\ moyenne\end{tabular}}\\
+\midrule
+Température maximale & $0{,}9994$ & $0{,}9951$ & \SI{19}{\kelvin}\\
+Déformation de fluage maximale & --- & $0{,}9905$ & \num{1.5e-4}\\
+Largeur de gap minimale & $0{,}9992$ & $0{,}9715$ & \SI{1.8}{\micro\metre}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Les coefficients baissent, et c'est le résultat attendu. Sur le domaine court,
+l'émulateur ajustait une relation monotone à une seule variable effective~; sur
+le domaine réaliste, il doit restituer des grandeurs non monotones qui changent
+de signe. Un $R^2$ de $0{,}9951$ sur un problème difficile vaut mieux qu'un
+$0{,}9994$ sur un problème trivial. Cet épisode illustre un point de méthode
+général~: \textbf{une métrique de validation ne dit rien de la pertinence du
+domaine sur lequel elle est calculée}.
+
+\subsection{Validation sur la question de sûreté}
+
+Le test décisif ne porte pas sur un coefficient de détermination, mais sur la
+capacité de l'émulateur à répondre à la question que le jumeau numérique est
+censé traiter~: \emph{quand le contact pastille-gaine s'établit-il~?}
+
+L'émulateur a donc été interrogé à \SI{25}{\kilo\watt\per\metre}, une puissance
+\textbf{absente de son jeu d'apprentissage} (qui ne contient que 12, 18, 24, 30
+et \SI{36}{\kilo\watt\per\metre}), et sa prédiction confrontée à la simulation
+de référence de la section précédente (figure~\ref{fig:pcmi}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\textwidth, height=6.2cm,
+  xlabel={Temps d'irradiation [jours]},
+  ylabel={Largeur de gap [\si{\micro\metre}]},
+  xmin=0, xmax=760, ymin=-11, ymax=19,
+  grid=major, grid style={cGrid!60,very thin},
+  legend pos=north east, legend style={font=\scriptsize,draw=black!30},
+  label style={font=\small}, tick label style={font=\scriptsize},
+]
+\addplot[color=cClad,thick,no marks] coordinates {
+ (69.4,16.312) (100.9,14.651) (132.3,12.955) (163.7,11.242) (195.1,9.527)
+ (226.5,7.828) (257.9,6.162) (289.4,4.544) (320.8,2.991) (352.2,1.517)
+ (383.6,0.134) (415.0,-1.147) (446.4,-2.319) (477.8,-3.376) (509.3,-4.313)
+ (540.7,-5.129) (572.1,-5.825) (603.5,-6.401) (634.9,-6.863) (666.3,-7.215)
+ (697.8,-7.466) (729.2,-7.621)};
+\addlegendentry{Émulateur (\SI{2}{\milli\second})}
+\addplot[only marks,mark=*,mark size=2.2pt,color=cFuel] coordinates {
+ (170.0,10.097) (354.1,0.370) (456.9,-1.959)
+ (590.2,-5.251) (710.9,-7.703) (729.2,-7.997)};
+\addlegendentry{OFFBEAT (\SI{36}{\second})}
+\addplot[black!55,dashed,thick,domain=0:760,forget plot] {0};
+\node[font=\tiny,anchor=south west,text=black!65] at (axis cs:20,0.6)
+  {jeu ouvert};
+\node[font=\tiny,anchor=north west,text=black!65] at (axis cs:20,-0.6)
+  {contact établi};
+\end{axis}
+\end{tikzpicture}
+\caption[Datation du PCMI à une puissance non apprise]{Fermeture du jeu pastille-gaine à \SI{25}{\kilo\watt\per\metre},
+puissance absente du jeu d'apprentissage de l'émulateur. La courbe continue est
+la prédiction de l'émulateur, les points sont les états calculés par OFFBEAT.
+Le passage par zéro — l'entrée en PCMI — est prédit à \num{387} jours contre
+\num{370} calculés, soit \SI{4.4}{\percent} d'écart.}
+\label{fig:pcmi}
+\end{figure}
+
+L'émulateur situe la fermeture du jeu à \textbf{\num{387} jours}, contre
+\textbf{\num{370} jours} obtenus par interpolation des états calculés par
+OFFBEAT~: un écart de \SI{4.4}{\percent}, soit seize jours sur un cycle de
+deux ans. Le coût de la prédiction est de \SI{2}{\milli\second}, contre
+\SI{36}{\second} pour la simulation complète, soit un facteur d'accélération
+d'environ \num{18000}.
+
+Ce résultat valide l'émulateur là où il compte~: non plus sur sa capacité à
+reproduire une température d'équilibre, mais sur celle à \emph{dater un
+événement de sûreté} en interpolant entre des conditions d'exploitation qu'il
+n'a jamais vues.
+
+Deux réserves subsistent néanmoins. La validation repose sur vingt-cinq points,
+ce qui reste peu~; et rien ne garantit la validité \textbf{hors} du domaine
+d'apprentissage — un émulateur extrapole mal par construction, comme la
+première version l'a démontré de façon spectaculaire. C'est précisément pour
+cela que l'incertitude fournie par le processus gaussien est systématiquement
+remontée à l'interface à côté de la valeur prédite.
+
+\section{Mise à l'épreuve de l'auto-réparation}
+\label{sec:epreuve}
+
+L'objectif de cette section est de délimiter, de façon mesurée et non
+anecdotique, ce que l'agent sait réparer seul.
+
+\subsection{Protocole}
+
+Un banc d'essai a été construit sur le principe de l'\textbf{injection de
+fautes}. Un cas sain est d'abord généré par l'outil de création, puis corrompu
+de façon contrôlée, et enfin soumis à l'exécuteur avec l'auto-réparation
+active. Quatorze cas ont été traités~: douze fautes réparties en quatre
+catégories de cause racine, plus deux cas sains servant de contrôle.
+
+L'issue de chaque cas est classée selon deux axes délibérément
+\textbf{indépendants}~:
+\begin{itemize}
+  \item \textbf{détecté} — un motif de la base de connaissance a-t-il reconnu
+    l'erreur, par opposition au repli sur le modèle de langage~;
+  \item \textbf{réparé} — le cas a-t-il fini par s'exécuter.
+\end{itemize}
+
+Séparer ces deux axes est l'enjeu du protocole~: c'est la case « détecté mais
+non réparé » qui matérialise l'écart entre un \emph{symptôme} reconnu dans un
+journal et une \emph{cause} effectivement traitée.
+
+Chaque faute est en outre étiquetée a priori selon deux critères distincts~:
+la base propose-t-elle un correctif pour ce motif, et ce correctif peut-il, par
+nature, s'attaquer à la cause racine~? Une faute pour laquelle la base
+\emph{croit} savoir intervenir alors que le remède ne vise que le symptôme est
+le c\oe ur du problème étudié.
+
+\subsection{Résultats}
+
+Le tableau~\ref{tab:selfheal} donne les résultats par catégorie.
+
+\begin{table}[htbp]
+\centering
+\caption[Banc d'essai de l'auto-réparation]{Banc d'essai de l'auto-réparation~: 14 cas, dont 12 fautes injectées.
+La colonne « arrêt au maillage » signale les cas interceptés par le mailleur
+avant même le lancement du solveur.}
+\label{tab:selfheal}
+\begin{tabularx}{\textwidth}{@{}Xcccc@{}}
+\toprule
+\textbf{Catégorie de cause racine} & \textbf{$n$} & \textbf{détectés} &
+\textbf{réparés} & \textbf{arrêt au maillage}\\
+\midrule
+Contrôle (cas sains) & 2 & 0/2 & \textbf{2/2} & 0/2\\
+Numérique (divergence du solveur) & 3 & 3/3 & 0/3 & 0/3\\
+Cohérence physique (géométrie) & 3 & 3/3 & 0/3 & 2/3\\
+Fichier manquant & 3 & 1/3 & 0/3 & 0/3\\
+Entrée de dictionnaire invalide & 3 & 2/3 & \textbf{1/3} & 1/3\\
+\midrule
+\textbf{Total} & \textbf{14} & \textbf{9} & \textbf{3} & \textbf{3}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le taux de détection est correct — neuf fautes sur douze sont reconnues par un
+motif, le repli sur le modèle de langage n'ayant été sollicité que deux fois.
+Le taux de réparation, lui, est très faible~: sur les douze fautes injectées,
+\textbf{une seule} a été réparée.
+
+Le croisement du tableau~\ref{tab:selfheal-croise} explique pourquoi, et
+constitue le résultat central de cette section.
+
+\begin{table}[htbp]
+\centering
+\caption[Réparation selon la traitabilité de la cause]{Taux de réparation selon que le correctif disponible peut, ou non,
+traiter la cause racine de la faute.}
+\label{tab:selfheal-croise}
+\begin{tabularx}{0.9\textwidth}{@{}Xc@{}}
+\toprule
+\textbf{Situation} & \textbf{Réparées}\\
+\midrule
+Correctif en base \textbf{et} cause traitable par ce correctif & \textbf{1/1}\\
+Correctif en base mais cause \textbf{non} traitable par ce correctif &
+  \textcolor{cAlert}{\textbf{0/3}}\\
+Aucun correctif en base pour ce motif & 0/8\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+L'auto-réparation répare donc \emph{exactement} les fautes dont la cause racine
+relève du correctif disponible, et uniquement celles-là. La ligne médiane est
+la plus instructive~: dans ces trois cas, le motif est reconnu, le diagnostic
+s'affiche, le correctif se déclenche — et échoue systématiquement, en
+consommant à chaque fois l'intégralité du budget de trois tentatives. Le
+mécanisme donne l'apparence de travailler alors qu'il ne peut structurellement
+pas aboutir.
+
+\subsection{Analyse des échecs}
+
+Trois mécanismes d'échec distincts se dégagent.
+
+\textbf{Le remède ne vise que le symptôme.} Les trois fautes numériques
+(puissances de \num{100} à \num{200} fois la valeur nominale, ou négative)
+déclenchent une exception en virgule flottante dans le modèle de fluage. Le
+motif correspond, et le correctif associé réduit le pas de temps. Mais aucune
+réduction du pas de temps ne peut corriger une donnée d'entrée physiquement
+absurde~: la cause est en amont du solveur. L'agent applique donc trois fois de
+suite un remède sans effet.
+
+\textbf{Le correctif est annulé par le solveur.} Un cas est particulièrement
+révélateur~: la réduction du pas de temps est bien appliquée et le premier pas
+de calcul réussit, mais le contrôleur de pas de temps adaptatif d'OFFBEAT,
+constatant que tout se passe bien, ré-augmente aussitôt le pas et provoque une
+nouvelle divergence. Une réparation robuste devrait agir sur le pas de temps
+\emph{maximal} autorisé, et non sur le pas initial.
+
+\textbf{Le correctif converge trop lentement pour son budget.} Le banc a mis au
+jour un défaut que les essais ponctuels n'avaient pas révélé. Le correctif
+associé au dépassement de l'historique de puissance réduisait la durée simulée
+de \SI{1}{\percent} par tentative. Pour ramener une durée de \SI{1.5e8}{\second}
+sous une table s'arrêtant à \SI{1.26e8}{\second}, il aurait fallu
+\textbf{dix-huit} tentatives pour un budget de \textbf{trois}~: le correctif ne
+pouvait mathématiquement jamais aboutir. Il a été remplacé par un calcul
+déterministe, qui lit les tables temporelles réellement présentes dans le cas
+et vise directement une valeur admissible. Après correction, ce cas — le seul
+dont la cause racine relevait effectivement d'un correctif disponible — passe
+de l'échec à la réussite en deux tentatives.
+
+\subsection{Une nuance sur les échecs « réussis »}
+
+La colonne « arrêt au maillage » du tableau~\ref{tab:selfheal} mérite d'être
+lue à contre-courant. Deux des trois fautes géométriques sont interceptées par
+le mailleur \emph{avant} que le solveur ne démarre~: \texttt{blockMesh} refuse
+de construire une géométrie impossible. Ce n'est pas une défaillance de
+l'auto-réparation, c'est un garde-fou qui fonctionne. Comptabiliser ces cas
+comme des échecs, ainsi que le faisait une première version du banc, revenait à
+pénaliser le système pour avoir correctement refusé une entrée invalide — d'où
+l'ajout de cette colonne.
+
+\subsection{Enseignement}
+
+L'auto-réparation par motif est adaptée aux erreurs qui sont \emph{réellement}
+d'ordre numérique, pour lesquelles ajuster un paramètre de résolution a un sens.
+Elle est structurellement inadaptée aux erreurs de \textbf{cohérence physique}
+et aux erreurs de \textbf{configuration}, qui représentent onze des douze
+fautes de ce banc.
+
+La conséquence pratique est un déplacement de l'effort~: plutôt que d'enrichir
+indéfiniment la base de motifs de plantage, il est plus rentable de
+\textbf{valider les entrées avant l'exécution}. Un cas qui ne peut pas être
+physiquement valide ne devrait jamais atteindre le solveur. Une première
+validation géométrique a été ajoutée en ce sens (§\ref{sec:bugs}).
+
+\section{Évaluation de la couche de décision}
+\label{sec:toolselection}
+
+Les sections précédentes mesurent la chaîne physique et la boucle de
+réparation. Restait un maillon non évalué, et pourtant central~: face à une
+demande formulée en français, le superviseur choisit-il le bon outil~?
+
+\subsection{Protocole}
+
+Vingt-six requêtes ont été rédigées, couvrant les six outils exposés à l'agent,
+plus quatre requêtes pour lesquelles \emph{aucun} outil ne doit être appelé —
+une salutation, une question de culture générale, un remerciement. Déclencher
+un outil sur ces dernières est un faux positif au même titre qu'un mauvais
+choix.
+
+Les outils ne sont pas exécutés. Ils sont liés au modèle, et c'est
+l'\emph{intention} produite — la liste des appels demandés — qui est relevée.
+Ce protocole mesure exactement la sélection, sans effet de bord~: aucun cas
+n'est créé, aucun solveur lancé. Il tient en une passe par requête.
+
+Il faut souligner que cette évaluation n'était pas praticable avant
+l'accélération matérielle décrite en section~\ref{sec:latence}. À quatre
+minutes par invocation, ces vingt-six requêtes auraient demandé près de deux
+heures~; elles s'exécutent désormais en moins d'une minute, ce qui autorise
+plusieurs itérations dans une même séance de travail.
+
+\subsection{Résultats et diagnostic}
+
+La première campagne donne une exactitude globale de \SI{77}{\percent}. La
+répartition par outil, en revanche, est très inégale
+(tableau~\ref{tab:toolsel}) et désigne un coupable unique~: l'analyseur de
+sûreté n'est correctement sélectionné que dans un cas sur quatre.
+
+\begin{table}[htbp]
+\centering
+\caption[Exactitude de sélection des outils]{Exactitude de sélection des outils, avant et après reformulation des
+descriptions. Un cas est compté correct si l'outil attendu est appelé en
+premier, ou si aucun outil n'est appelé lorsque aucun n'est attendu.}
+\label{tab:toolsel}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Outil attendu} & \textbf{$n$} & \textbf{Avant} & \textbf{Après}\\
+\midrule
+Création de cas & 4 & 4/4 & 4/4\\
+Exécution du solveur & 4 & 4/4 & 4/4\\
+Post-traitement & 4 & 3/4 & 3/4\\
+Analyse de sûreté & 4 & \textcolor{cAlert}{\textbf{1/4}} & \textbf{4/4}\\
+Émulateur & 3 & 2/3 & 2/3\\
+Documentation & 3 & 3/3 & 3/3\\
+Aucun outil attendu & 4 & 3/4 & 3/4\\
+\midrule
+\textbf{Total} & \textbf{26} & \textbf{20/26 (\SI{77}{\percent})} &
+  \textbf{23/26 (\SI{88}{\percent})}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+L'examen des trois échecs est éclairant. Sur « vérifie si un critère de sûreté
+est franchi », l'agent appelle l'exécuteur~; sur « analyse les marges PCMI et
+dis-moi quand la limite sera atteinte », il appelle l'émulateur~; sur « y a-t-il
+un risque de fusion du combustible~? », il n'appelle rien.
+
+La cause n'est pas le modèle, mais les descriptions fournies. Celles de
+l'analyseur de sûreté et de l'émulateur promettaient exactement la même chose —
+marges de sûreté, statut par critère, PCMI, fermeture du jeu — sans jamais
+énoncer ce qui les distingue réellement. Or ce critère est simple et sans
+ambiguïté~: \textbf{l'analyseur exige un cas déjà simulé sur disque, l'émulateur
+ne prend que des paramètres numériques}.
+
+\subsection{Correction et re-mesure}
+
+Les deux descriptions ont été réécrites pour énoncer explicitement cette
+condition d'emploi, et pour se désigner mutuellement comme alternatives à ne
+pas confondre. Aucune autre modification n'a été apportée — ni au modèle, ni au
+code des outils, ni aux requêtes.
+
+L'exactitude de l'analyseur de sûreté passe de \SI{25}{\percent} à
+\SI{100}{\percent}, et l'exactitude globale de \SI{77}{\percent} à
+\SI{88}{\percent}.
+
+L'enseignement dépasse ce cas particulier. Dans une architecture à outils, la
+description d'un outil n'est pas de la documentation~: c'est l'\emph{interface
+de programmation} par laquelle le modèle décide. Deux outils dont les
+descriptions se recouvrent sont, du point de vue du modèle, indiscernables — et
+aucune qualité du modèle ne compense cette ambiguïté. C'est aussi une bonne
+nouvelle en termes de coût~: onze points d'exactitude ont été gagnés en
+réécrivant deux paragraphes, sans réentraînement ni changement de modèle.
+
+Les trois erreurs restantes ne relèvent pas de cette cause. Deux concernent des
+formulations où la frontière est objectivement discutable — « estime rapidement
+la température maximale » peut légitimement appeler l'émulateur comme le
+post-traitement — et la troisième est un appel à la documentation sur une
+question de culture générale, faux positif bénin.
+
+\subsection{De la sélection à l'exécution : un angle mort}
+\label{sec:angle-mort}
+
+L'évaluation qui précède mesure quel outil l'agent \emph{choisit}. Elle ne dit
+rien de ce qui se passe quand cet appel est réellement \emph{exécuté}, puisque
+le protocole lit l'intention sans jamais la déclencher. Ce choix, justifié pour
+isoler la décision, s'est révélé être un angle mort~: la première tentative
+d'exécution de bout en bout a échoué complètement, sur un défaut invisible pour
+le banc de sélection.
+
+\textbf{Un schéma d'outil incompatible avec l'usage.} L'outil de création
+déclarait son paramètre \texttt{params} comme une \emph{chaîne} contenant du
+JSON. Or un modèle de langage produit spontanément un \emph{objet} pour un
+argument ainsi nommé. La validation le refusait, l'agent recevait un message
+d'erreur, et rejouait le même appel à l'identique. Mesuré~: \num{30} appels
+d'outils, \num{53} messages, \SI{179}{\second}, \textbf{aucune création aboutie}.
+Accepter les deux formes a supprimé la boucle.
+
+\textbf{Une fenêtre de contexte trop étroite.} Un second défaut se manifestait
+par des blocages sur les demandes en plusieurs étapes, alors qu'une question
+simple recevait une réponse en une seconde. La mesure a montré que le prompt
+système et les schémas des outils consomment à eux seuls
+\textbf{$\sim$\num{1900} tokens, soit \SI{47}{\percent} de la fenêtre de
+\num{4096} tokens} retenue par défaut — avant tout échange. Un seul résultat
+d'outil suffisait ensuite à la faire déborder. La fenêtre a été portée à
+\num{16384} tokens.
+
+Le tableau~\ref{tab:bout-en-bout} donne l'effet cumulé de ces deux corrections
+sur la même demande.
+
+\begin{table}[htbp]
+\centering
+\caption[Exécution de bout en bout]{Exécution de bout en bout d'une demande en quatre étapes (créer,
+simuler, post-traiter, analyser la sûreté), avant et après correction du schéma
+d'outil et de la fenêtre de contexte.}
+\label{tab:bout-en-bout}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Indicateur} & \textbf{Avant} & \textbf{Après}\\
+\midrule
+Appels d'outils & \num{30} & \textbf{\num{5}}\\
+Messages échangés & \num{53} & \textbf{\num{11}}\\
+Durée totale & \SI{179}{\second} & \textbf{\SI{39}{\second}}\\
+Cas créé et simulé & \textcolor{cAlert}{\textbf{non}} & \textbf{oui}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+L'enseignement méthodologique dépasse ces deux correctifs. Un banc de mesure
+délimite ce qu'il peut voir~: mesurer la sélection donnait \SI{88}{\percent} de
+réussite pendant que l'exécution de la tâche principale échouait dans
+\SI{100}{\percent} des cas. \textbf{Un indicateur flatteur sur un maillon ne
+renseigne pas sur la chaîne.} La transcription complète de la session
+réussie figure en annexe~\ref{ann:session}.
+
+\section{Évaluation de l'assistant documentaire}
+\label{sec:rag}
+
+L'assistant documentaire était le dernier composant du système à n'être étayé
+par aucune mesure. Son évaluation a produit le résultat le plus net de tout ce
+chapitre.
+
+\subsection{Protocole}
+
+Ce qui détermine la qualité d'une réponse documentaire, c'est la
+\textbf{recherche} qui la précède~: si le mauvais extrait remonte, la réponse
+sera fausse quelle que soit la qualité du modèle de langage. C'est donc la
+recherche seule qui est mesurée ici.
+
+Quinze questions ont été rédigées, chacune associée au document du corpus qui
+contient effectivement la réponse. Deux indicateurs sont relevés~: le bon
+document est-il celui du premier extrait (exactitude@1), et apparaît-il parmi
+les quatre extraits remontés (rappel@4)~? Le second est le plus pertinent en
+pratique, puisque l'agent reçoit les quatre extraits.
+
+Le corpus ne comptant que quatre documents, un tirage au hasard donnerait déjà
+environ \SI{33}{\percent} d'exactitude@1. Ce seuil sert de référence basse.
+
+\subsection{Un résultat sous le hasard}
+
+La première campagne donne \SI{27}{\percent} d'exactitude@1 — soit
+\textbf{moins bien qu'un tirage au hasard}. Mais l'indicateur réellement
+alarmant est ailleurs~: le rappel@4 vaut lui aussi \SI{27}{\percent}, exactement
+la même valeur.
+
+Cette égalité est le signe d'une défaillance structurelle. Avec quatre extraits
+remontés et quatre documents au corpus, le rappel@4 devrait être proche de
+\SI{100}{\percent}. Qu'il soit égal à l'exactitude@1 signifie que les quatre
+extraits proviennent \emph{toujours du même document}~: la recherche s'effondre
+systématiquement sur une seule source.
+
+\subsection{Diagnostic : une défaillance translinguistique}
+
+L'examen du corpus fournit l'explication. Il est \textbf{bilingue}, et le
+partage est net~: les deux fichiers qui documentent réellement OFFBEAT — la
+structure d'un cas et la liste des commandes — sont en \textbf{anglais}, car ils
+proviennent du dépôt du code~; les documents ajoutés par le projet sont en
+\textbf{français}.
+
+Or l'agent est piloté en français. Le modèle d'embeddings employé apparie alors
+les questions françaises aux documents français, indépendamment de leur
+contenu. La documentation OFFBEAT proprement dite n'est jamais atteinte.
+
+L'expérience de contrôle lève tout doute~: les mêmes questions posées en anglais
+retrouvent correctement les documents anglais.
+
+\begin{table}[htbp]
+\centering
+\caption[Effet de la langue sur la recherche]{Effet de la langue de la question sur la recherche documentaire, à
+corpus et modèle inchangés. Le mécanisme de recherche fonctionne~; c'est le
+franchissement de la barrière linguistique qui échoue.}
+\label{tab:rag-langue}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Langue de la question} & \textbf{Exactitude@1} & \textbf{Rappel@4}\\
+\midrule
+Français $\rightarrow$ documents anglais & \textcolor{cAlert}{\textbf{0/11}} &
+  \textcolor{cAlert}{\textbf{0/11}}\\
+Anglais $\rightarrow$ documents anglais & 9/11 (\SI{82}{\percent}) &
+  \textbf{11/11 (\SI{100}{\percent})}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Correction et re-mesure}
+
+Le correctif naturel n'est pas de traduire la documentation — elle appartient au
+dépôt amont et devrait être maintenue à chaque montée de version — mais de
+remplacer le modèle d'embeddings par un modèle \textbf{multilingue}, qui projette
+un texte français et sa traduction anglaise au même endroit de l'espace
+vectoriel. Le corpus et l'index ont été reconstruits à l'identique, seul le
+modèle d'embeddings changeant.
+
+\begin{table}[htbp]
+\centering
+\caption[Qualité de la recherche documentaire]{Qualité de la recherche documentaire avant et après passage à un
+modèle d'embeddings multilingue. Corpus, questions et découpage identiques.}
+\label{tab:rag}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Indicateur} & \textbf{Modèle initial} & \textbf{Modèle multilingue}\\
+\midrule
+Exactitude@1 & \SI{27}{\percent} & \textbf{\SI{87}{\percent}}\\
+Rappel@4 & \SI{27}{\percent} & \textbf{\SI{100}{\percent}}\\
+\midrule
+Structure d'un cas & 0/6 & \textbf{6/6}\\
+Commandes & 0/5 & 3/5 (rappel@4~: 5/5)\\
+Ajout d'une erreur & 4/4 & 4/4\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le rappel@4 atteint \SI{100}{\percent}~: l'agent reçoit désormais toujours le
+bon document parmi ses quatre extraits. Le modèle multilingue est devenu le
+défaut du projet.
+
+Ce cas complète les deux précédents et forme avec eux un motif~: aucune de ces
+trois défaillances — descriptions d'outils recouvrantes, domaine d'apprentissage
+dégénéré, recherche translinguistique — n'était visible sans mesure, et chacune
+s'est corrigée sans réécrire de code applicatif. Ce qui manquait n'était pas de
+la technique, mais de l'\emph{instrumentation}.
+
+\section{Confronter le critère à ce que le solveur calcule}
+\label{sec:seuils}
+
+Les seuils de sûreté sont, dans l'architecture retenue, de simples constantes
+inscrites dans un fichier JSON. Vérifier ces constantes contre le modèle
+physique effectivement résolu a révélé deux défauts de même nature, et suggéré
+une amélioration de fond.
+
+\subsection{Un critère qui vérifiait une limite que la simulation n'utilise pas}
+
+La limite d'écoulement de la gaine était fixée à \SI{350}{\mega\pascal} dans la
+base de critères. Or le gabarit configure le modèle de plasticité avec une
+limite de \SI{250}{\mega\pascal}. Le critère de sûreté évaluait donc la
+contrainte calculée par le solveur \emph{contre une limite que ce même solveur
+n'applique pas} — un écart de \SI{100}{\mega\pascal}, soit \SI{40}{\percent}.
+Sur le cas de référence, la marge annoncée passait ainsi de
+\SI{32}{\percent} réels à \SI{23}{\percent} affichés.
+
+La correction ne consiste pas à recopier la bonne constante, car cela
+reproduirait le même risque de désynchronisation. OFFBEAT écrit la limite
+d'écoulement comme un \textbf{champ}, \texttt{sigmaY}, cellule par cellule~: la
+base de critères a donc été étendue pour qu'une limite puisse désigner un champ
+(\texttt{limit\_field}) plutôt qu'une constante. Le rapport à la limite est
+alors calculé \emph{point par point} puis réduit~:
+\[
+  \max_{x}\ \frac{|\sigma_{\theta\theta}(x)|}{\sigma_Y(x)}
+\]
+
+Ce calcul point par point n'est pas un raffinement cosmétique. Le pic de
+contrainte et le minimum de limite ne sont pas au même endroit~; comparer le
+maximum de l'un au minimum de l'autre donne un résultat qui ne correspond à
+aucun point du crayon. Sur un cas de test construit à cet effet, le critère
+naïf conclut à \SI{83}{\percent} de la limite là où le calcul correct donne
+\SI{150}{\percent} — c'est-à-dire un franchissement manqué.
+
+Le bénéfice principal est de nature architecturale~: le critère hérite
+désormais \emph{automatiquement} de toute dépendance en température, en
+irradiation ou en burnup que le modèle matériau viendrait à porter, sans qu'une
+seule valeur ait à être maintenue en double.
+
+\subsection{Un critère qui mesurait autre chose que ce qu'il annonçait}
+
+Le critère PCMI énonce une limite sur la déformation circonférentielle
+\textbf{plastique}. Il lisait en réalité \texttt{epsilonCyl}, la déformation
+\textbf{totale}. La décomposition des déformations sur le cas de référence
+(tableau~\ref{tab:deformations}) montre l'ampleur du malentendu.
+
+\begin{table}[htbp]
+\centering
+\caption[Décomposition de la déformation de gaine]{Décomposition de la déformation circonférentielle de la gaine en fin
+de cycle. Le critère PCMI lisait le total, alors que son énoncé porte sur la
+seule composante plastique — qui est exactement nulle.}
+\label{tab:deformations}
+\begin{tabularx}{0.9\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Composante} & \textbf{Valeur maximale} & \textbf{Réversible~?}\\
+\midrule
+Totale (\texttt{epsilonCyl}, lue par l'ancien critère) & \num{1.81e-3} & ---\\
+\midrule
+Plastique (\texttt{epsilonP}) & \textbf{exactement 0} & non\\
+Fluage (\texttt{epsilonCreepEq}) & \num{3.55e-3} & non\\
+Élastique (\texttt{epsEl}) & \num{1.03e-3} & oui\\
+Thermique (\texttt{epsTh}) & \num{2.31e-3} & oui\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le critère annonçait donc \SI{18}{\percent} d'une limite dont la grandeur
+mesurée est en réalité à \SI{0}{\percent}. L'erreur allait dans le sens
+conservatif — la déformation totale majore la plastique — mais elle mesurait la
+mauvaise grandeur, et surtout elle masquait l'essentiel~: la déformation
+irréversible réellement présente est celle de \textbf{fluage}, presque deux fois
+supérieure au total rapporté, et qu'aucun critère ne surveillait.
+
+Le critère PCMI lit désormais la déformation plastique, conformément à son
+énoncé, et un critère distinct a été ajouté pour la déformation de fluage. La
+question de savoir si le critère de conception à \SI{1}{\percent} porte sur la
+plasticité seule ou sur la déformation permanente totale reste ouverte et
+figure parmi les points à trancher avec l'encadrant.
+
+\subsection{Effet de bord sur l'émulateur}
+
+Ces corrections ont eu une conséquence que seule une vérification systématique
+pouvait faire apparaître. L'émulateur du chapitre~3 relève ses grandeurs cibles
+\emph{à travers} la base de critères~: rendre le critère PCMI conforme à son
+énoncé a donc fait tomber à zéro l'une de ses trois cibles, la déformation
+plastique étant nulle en fonctionnement nominal. La cible aurait été dégénérée,
+sans variation à apprendre.
+
+L'émulateur vise désormais la déformation de fluage et le plan d'expériences a
+été reconstruit en conséquence. Le résultat est meilleur qu'auparavant~: le
+fluage s'accumule de façon monotone, là où la déformation totale était non
+monotone, et le coefficient de détermination en validation croisée passe de
+$0{,}9535$ à $\mathbf{0{,}9905}$ (tableau~\ref{tab:surrogate}). La grandeur
+correcte se trouve être aussi la plus facile à apprendre. La prédiction de la
+date de fermeture du jeu, résultat principal de la section
+\ref{sec:validation-emulateur}, est inchangée.
+
+C'est une illustration de plus du couplage entre des composants qu'on croit
+indépendants~: une correction de justesse dans la base de seuils invalidait
+silencieusement une cible d'apprentissage située deux couches plus loin. Elle
+n'a été détectée que parce que chaque modification a été suivie d'une
+vérification de bout en bout.
+
+\section{Défauts de justesse identifiés et corrigés}
+\label{sec:bugs}
+
+Une seconde forme de mise à l'épreuve s'est révélée au moins aussi fructueuse~:
+non plus provoquer des plantages, mais confronter des résultats obtenus à des
+résultats attendus. Quatorze défauts ont ainsi été identifiés, dont \textbf{aucun
+ne provoquait d'erreur visible} (tableau~\ref{tab:bugs}). Ce sont des erreurs
+de \textit{justesse}, silencieuses par nature, et donc particulièrement
+préoccupantes dans un contexte de sûreté~: le système produisait des nombres
+plausibles, correctement formatés, et faux.
+
+\begin{table}[htbp]
+\centering
+\caption[Défauts de justesse identifiés]{Défauts de justesse identifiés au cours de l'exploitation et corrigés.}
+\label{tab:bugs}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}XX@{}}
+\toprule
+\textbf{Composant} & \textbf{Symptôme} & \textbf{Cause et portée}\\
+\midrule
+Analyseur de sûreté & Un jeu pastille-gaine fermé, donc négatif, était
+  rapporté comme sûr & Le rapport à la limite est calculé par division~;
+  une valeur négative en inverse le signe. Le seul critère franchi du cas de
+  référence était masqué\\
+\addlinespace
+Post-traitement & La « température maximale de gaine » valait
+  \SI{1467}{\kelvin} & L'extremum était pris sur tout le maillage, donc au
+  c\oe ur de la pastille. Écart de \SI{830}{\kelvin} avec la valeur réelle
+  (\SI{637}{\kelvin})\\
+\addlinespace
+Analyseur de sûreté & Contrainte et déformation de gaine surestimées &
+  Même cause~; le signe lui-même était erroné, une traction étant rapportée
+  là où la gaine est en compression\\
+\addlinespace
+Générateur de cas & Fichier de géométrie corrompu après modification d'un
+  paramètre à plusieurs valeurs & L'expression régulière de substitution
+  s'arrêtait à la première virgule d'une liste, produisant un littéral
+  invalide\\
+\addlinespace
+Générateur de cas & Aucun garde-fou géométrique & Rayons de pastille et de
+  gaine jamais comparés entre eux (cf. §\ref{sec:epreuve})\\
+\addlinespace
+Émulateur & Validation \textit{leave-one-out} à $R^2 > 0{,}998$ &
+  Domaine d'apprentissage dégénéré~: saturation thermique dès
+  \SI{5000}{\second}, et \num{10000} fois en deçà des durées d'intérêt
+  (§\ref{sec:validation-emulateur})\\
+\addlinespace
+Auto-réparation & Le correctif de durée simulée n'aboutissait jamais &
+  Décrément de \SI{1}{\percent} par tentative~: \num{18} tentatives
+  nécessaires pour un budget de \num{3} (§\ref{sec:epreuve})\\
+\addlinespace
+Descriptions d'outils & L'analyseur de sûreté n'était sélectionné qu'une fois
+  sur quatre & Recouvrement avec la description de l'émulateur, sans énoncé du
+  critère distinctif (§\ref{sec:toolselection})\\
+\addlinespace
+Lecture des champs & Tous les critères rapportés « champ absent » sur un cas
+  multi-régions & La fusion des blocs du maillage inclut les régions sans
+  données et perd les champs~; détecté en portant les outils sur les cas de
+  vérification (§\ref{sec:verification})\\
+\addlinespace
+Assistant documentaire & Recherche moins performante qu'un tirage au hasard &
+  Corpus bilingue et modèle d'embeddings monolingue~: les questions françaises
+  n'atteignaient jamais la documentation anglaise (§\ref{sec:rag})\\
+\addlinespace
+Schéma de l'outil de création & L'agent bouclait sans jamais créer de cas &
+  Le paramètre était déclaré comme une chaîne JSON là où un modèle produit un
+  objet~; 30 appels sans aboutir (§\ref{sec:angle-mort})\\
+\addlinespace
+Fenêtre de contexte & Blocage sur les demandes en plusieurs étapes &
+  \num{4096} tokens par défaut, dont \SI{47}{\percent} consommés par le prompt
+  système et les schémas d'outils avant tout échange (§\ref{sec:angle-mort})\\
+\addlinespace
+Seuil de contrainte gaine & Le critère vérifiait \SI{350}{\mega\pascal} quand le
+  solveur applique \SI{250}{\mega\pascal} & Constante figée, désynchronisée du
+  modèle matériau~; marge affichée \SI{23}{\percent} au lieu de
+  \SI{32}{\percent} (§\ref{sec:seuils})\\
+\addlinespace
+Critère PCMI & Annonçait \SI{18}{\percent} d'une limite en déformation
+  plastique & Lisait la déformation \emph{totale}~; la plastique est exactement
+  nulle, et le fluage — irréversible — n'était pas surveillé
+  (§\ref{sec:seuils})\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Les deux défauts portant sur les grandeurs de gaine — la température maximale
+et la contrainte de cerclage — ont une origine commune, qui mérite d'être
+explicitée car elle est instructive. Le maillage d'un crayon contient à la fois
+la pastille et la gaine. Prendre le maximum d'un champ « sur le domaine »
+revient donc, pour la température, à mesurer le c\oe ur de la pastille — la
+région la plus chaude — alors que le critère porte sur la gaine. Le code
+initial en avait conscience et documentait ce choix comme une approximation
+conservative~; l'analyse a montré qu'elle ne l'était pas toujours, puisque dans
+le cas de la contrainte elle inversait le signe du résultat.
+
+La correction a consisté à exploiter les \textit{zones de cellules} définies par
+OFFBEAT, qui distinguent explicitement le combustible de la gaine dans le
+maillage. Il a fallu pour cela activer une option de lecture qui n'est pas
+active par défaut. La correction retombe silencieusement sur le comportement
+antérieur si la zone n'est pas disponible, de sorte qu'aucun cas existant ne
+peut être cassé par ce changement.
+
+\section{Performance de l'environnement d'exécution}
+\label{sec:latence}
+
+Le portage du projet sur une nouvelle machine a été l'occasion d'un gain de
+performance notable sur l'inférence du modèle de langage, qui constituait le
+principal frein au développement. Le tableau~\ref{tab:latence} en donne la
+mesure.
+
+\begin{table}[htbp]
+\centering
+\caption[Latence d'une invocation du modèle]{Latence d'une invocation du modèle de langage
+(\num{7} milliards de paramètres, requête courte).}
+\label{tab:latence}
+\begin{tabularx}{0.85\textwidth}{@{}Xr@{}}
+\toprule
+\textbf{Configuration} & \textbf{Latence}\\
+\midrule
+Processeur seul & \SI{64}{\second}\\
+Carte graphique, premier appel (chargement du modèle) & \SI{11.4}{\second}\\
+Carte graphique, modèle déjà chargé & \SI{0.33}{\second}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Le facteur d'accélération d'environ \num{190} entre l'exécution sur processeur
+et l'exécution sur carte graphique modifie qualitativement les conditions de
+travail~: il devient possible de tester l'agent en boucle complète plutôt que
+d'employer des contournements pour éviter les délais d'attente. Les difficultés
+rencontrées pour obtenir cette accélération sont relatées au chapitre suivant.
+
+\clearpage
+
+%==============================================================================
+% CHAPITRE 5
+%==============================================================================
+\chapter{Difficultés, fausses routes et planning}
+\markboth{Chapitre 5 — Difficultés, fausses routes et planning}{}
+
+Ce chapitre rend compte des obstacles rencontrés. Il ne s'agit pas d'un
+catalogue d'anecdotes~: chacune de ces difficultés a modifié une décision de
+conception ou une méthode de travail.
+
+\section{Difficultés techniques}
+
+\subsection{L'accélération matérielle du modèle de langage}
+
+Le développement était initialement ralenti par des invocations de l'agent
+dépassant les quatre minutes, le modèle de langage s'exécutant sur processeur.
+La machine de travail disposant d'une carte graphique performante, l'exploiter
+paraissait immédiat. Ce fut la difficulté la plus longue à résoudre, pour trois
+raisons enchaînées.
+
+D'abord, la pile logicielle habituelle d'accélération pour ce fabricant de
+cartes graphiques ne couvre pas le modèle dont disposait la machine sous
+l'environnement Linux utilisé. Il a fallu identifier qu'une voie alternative,
+fondée sur une interface graphique standard, était disponible et devait être
+préférée.
+
+Ensuite, un message d'erreur trompeur a fait perdre du temps~: le journal
+indiquait que le pilote graphique était trop ancien, alors qu'il était à jour.
+Ce message provenait en réalité d'un test relatif à la pile non retenue, sans
+rapport avec la voie effectivement utilisée. La leçon est classique mais mérite
+d'être retenue~: un message d'erreur explicite n'est pas nécessairement un
+message d'erreur \emph{pertinent}.
+
+Enfin, une seconde installation du même service, effectuée par erreur à
+l'intérieur de l'environnement Linux au lieu du système hôte, interceptait
+silencieusement toutes les requêtes. Les mesures obtenues étaient donc celles de
+la configuration lente, alors même que la configuration rapide était en place.
+Cette confusion illustre un point méthodologique~: en présence de deux services
+équivalents sur le même port, aucune mesure n'est fiable tant que l'on n'a pas
+vérifié \emph{lequel} répond.
+
+\subsection{La compilation du solveur}
+
+L'installation d'OFFBEAT a buté sur un obstacle simple~: l'adresse du dépôt
+indiquée dans la documentation interne du projet n'était plus valide. Le dépôt
+public réel a dû être identifié, et sa structure de compilation s'est révélée
+différente de celle décrite. La compilation elle-même s'est ensuite déroulée
+sans erreur.
+
+Cet épisode a conduit à une remarque plus générale~: la documentation d'un
+projet vieillit, et une documentation fausse coûte plus cher qu'une
+documentation absente, car elle oriente activement dans la mauvaise direction.
+
+\subsection{Dépendances non déclarées}
+
+Le portage sur une machine neuve a fait apparaître trois bibliothèques Python
+utilisées par le code mais absentes de la liste des dépendances. Elles étaient
+présentes par accident sur la machine d'origine. Ce type de défaut ne se révèle
+que lors d'un transfert, ce qui plaide pour effectuer un tel transfert
+\emph{tôt} plutôt qu'en fin de projet.
+
+\section{Fausses routes et réorientations}
+
+\subsection{Un diagnostic correct mais inopérant}
+
+La fausse route la plus instructive concerne la conception même de
+l'auto-réparation. L'hypothèse initiale, héritée du projet de référence, était
+qu'un plantage se caractérise suffisamment par sa signature dans le journal
+d'exécution. La mise à l'épreuve du chapitre~4 a montré que cette hypothèse est
+insuffisante~: deux plantages de signature identique peuvent appeler des
+remèdes opposés, voire aucun remède automatisable.
+
+La réorientation qui en découle est un déplacement de l'effort~: plutôt que
+d'enrichir indéfiniment la base de motifs de plantage, il est plus efficace de
+\textbf{valider les entrées avant l'exécution}. Un cas qui ne peut pas être
+physiquement valide ne devrait jamais atteindre le solveur.
+
+\subsection{Une approximation conservative qui ne l'était pas}
+
+La seconde fausse route est le choix initial de mesurer les grandeurs de gaine
+sur l'ensemble du domaine, en le documentant comme une approximation
+conservative. Le raisonnement paraissait solide~: surestimer une contrainte ne
+peut que placer du côté de la sécurité.
+
+Il était faux. Dans le cas de la contrainte de cerclage, l'extremum retenu se
+situait dans la pastille et portait un signe opposé à la contrainte réelle dans
+la gaine — une traction rapportée là où la gaine était en compression. Une
+approximation prudente sur le principe s'était transformée en résultat
+qualitativement faux.
+
+L'enseignement retenu dépasse ce cas particulier~: un choix documenté comme
+conservatif doit être \emph{vérifié} comme tel, et non supposé. La correction a
+été validée sur un cas réel, où elle a effectivement modifié le résultat d'un
+facteur cinq sur la déformation et changé le signe de la contrainte.
+
+\subsection{Une validation rigoureuse d'un problème sans intérêt}
+
+La troisième fausse route est celle dont j'ai tiré le plus d'enseignement, car
+elle ne portait pas sur un bogue mais sur une \emph{méthode}.
+
+L'émulateur avait été validé avec ce qui me paraissait être toutes les
+précautions~: une validation croisée \textit{leave-one-out}, choisie
+précisément parce qu'elle est plus honnête qu'un coefficient d'ajustement, et
+des coefficients de détermination supérieurs à $0{,}998$ sur les trois
+grandeurs suivies. La méthode statistique était correcte et le résultat
+excellent.
+
+Le problème est que la question posée ne l'était pas. Le domaine
+d'échantillonnage — quelques milliers de secondes — avait été choisi pour que
+le plan d'expériences reste rapide à construire, à une époque où le solveur
+n'était pas compilé localement. Or sur ce domaine, le crayon atteint son
+équilibre thermique~: la durée d'irradiation, seconde variable du modèle,
+n'apportait presque plus d'information. J'avais donc validé rigoureusement un
+modèle sur un problème quasi unidimensionnel, alors que le tableau de bord
+présentait ses prédictions comme des marges de sûreté à deux paramètres.
+
+Ce qui a permis de le voir n'est pas une métrique, mais une confrontation~: la
+simulation de référence tournait sur \SI{6.3e7}{\second} quand l'émulateur
+n'avait jamais vu au-delà de \SI{6500}{\second}. Un rapport de dix mille entre
+le domaine d'apprentissage et le domaine d'emploi ne peut pas se lire dans un
+$R^2$.
+
+L'enseignement est double. D'une part, une métrique de validation ne qualifie
+que l'ajustement à un jeu de données, jamais la pertinence de ce jeu de
+données~: un modèle peut être irréprochablement validé et néanmoins inutile.
+D'autre part, la contrainte pratique qui avait dicté ce choix — le coût de
+construction du plan d'expériences — avait disparu depuis la compilation locale
+du solveur, sans que je réexamine la décision qu'elle avait motivée. Les
+hypothèses de conception méritent d'être réévaluées quand les contraintes qui
+les justifiaient changent.
+
+\subsection{Sur l'usage d'un assistant de programmation}
+
+Le développement a été mené avec l'appui d'un assistant de programmation fondé
+sur un modèle de langage. Le recul acquis mérite d'être consigné, le sujet du
+stage portant lui-même sur cette classe d'outils.
+
+L'assistance s'est révélée très efficace pour la production de code structuré
+et pour l'exploration d'une base de code inconnue. Elle s'est révélée en
+revanche incapable de détecter seule les défauts de justesse du
+tableau~\ref{tab:bugs}~: ceux-ci n'ont été trouvés qu'en \emph{confrontant des
+résultats numériques à une attente physique} — pourquoi la température de gaine
+est-elle égale à celle du c\oe ur de pastille~? pourquoi un gap fermé est-il
+rapporté comme sûr~? Le jugement physique reste le maillon déterminant, et cette
+observation vaut aussi pour l'agent développé ici.
+
+\clearpage
+
+%==============================================================================
+% PLANNING (page complète juste avant la conclusion, cf. consignes)
+%==============================================================================
+\section*{Planning du stage}
+\addcontentsline{toc}{section}{Planning du stage}
+
+\vspace{0.4cm}
+
+\noindent
+\textit{\color{red}[À ajuster selon les dates réelles du stage. Les phases
+ci-dessous reflètent l'ordre de construction effectivement suivi.]}
+
+\vspace{0.6cm}
+
+\begin{table}[htbp]
+\centering
+\caption[Déroulement du stage par phases]{Déroulement du stage par phases.}
+\label{tab:planning}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}
+                                >{\raggedright\arraybackslash}p{4.3cm}X@{}}
+\toprule
+\textbf{Période} & \textbf{Phase} & \textbf{Livrable / jalon}\\
+\midrule
+Semaines 1--2 & Prise en main
+  & Physique du combustible, prise en main d'OpenFOAM et d'OFFBEAT,
+    étude du projet de référence AutoFLUKA\\
+\addlinespace
+Semaines 3--4 & Socle logiciel
+  & Arborescence du projet, fabrique de modèles de langage agnostique,
+    environnement de développement\\
+\addlinespace
+Semaines 5--6 & Exécution et auto-réparation
+  & Outil d'exécution du solveur validé sur un cas réel~; base de motifs
+    d'erreur et boucle de réparation\\
+\addlinespace
+Semaines 7--8 & Agent complet
+  & Superviseur, outil de génération de cas, post-traitement~;
+    premier enchaînement de bout en bout\\
+\addlinespace
+Semaines 9--10 & Interface et documentation
+  & Interface web, assistant documentaire par recherche sémantique\\
+\addlinespace
+Semaines 11--13 & Jumeau numérique
+  & Analyseur de sûreté, pronostic, assimilation, tableau de bord,
+    émulateur par processus gaussien\\
+\addlinespace
+Semaines 14--15 & Validation et consolidation
+  & Simulation de référence sur cycle complet, mise à l'épreuve de
+    l'auto-réparation, correction des défauts de justesse\\
+\addlinespace
+Semaine 16 & Rédaction
+  & Rapport et soutenance\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\clearpage
+
+%==============================================================================
+% CONCLUSION
+%==============================================================================
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+\markboth{Conclusion}{Conclusion}
+
+\section*{Bilan du travail}
+
+Ce projet de recherche a abouti à un système fonctionnel, \textbf{AutoOFFBEAT},
+qui permet de piloter le code de performance combustible OFFBEAT à partir de
+demandes formulées en langage naturel. L'agent crée des cas de calcul à partir
+de gabarits validés, exécute le solveur, tente de réparer automatiquement
+certains plantages, post-traite les résultats et évalue les marges de sûreté par
+rapport à des critères de conception.
+
+Le système a ensuite été étendu vers un jumeau numérique de crayon
+combustible~: surveillance des critères de sûreté, pronostic de franchissement
+de seuil, tableau de bord, et émulateur par processus gaussien restituant en
+quelques millisecondes les résultats d'une simulation, avec une incertitude
+associée et une fidélité vérifiée par validation croisée.
+
+Une simulation de référence sur un cycle d'irradiation de deux ans a permis de
+vérifier que la chaîne complète reproduit le comportement physique attendu, en
+particulier la fermeture du jeu pastille-gaine et le basculement associé de la
+contrainte de gaine de la compression vers la traction. L'émulateur, reconstruit
+sur un domaine d'irradiation réaliste, prédit la date de cette fermeture à
+\SI{4.4}{\percent} près pour une puissance qu'il n'a jamais rencontrée, en
+\SI{2}{\milli\second} au lieu de \SI{36}{\second}.
+
+Le second volet du travail, moins attendu au départ, est la \textbf{mise à
+l'épreuve mesurée du système}. Un banc d'injection de fautes a quantifié la
+portée réelle de l'auto-réparation~; une évaluation de la couche de décision a
+mesuré, puis amélioré de onze points, la justesse de sélection des outils. Ces
+deux bancs sont réexécutables et livrés avec le code~: ils constituent un
+harnais de non-régression pour la suite du projet.
+
+\section*{Ce que j'ai appris}
+
+Trois apprentissages me paraissent devoir être retenus.
+
+Le premier est d'ordre physique. Je découvrais entièrement la performance
+combustible au début du stage. Comprendre que le jeu pastille-gaine gouverne à
+la fois le comportement thermique et le comportement mécanique du crayon, et
+savoir lire dans des courbes de simulation la signature du contact, constitue
+l'acquis technique le plus net.
+
+Le deuxième porte sur l'architecture logicielle des systèmes fondés sur des
+modèles de langage. Le principe qui structure tout le projet — le modèle
+orchestre, il ne calcule pas~; le déterministe d'abord, le modèle en repli — est
+transposable bien au-delà d'OFFBEAT.
+
+Le troisième est méthodologique, et c'est peut-être le plus important. Les
+défauts les plus dangereux rencontrés n'étaient pas des plantages mais des
+résultats faux qui n'en avaient pas l'air. Aucun outil automatique ne les a
+signalés~; ils ont été trouvés en confrontant une valeur numérique à une
+attente physique. Une chaîne de calcul de sûreté ne se valide pas en vérifiant
+qu'elle s'exécute, mais en vérifiant que ce qu'elle produit a un sens.
+
+Ce troisième point admet un corollaire que je n'avais pas anticipé~: une
+métrique de validation peut elle-même être trompeuse. L'émulateur affichait un
+coefficient de détermination supérieur à $0{,}998$, obtenu par une méthode
+rigoureuse, sur un domaine qui ne recouvrait pas le problème réel. Vérifier
+qu'un modèle est bien ajusté et vérifier qu'il est ajusté à la bonne question
+sont deux opérations distinctes, et seule la seconde relève du jugement
+physique.
+
+\section*{Perspectives}
+
+Plusieurs suites concrètes se dégagent, par ordre de priorité.
+
+\textbf{Valider les seuils de sûreté.} Les critères actuellement inscrits dans
+la base de connaissance sont marqués comme non validés. Leur confirmation avec
+l'encadrant et la littérature est le préalable à tout usage sérieux de
+l'analyse de sûreté.
+
+\textbf{Trancher le périmètre.} Le passage du crayon isolé à l'assemblage
+change la nature du problème et reste une question ouverte.
+
+\textbf{Déplacer l'effort de la réparation vers la validation.} L'analyse du
+chapitre~4 montre que valider les entrées avant exécution est plus fiable
+qu'enrichir la base de motifs de plantage. Une première validation géométrique
+a été ajoutée~; elle pourrait être systématisée à l'ensemble des paramètres
+exposés.
+
+\textbf{Étendre l'émulateur.} L'émulateur ne couvre que deux paramètres. Sa
+reconstruction sur un domaine réaliste ayant montré qu'un plan de vingt-cinq
+simulations tient en une demi-heure, ajouter une troisième variable — la
+géométrie initiale du jeu, par exemple — est désormais abordable. Le code est
+écrit pour un nombre quelconque de variables.
+
+\textbf{Fiabiliser l'auto-réparation du pas de temps.} Le banc d'essai a montré
+que le correctif est annulé par le contrôleur adaptatif du solveur~; agir sur le
+pas de temps maximal plutôt que sur le pas initial est une correction
+identifiée et localisée.
+
+\textbf{Achever la validation des seuils.} La corrélation de décroissance de la
+température de fusion avec le taux de combustion a été tranchée en fin de stage
+par retour à la littérature~: la valeur portée par le projet provenait de la
+corrélation MATPRO, remplacée depuis dans les codes de référence
+(annexe~\ref{ann:safetykb}). La même démarche reste à mener sur les trois autres
+critères, dont la limite d'écoulement du Zircaloy, fortement dépendante de la
+température et pour l'instant renseignée par une valeur unique.
+
+\textbf{Étendre le banc d'essai de sélection d'outils.} Les vingt-six requêtes
+actuelles ont suffi à révéler une ambiguïté majeure entre deux descriptions.
+Un jeu plus large, et surtout des requêtes en plusieurs étapes, permettraient
+d'évaluer l'enchaînement d'outils et non plus le seul premier appel.
+
+\clearpage
+
+%==============================================================================
+% BIBLIOGRAPHIE
+%==============================================================================
+\chapter*{Bibliographie}
+\addcontentsline{toc}{chapter}{Bibliographie}
+\markboth{Bibliographie}{Bibliographie}
+
+\vspace{0.3cm}
+\noindent\textit{\color{red}[Références à compléter et à vérifier — notamment
+les articles de référence sur OFFBEAT, à citer dans leur version publiée.]}
+\vspace{0.6cm}
+
+\section*{Articles de périodique}
+
+\begin{list}{}{\setlength{\leftmargin}{1cm}\setlength{\itemindent}{-1cm}}
+
+\item[{[1]}]
+SCOLARO, Alessandro, CLIFFORD, Ivor, FIORINA, Carlo, PAUTZ, Andreas.
+The OFFBEAT multi-dimensional fuel behavior solver.
+\textit{Nuclear Engineering and Design}, 2020, vol.~358, 110416.
+\textit{\color{red}[références à vérifier sur la version publiée]}
+
+\item[{[2]}]
+SCOLARO, Alessandro \textit{et al.}
+Extension of the OFFBEAT fuel performance code to finite strains and
+validation against LOCA experiments.
+\textit{Nuclear Engineering and Design}, 2023.
+\textit{\color{red}[volume et pagination à compléter]}
+
+\item[{[3]}]
+NDUM NDUM, Zavier, TAO, Jian, FORD, John, LIU, Yang.
+AutoFLUKA: A Large Language Model Based Framework for Automating Monte Carlo
+Simulations in FLUKA. \textit{arXiv preprint} arXiv:2410.15222, 19 octobre 2024.
+DOI 10.48550/arXiv.2410.15222.
+\textit{\color{red}[une version de revue existe dans Energy and AI (2025)~;
+vérifier volume et numéro d'article avant remise]}
+
+\item[{[4]}]
+GEELHOOD, Kenneth J., LUSCHER, Walter G.
+FRAPCON and FRAPTRAN codes: fuel rod performance analysis codes under normal
+and accident conditions. In~: \textit{Advances in Nuclear Fuel Chemistry}.
+Elsevier, 2020.
+\textit{\color{red}[pagination à compléter]}
+
+\item[{[5]}]
+LASSMANN, Klaus.
+TRANSURANUS: a fuel rod analysis code ready for use.
+\textit{Journal of Nuclear Materials}, 1992, vol.~188, p.~295--302.
+\textit{\color{red}[référence à vérifier]}
+
+\item[{[6]}]
+WILLIAMSON, Richard L. \textit{et al.}
+Multidimensional multiphysics simulation of nuclear fuel behavior.
+\textit{Journal of Nuclear Materials}, 2012, vol.~423, n\textsuperscript{o}~1-3,
+p.~149--163.
+\textit{\color{red}[référence à vérifier]}
+
+\end{list}
+
+\section*{Rapports techniques et référentiels de sûreté}
+
+\begin{list}{}{\setlength{\leftmargin}{1cm}\setlength{\itemindent}{-1cm}}
+
+\item[{[7]}]
+PACIFIC NORTHWEST NATIONAL LABORATORY.
+\textit{Pellet-Cladding Mechanical Interaction Failure Threshold for Reactivity
+Initiated Accidents}. Rapport PNNL-22549.
+\url{https://www.pnnl.gov/main/publications/external/technical_reports/PNNL-22549.pdf}
+(consulté le \textit{[date]}).
+
+\item[{[8]}]
+U.S. NUCLEAR REGULATORY COMMISSION.
+\textit{Pellet Cladding Interaction Fuel Failures during Anticipated
+Operational Occurrences}. Document ML14107A179.
+\url{https://www.nrc.gov/docs/ML1410/ML14107A179.pdf}
+(consulté le \textit{[date]}).
+
+\item[{[9]}]
+AGENCE INTERNATIONALE DE L'ÉNERGIE ATOMIQUE.
+\textit{Technical and economic limits to fuel burnup extension}.
+IAEA-TECDOC-1299, Vienne, 2002.
+\url{https://www-pub.iaea.org/MTCD/Publications/PDF/te_1299_web.pdf}
+(consulté le \textit{[date]}).
+
+\item[{[10]}]
+U.S. NUCLEAR REGULATORY COMMISSION. \textit{10 CFR 50.46 — Acceptance criteria
+for emergency core cooling systems for light-water nuclear power reactors}.
+\textit{\color{red}[à vérifier et compléter]}
+
+\item[{[11]}]
+LUSCHER, Walter G., GEELHOOD, Kenneth J., PORTER, Ian E.
+\textit{Material Property Correlations: Comparisons between FRAPCON-4.0,
+FRAPTRAN-2.0, and MATPRO}. Rapport PNNL-19417 Rev.~2, Pacific Northwest
+National Laboratory, préparé pour le U.S. Department of Energy, septembre 2015.
+\S~2.1 (\textit{Fuel Melting Temperature}, sous-programme PHYPRP).
+
+\end{list}
+
+\section*{Sites web et documentation technique}
+
+\begin{list}{}{\setlength{\leftmargin}{1cm}\setlength{\itemindent}{-1cm}}
+
+\item
+FOAM-FOR-NUCLEAR. \textit{OFFBEAT Documentation} [en ligne].
+\url{https://foam-for-nuclear.gitlab.io/offbeat/}
+(consulté le \textit{[date]}).
+
+\item
+FOAM-FOR-NUCLEAR. \textit{OFFBEAT source repository} [en ligne].
+\url{https://gitlab.com/foam-for-nuclear/offbeat}
+(consulté le \textit{[date]}).
+
+\item
+OPENCFD LTD. \textit{OpenFOAM v2506 User Guide} [en ligne].
+\url{https://www.openfoam.com/documentation/}
+(consulté le \textit{[date]}).
+
+\item
+SMARTLABNUCLEAR. \textit{AutoFLUKA} [en ligne].
+\url{https://github.com/SmartLabNuclear/AutoFLUKA}
+(consulté le \textit{[date]}).
+
+\item
+LANGCHAIN. \textit{LangChain / LangGraph documentation} [en ligne].
+\url{https://python.langchain.com/}
+(consulté le \textit{[date]}).
+
+\end{list}
+
+
+\clearpage
+
+%==============================================================================
+% GLOSSAIRE
+%==============================================================================
+\chapter*{Glossaire}
+\addcontentsline{toc}{chapter}{Glossaire}
+\markboth{Glossaire}{Glossaire}
+
+\vspace{0.4cm}
+
+\noindent
+\begin{xltabular}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}
+                     >{\raggedright\arraybackslash}p{4.4cm}
+                     >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Français} & \textbf{Anglais} & \textbf{Définition}\\
+\midrule
+\endhead
+Agent (LLM) & LLM agent & Système où un modèle de langage sélectionne et
+  enchaîne des outils logiciels pour accomplir une tâche\\
+Assimilation de données & Data assimilation & Mise à jour d'un modèle à partir
+  de données d'exploitation nouvelles\\
+Burnup / taux de combustion & Burnup & Énergie extraite par unité de masse de
+  combustible ; mesure du vieillissement\\
+Caloporteur & Coolant & Fluide évacuant la chaleur du c\oe ur\\
+Contrainte de cerclage & Hoop stress & Composante circonférentielle
+  ($\theta\theta$) du tenseur des contraintes dans la gaine\\
+Crayon combustible & Fuel rod & Tube de gaine contenant la colonne de
+  pastilles de combustible\\
+Densification & Densification & Réduction de volume du combustible en début
+  d'irradiation\\
+DNBR & Departure from Nucleate Boiling Ratio & Marge à la crise d'ébullition ;
+  relève de la thermohydraulique\\
+Émulateur / modèle réduit & Surrogate model & Modèle statistique rapide
+  approchant les sorties d'un code de calcul coûteux\\
+Fluage & Creep & Déformation lente sous contrainte constante\\
+Gaine & Cladding & Tube métallique (Zircaloy) entourant le combustible\\
+Gonflement & Swelling & Augmentation de volume du combustible sous
+  irradiation\\
+Jeu pastille-gaine & Pellet-cladding gap & Espace radial initial entre pastille
+  et gaine\\
+Jumeau numérique & Digital twin & Modèle numérique d'un système physique,
+  mis à jour par ses données d'exploitation\\
+Maillage & Mesh & Découpage du domaine en cellules de calcul\\
+Pastille & Pellet & Cylindre d'oxyde d'uranium fritté\\
+PCMI & Pellet-Cladding Mechanical Interaction & Chargement mécanique de la
+  gaine par la pastille après fermeture du jeu\\
+PCT & Peak Cladding Temperature & Température maximale atteinte par la gaine\\
+Processus gaussien & Gaussian process & Méthode de régression fournissant une
+  prédiction et son incertitude\\
+Pronostic & Prognosis & Prédiction de l'instant de franchissement d'un seuil\\
+RAG & Retrieval-Augmented Generation & Génération assistée par recherche
+  documentaire\\
+Recuit / relâchement des gaz de fission & Fission gas release (FGR) &
+  Libération des gaz de fission hors de la matrice combustible\\
+REP & PWR (Pressurized Water Reactor) & Réacteur à eau pressurisée\\
+Self-healing / auto-réparation & Self-healing & Diagnostic et correction
+  automatiques d'un plantage de calcul\\
+Solveur & Solver & Programme résolvant les équations du modèle\\
+Validation croisée « un contre tous » & Leave-one-out cross-validation &
+  Validation où chaque point est prédit par un modèle ajusté sur les autres\\
+Volumes finis & Finite volume method & Méthode de discrétisation conservative\\
+\bottomrule
+\end{xltabular}
+
+\clearpage
+
+%==============================================================================
+% ANNEXES
+%==============================================================================
+\appendix
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+\markboth{Annexes}{Annexes}
+
+\renewcommand{\thesection}{Annexe \Alph{section}}
+\setcounter{section}{0}
+
+%------------------------------------------------------------------ Annexe A --
+\section{Environnement logiciel et procédure d'installation}
+\label{ann:install}
+
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Composant} & \textbf{Version / rôle}\\
+\midrule
+Système & Linux (Ubuntu 24.04) sous WSL2\\
+OpenFOAM & v2506 (distribution OpenCFD)\\
+OFFBEAT & branche \textit{master}, compilée depuis les sources\\
+Python & 3.12, environnement virtuel dédié\\
+Modèle de langage & \num{7} milliards de paramètres, exécution locale\\
+Modèle d'embeddings & modèle local \textbf{multilingue} (cf. §\ref{sec:rag})\\
+Post-traitement & bibliothèque de lecture VTK\\
+Émulateur & processus gaussien (noyau de Matérn)\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\noindent
+\textit{Remarque.} Le projet et les cas de simulation doivent résider dans le
+système de fichiers Linux natif~: les entrées-sorties d'un cas OpenFOAM sont
+très dégradées sur un système de fichiers monté depuis l'hôte.
+
+%------------------------------------------------------------------ Annexe B --
+\section{Structure d'un cas OFFBEAT et paramètres exposés}
+\label{ann:cas}
+
+\noindent Un cas OFFBEAT est une arborescence de fichiers~:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Élément} & \textbf{Contenu}\\
+\midrule
+\texttt{0/} & Champs initiaux (température, déplacement, flux neutronique)\\
+\texttt{constant/} & Propriétés matériaux, modèles physiques, historique de
+  puissance, pression du caloporteur\\
+\texttt{system/} & Contrôle du calcul (durée, pas de temps, écriture),
+  schémas et solveurs numériques\\
+\texttt{rodDict} & Géométrie du crayon par blocs (rayons, hauteurs,
+  discrétisation), propre à OFFBEAT\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.6cm}
+
+\noindent Paramètres exposés par l'agent~:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}lXl@{}}
+\toprule
+\textbf{Paramètre} & \textbf{Signification} & \textbf{Unité}\\
+\midrule
+\texttt{linear\_heat\_rate} & Puissance linéique & \si{\watt\per\metre}\\
+\texttt{end\_time} & Durée simulée & \si{\second}\\
+\texttt{delta\_t} & Pas de temps initial & \si{\second}\\
+\texttt{write\_interval} & Fréquence d'écriture & pas\\
+\texttt{enrichment} & Enrichissement & --\\
+\texttt{fuel\_outer\_radius} & Rayon extérieur de pastille & \si{\milli\metre}\\
+\texttt{fuel\_height} & Hauteur de la colonne & \si{\milli\metre}\\
+\texttt{clad\_inner\_radius} & Rayon intérieur de gaine & \si{\milli\metre}\\
+\texttt{clad\_outer\_radius} & Rayon extérieur de gaine & \si{\milli\metre}\\
+\texttt{n\_cells\_r\_fuel} & Discrétisation radiale & --\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Contrainte de cohérence vérifiée avant exécution~:}
+$r_{\text{pastille}} < r_{\text{gaine,int}} < r_{\text{gaine,ext}}$.
+
+%------------------------------------------------------------------ Annexe C --
+\section{Base de connaissance des erreurs}
+\label{ann:errkb}
+
+\noindent Chaque entrée associe un motif de détection à un diagnostic et à un
+correctif. Extrait des entrées validées empiriquement~:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}XX@{}}
+\toprule
+\textbf{Identifiant} & \textbf{Diagnostic} & \textbf{Correctif}\\
+\midrule
+Exception en virgule flottante & Division par zéro ou valeur non numérique~:
+  divergence, conditions irréalistes, ou propriété matériau hors domaine
+  & Réduire le pas de temps\\
+Durée au-delà de l'historique de puissance & La durée simulée dépasse le
+  dernier point tabulé de l'historique & Lire les tables temporelles du cas et
+  ramener la durée juste sous le dernier point\\
+Redémarrage impossible & Condition aux limites non relisible depuis un pas de
+  temps écrit & Nettoyer les pas de temps et redémarrer proprement\\
+Géométrie retournée & Maillage invalide & Aucun~: intervention requise\\
+Dictionnaire manquant & Entrée absente d'un fichier de configuration &
+  Aucun~: intervention requise\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent\textit{Remarque.} Une entrée héritée du projet de référence, relative
+au nombre de Courant, s'est révélée sans objet pour OFFBEAT~: le solveur ne
+comporte aucun terme d'advection, donc aucune condition de stabilité de ce type.
+Elle a été conservée désactivée, avec sa justification, à titre de trace.
+
+%------------------------------------------------------------------ Annexe D --
+\section{Base de connaissance des critères de sûreté}
+\label{ann:safetykb}
+
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}
+                                >{\raggedright\arraybackslash}p{2.2cm}
+                                >{\raggedright\arraybackslash}p{1.9cm}
+                                X@{}}
+\toprule
+\textbf{Critère} & \textbf{Grandeur} & \textbf{Limite} & \textbf{Remarque}\\
+\midrule
+Fusion à c\oe ur & Température, maximum & \SI{3113}{\kelvin} &
+  $\mathrm{UO_2}$ non irradié~; la limite décroît avec le burnup (voir
+  ci-dessous)\\
+Déformation PCMI & Déformation \textbf{plastique} $\theta\theta$, zone gaine &
+  \SI{1}{\percent} & Critère de conception usuel~; voir [7], [8]\\
+Déformation permanente & Déformation de fluage équivalente, zone gaine &
+  \SI{1}{\percent} & Limite reprise par défaut, \textbf{non validée}\\
+Contrainte de gaine & Contrainte $\theta\theta$, zone gaine &
+  champ \texttt{sigmaY} & Limite lue dans le champ calculé par le solveur
+  (repli \SI{250}{\mega\pascal})\\
+Fermeture du gap & Largeur de gap, minimum & \SI{5}{\micro\metre} &
+  Sens inversé~: le danger est une valeur trop \emph{petite}\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textcolor{cAlert}{\textbf{Important.}} Ces cinq critères sont marqués comme
+\textbf{non validés} dans la base. Ce sont des ordres de grandeur de conception
+publiés, non des valeurs inventées, mais leur validation avec l'encadrant reste
+un préalable à toute exploitation.
+
+\vspace{0.4cm}
+\noindent
+\textbf{La décroissance de la limite de fusion avec le burnup.} La température
+de fusion de l'$\mathrm{UO_2}$ diminue au cours de l'irradiation~: les produits
+de fission et le plutonium formés entrent en solution solide dans la matrice et
+abaissent le point de fusion, comme un soluté abaisse celui d'un solvant. La
+marge à la fusion se referme donc au fil du cycle, au moment même où la
+température à c\oe ur, elle, augmente.
+
+La note initialement portée dans la base indiquait une pente de
+\SI{-32}{\kelvin} par \num{10}~GWj/tU. La vérification bibliographique menée
+pour ce rapport a montré qu'il existe en réalité \textbf{deux corrélations
+publiées}, et que celle retenue par le projet était la plus ancienne
+(tableau~\ref{tab:fusion}).
+
+\begin{table}[htbp]
+\centering
+\caption[Corrélations de fusion de l'UO2]{Les deux corrélations publiées de décroissance de la température de
+fusion de l'$\mathrm{UO_2}$ avec le taux de combustion. Toutes deux partent de
+\SI{3113.15}{\kelvin} pour l'$\mathrm{UO_2}$ non irradié (Brassfield, 1968).}
+\label{tab:fusion}
+\small
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Corrélation} & \textbf{Sous-programme} & \textbf{Pente} &
+\textbf{$T_{\text{fusion}}$ à 50 GWj/tU}\\
+\midrule
+MATPRO (antérieure) & \texttt{FHYPRP} & $-3{,}2$ K/GWj/tU
+  & \SI{2953}{\kelvin}\\
+FRAPCON-4.0 / FRAPTRAN-2.0 (retenue) & \texttt{PHYPRP} &
+  $-0{,}5$ K/GWj/tU & \SI{3088}{\kelvin}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La corrélation des codes de référence actuels s'écrit
+$T_{\text{fusion}} = 3113{,}15 - 5\,Bu/10000$, avec $Bu$ en MWj/tU. Elle
+\textbf{remplace} celle de MATPRO~: la révision, d'un facteur \num{6.4}, a été
+proposée par Popov \textit{et al.} (2000) sur la base de données expérimentales
+d'Adamson \textit{et al.} (1985) et de Komatsu \textit{et al.}, la pente forte
+de MATPRO s'étant révélée trop pessimiste~[11]. C'est donc la valeur de
+$-0{,}5$ K/GWj/tU qui a été retenue.
+
+\vspace{0.3cm}
+\noindent
+\textit{Portée pratique.} À 50 GWj/tU, l'écart entre les deux corrélations
+atteint \SI{135}{\kelvin} sur la limite. Sur le cas de référence de ce rapport,
+où la température à c\oe ur culmine à \SI{1467}{\kelvin}, les deux donnent le
+même verdict avec une marge confortable. La question ne devient discriminante
+que pour un crayon poussé à haut taux de combustion — c'est-à-dire précisément
+le domaine où l'analyse de sûreté a le plus de valeur.
+
+%------------------------------------------------------------------ Annexe E --
+\section{Jeu de données d'entraînement de l'émulateur}
+\label{ann:dataset}
+
+\noindent Plan d'expériences complet~: \num{5} valeurs de puissance linéique
+$\times$ \num{5} durées d'irradiation, soit \num{25} simulations OFFBEAT,
+toutes menées à terme. Coût total~: environ \num{30} minutes de calcul.
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}Xll@{}}
+\toprule
+\textbf{Variable} & \textbf{Domaine exploré} & \textbf{Rôle}\\
+\midrule
+Puissance linéique & 12, 18, 24, 30, \SI{36}{\kilo\watt\per\metre} & entrée\\
+Durée d'irradiation & \SIrange{7.9e6}{6.3e7}{\second} (3 mois à 2 ans)
+  & entrée\\
+\midrule
+Température maximale & \SIrange{930}{2080}{\kelvin} & sortie\\
+Déformation de fluage maximale & \numrange{9.8e-4}{1.1e-2} & sortie\\
+Largeur de gap minimale & \SIrange{-13.2}{31.8}{\micro\metre} & sortie\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Choix des durées.} Les cinq valeurs sont placées juste en deçà des
+points tabulés de l'historique de puissance du gabarit. Une durée qui atteint
+ou dépasse le dernier marqueur temporel fait échouer le solveur, faute de
+marqueur suivant pour piloter le pas de temps adaptatif.
+
+\vspace{0.3cm}
+\noindent
+\textit{Signe des sorties.} Une largeur de gap négative signale une
+interférence, c'est-à-dire un contact pastille-gaine établi. C'est
+précisément parce que le domaine couvre ce changement de signe que l'émulateur
+peut apprendre à dater l'entrée en PCMI — ce que la première version, limitée
+à des durées de quelques milliers de secondes, ne permettait pas
+(§\ref{sec:validation-emulateur}).
+
+\vspace{0.3cm}
+\noindent
+\textit{Limite de validité.} L'émulateur n'est fiable que dans ce domaine.
+Toute prédiction en dehors relève de l'extrapolation~; c'est la raison pour
+laquelle l'incertitude du processus gaussien est systématiquement affichée à
+côté de la valeur prédite.
+
+%------------------------------------------------------------------ Annexe F --
+\section{Catalogue des fautes du banc d'essai d'auto-réparation}
+\label{ann:bench}
+
+\noindent Chaque faute est injectée dans un cas \emph{sain} préalablement
+généré, afin que la corruption soit la seule variable. Les fautes géométriques
+sont injectées après création pour contourner délibérément la validation
+d'entrée, l'objet du banc étant de mesurer l'auto-réparation et non le
+garde-fou amont.
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.5cm}Xcc@{}}
+\toprule
+\textbf{Catégorie} & \textbf{Faute injectée} &
+\textbf{\begin{tabular}{@{}c@{}}Correctif\\ en base\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}Cause\\ traitable\end{tabular}}\\
+\midrule
+\multirow{2}{=}{Contrôle} & Cas nominal \SI{25}{\kilo\watt\per\metre}
+  & --- & ---\\
+ & Cas nominal \SI{18}{\kilo\watt\per\metre} & --- & ---\\
+\addlinespace
+\multirow{3}{=}{Numérique} & Puissance \num{200} fois nominale & oui & non\\
+ & Puissance \num{100} fois nominale & oui & non\\
+ & Puissance négative & oui & non\\
+\addlinespace
+\multirow{3}{=}{Cohérence physique} & Pastille plus large que l'intérieur de
+  la gaine & non & non\\
+ & Épaisseur de gaine négative & non & non\\
+ & Rayon de pastille nul & non & non\\
+\addlinespace
+\multirow{3}{=}{Fichier manquant} & Dictionnaire principal du solveur supprimé
+  & non & non\\
+ & Champ initial de température supprimé & non & non\\
+ & Dictionnaire de contrôle supprimé & non & non\\
+\addlinespace
+\multirow{3}{=}{Entrée invalide} & Durée simulée non numérique & non & non\\
+ & Durée au-delà de l'historique de puissance & \textbf{oui} & \textbf{oui}\\
+ & Pas de temps négatif & non & non\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Lecture des deux dernières colonnes.} « Correctif en base » indique que
+la base de connaissance associe un remède au motif attendu~; « cause traitable »
+indique que ce remède peut, par nature, s'attaquer à la cause racine. Une seule
+faute du catalogue réunit les deux conditions, et c'est la seule que
+l'auto-réparation résout (§\ref{sec:epreuve}).
+
+%------------------------------------------------------------------ Annexe G --
+\section{Exemple déroulé : une session complète}
+\label{ann:session}
+
+\noindent Transcription d'une session réelle, capturée après les corrections de
+la section~\ref{sec:angle-mort}. Les résultats d'outils sont abrégés~; la
+séquence d'appels est complète.
+
+\vspace{0.4cm}
+\noindent\textbf{Demande de l'utilisateur}
+\begin{quote}
+\itshape
+Crée un cas de crayon combustible REP dans \texttt{/tmp/demo\_agent} avec une
+puissance linéique de 22 kW/m sur environ un an, lance la simulation, puis
+dis-moi si les marges de sûreté sont respectées.
+\end{quote}
+
+\vspace{0.2cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.7cm}
+                                >{\raggedright\arraybackslash}p{3.5cm}X@{}}
+\toprule
+\textbf{\#} & \textbf{Outil appelé} & \textbf{Résultat}\\
+\midrule
+1 & \texttt{input\_creator} & Cas créé, mais l'agent a placé
+  \texttt{template\_name} \emph{dans} les paramètres~: la clé est signalée comme
+  ignorée\\
+\addlinespace
+2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejeté}~: « n'est pas un cas
+  OpenFOAM valide ». L'agent avait lancé l'exécution \emph{en parallèle} de la
+  création, avant que le cas n'existe\\
+\addlinespace
+3 & \texttt{input\_creator} & L'agent corrige de lui-même~: \texttt{template\_name}
+  est repositionné hors des paramètres. Cas créé\\
+\addlinespace
+4 & \texttt{offbeat\_executor} & Maillage généré, simulation réussie dès la
+  première tentative\\
+\addlinespace
+5 & \texttt{data\_processor} & Profil axial \SIrange{968.7}{1263.5}{\kelvin}~;
+  profil radial centre \SI{1220.6}{\kelvin}, périphérie \SI{601.6}{\kelvin}~;
+  contrainte de cerclage \SI{-38.81}{\mega\pascal}~; PCT \SI{634.5}{\kelvin}~;
+  trois figures générées\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textbf{Ce que cette session montre.} L'étape~2 est la plus instructive~:
+l'agent commet une erreur de séquencement — il lance le solveur avant que le cas
+n'existe — et c'est le \emph{garde-fou déterministe} de l'outil d'exécution, non
+le modèle de langage, qui l'intercepte. L'agent lit le message d'erreur, en
+déduit la correction et reprend. C'est exactement le partage des rôles visé par
+l'architecture~: le modèle orchestre, les outils valident.
+
+\vspace{0.3cm}
+\noindent
+\textbf{Ce qu'elle montre aussi.} La demande comportait quatre étapes~; l'agent
+en a mené trois. Il a annoncé qu'il allait lancer l'analyse de sûreté, puis a
+terminé son tour sans le faire. L'enchaînement long reste donc imparfait, ce que
+le banc de sélection d'outils ne mesurait pas non plus~: il n'évalue que le
+premier appel, jamais la conduite d'une séquence.
+
+\end{document}

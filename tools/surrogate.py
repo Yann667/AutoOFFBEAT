@@ -37,9 +37,15 @@ MODEL_PATH = SURROGATE_DIR / "model.joblib"
 # Emulateur 2D : la surete depend de la PUISSANCE et de la DUREE simulee
 # (proxy du burnup). Le code reste generique sur le nombre de features.
 FEATURES = ["linear_heat_rate", "end_time"]
+# La cible de deformation vise le critere de deformation PERMANENTE (fluage) et
+# non le critere PCMI. Ce dernier mesure desormais la deformation PLASTIQUE, qui
+# vaut exactement zero en fonctionnement nominal : elle constituerait une cible
+# degeneree, sans variation a apprendre. Le fluage, lui, croit continument avec
+# la puissance et la duree — c'est la grandeur irreversible qui porte
+# l'information dans ce domaine d'exploitation.
 TARGET_TO_RULE = {
     "peak_T":          "fuel_centerline_melt",
-    "peak_hoop_strain": "cladding_hoop_strain_pcmi",
+    "peak_creep_strain": "cladding_permanent_strain",
     "min_gap":         "gap_closure_pcmi_onset",
 }
 TARGETS = list(TARGET_TO_RULE)
@@ -260,7 +266,9 @@ class OffbeatSurrogateTool(BaseTool):
         "marges de surete d'un crayon pour une puissance lineique et une duree "
         "donnees : temperature a coeur, deformation de gaine (PCMI), fermeture "
         "du gap, avec un verdict 🟢/🟡/🔴. A utiliser pour des questions 'et si "
-        "la puissance etait de X W/m ?' sans attendre une simulation."
+        "la puissance etait de X W/m ?' sans attendre une simulation. "
+        "N'EXIGE AUCUN cas sur disque : ne prend que des parametres numeriques. "
+        "Pour evaluer un cas DEJA SIMULE, utiliser safety_analyzer a la place."
     )
     args_schema: Type[BaseModel] = SurrogateInput
 

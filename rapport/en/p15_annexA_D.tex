@@ -1,0 +1,189 @@
+%==============================================================================
+% APPENDICES
+%==============================================================================
+\appendix
+\chapter*{Appendices}
+\addcontentsline{toc}{chapter}{Appendices}
+\markboth{Appendices}{Appendices}
+
+\renewcommand{\thesection}{Appendix \Alph{section}}
+\setcounter{section}{0}
+\addtocontents{toc}{\protect\tocAppendixWidth}
+
+%---------------------------------------------------------------- Appendix A --
+\section{Software environment and installation procedure}
+\label{ann:install}
+
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Component} & \textbf{Version / role}\\
+\midrule
+Operating system & Linux (Ubuntu 24.04) under WSL2\\
+OpenFOAM & v2506 (OpenCFD distribution)\\
+OFFBEAT & \textit{master} branch, compiled from source\\
+Python & 3.12, dedicated virtual environment\\
+Language model & \num{7} billion parameters, run locally\\
+Embedding model & local \textbf{multilingual} model (see §\ref{sec:rag})\\
+Post-processing & VTK reading library\\
+Surrogate & Gaussian process (Matérn kernel)\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\noindent
+\textit{Remark.} The project and the simulation cases must reside on the native
+Linux file system: the input/output of an OpenFOAM case is severely degraded on
+a file system mounted from the host.
+
+%---------------------------------------------------------------- Appendix B --
+\section{Structure of an OFFBEAT case and exposed parameters}
+\label{ann:cas}
+
+\noindent An OFFBEAT case is a file tree:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Element} & \textbf{Contents}\\
+\midrule
+\texttt{0/} & Initial fields (temperature, displacement, neutron flux)\\
+\texttt{constant/} & Material properties, physical models, power history,
+  coolant pressure\\
+\texttt{system/} & Run control (duration, time step, writing), numerical
+  schemes and solvers\\
+\texttt{rodDict} & Rod geometry by blocks (radii, heights, discretisation),
+  specific to OFFBEAT\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.6cm}
+
+\noindent Parameters exposed by the agent:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}lXl@{}}
+\toprule
+\textbf{Parameter} & \textbf{Meaning} & \textbf{Unit}\\
+\midrule
+\texttt{linear\_heat\_rate} & Linear heat rate & \si{\watt\per\metre}\\
+\texttt{end\_time} & Simulated duration & \si{\second}\\
+\texttt{delta\_t} & Initial time step & \si{\second}\\
+\texttt{write\_interval} & Writing frequency & steps\\
+\texttt{enrichment} & Enrichment & --\\
+\texttt{fuel\_outer\_radius} & Pellet outer radius & \si{\milli\metre}\\
+\texttt{fuel\_height} & Height of the column & \si{\milli\metre}\\
+\texttt{clad\_inner\_radius} & Cladding inner radius & \si{\milli\metre}\\
+\texttt{clad\_outer\_radius} & Cladding outer radius & \si{\milli\metre}\\
+\texttt{n\_cells\_r\_fuel} & Radial discretisation & --\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Consistency constraint checked before execution:}
+$r_{\text{pellet}} < r_{\text{clad,in}} < r_{\text{clad,out}}$.
+
+%---------------------------------------------------------------- Appendix C --
+\section{Error knowledge base}
+\label{ann:errkb}
+
+\noindent Each entry associates a detection pattern with a diagnosis and a
+correction. Extract of the empirically validated entries:
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}XX@{}}
+\toprule
+\textbf{Identifier} & \textbf{Diagnosis} & \textbf{Correction}\\
+\midrule
+Floating-point exception & Division by zero or non-numeric value: divergence,
+  unrealistic conditions, or a material property out of range
+  & Reduce the time step\\
+Duration beyond the power history & The simulated duration exceeds the last
+  tabulated point of the history & Read the time tables present in the case and
+  bring the duration just below the last point\\
+Restart impossible & Boundary condition not re-readable from a written time
+  step & Clean the time steps and restart cleanly\\
+Inverted geometry & Invalid mesh & None: intervention required\\
+Missing dictionary & Entry absent from a configuration file &
+  None: intervention required\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent\textit{Remark.} An entry inherited from the reference project,
+relating to the Courant number, turned out to be irrelevant to OFFBEAT: the
+solver contains no advection term, hence no stability condition of that kind. It
+was kept disabled, together with its justification, as a record.
+
+%---------------------------------------------------------------- Appendix D --
+\section{Safety criteria knowledge base}
+\label{ann:safetykb}
+
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}
+                                >{\raggedright\arraybackslash}p{2.2cm}
+                                >{\raggedright\arraybackslash}p{1.9cm}
+                                X@{}}
+\toprule
+\textbf{Criterion} & \textbf{Quantity} & \textbf{Limit} & \textbf{Remark}\\
+\midrule
+Centreline melting & Temperature, maximum & \SI{3113}{\kelvin} &
+  Unirradiated $\mathrm{UO_2}$; the limit decreases with burnup (see
+  below)\\
+PCMI strain & \textbf{Plastic} $\theta\theta$ strain, cladding zone &
+  \SI{1}{\percent} & Usual design criterion; see [7], [8]\\
+Permanent strain & Equivalent creep strain, cladding zone &
+  \SI{1}{\percent} & Limit taken over by default, \textbf{not validated}\\
+Cladding stress & $\theta\theta$ stress, cladding zone &
+  \texttt{sigmaY} field & Limit read from the field computed by the solver
+  (fallback \SI{250}{\mega\pascal})\\
+Gap closure & Gap width, minimum & \SI{5}{\micro\metre} &
+  Reversed sense: the danger is a value that is too \emph{small}\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textcolor{cAlert}{\textbf{Important.}} These five criteria are marked as
+\textbf{not validated} in the base. They are published design orders of
+magnitude, not invented values, but their validation with the supervisor remains
+a prerequisite to any exploitation.
+
+\vspace{0.4cm}
+\noindent
+\textbf{The decrease of the melting limit with burnup.} The melting temperature
+of $\mathrm{UO_2}$ decreases during irradiation: the fission products and the
+plutonium formed enter into solid solution in the matrix and lower the melting
+point, as a solute lowers that of a solvent. The margin to melting therefore
+narrows over the cycle, at the very moment when the centreline temperature is
+itself rising.
+
+The note initially carried in the base indicated a slope of \SI{-32}{\kelvin}
+per \num{10}~GWd/tU. The bibliographic check carried out for this report showed
+that there are in fact \textbf{two published correlations}, and that the one
+adopted by the project was the older of the two (table~\ref{tab:fusion}).
+
+\begin{table}[htbp]
+\centering
+\caption[UO2 melting correlations]{The two published correlations for the
+decrease of the melting temperature of $\mathrm{UO_2}$ with burnup. Both start
+from \SI{3113.15}{\kelvin} for unirradiated $\mathrm{UO_2}$ (Brassfield, 1968).}
+\label{tab:fusion}
+\small
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Correlation} & \textbf{Subroutine} & \textbf{Slope} &
+\textbf{$T_{\text{melt}}$ at 50 GWd/tU}\\
+\midrule
+MATPRO (earlier) & \texttt{FHYPRP} & $-3.2$ K/GWd/tU
+  & \SI{2953}{\kelvin}\\
+FRAPCON-4.0 / FRAPTRAN-2.0 (adopted) & \texttt{PHYPRP} &
+  $-0.5$ K/GWd/tU & \SI{3088}{\kelvin}\\
+\bottomrule
+\end{tabularx}
+\end{table}

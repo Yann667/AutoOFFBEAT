@@ -32,7 +32,7 @@ import json
 import re
 import shutil
 from pathlib import Path
-from typing import Type
+from typing import Any, Dict, Type, Union
 
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
@@ -97,14 +97,66 @@ def _patch_roddict(case_dir: Path, key: str, value) -> bool:
         return False
     text = f.read_text()
     literal = json.dumps(value)  # JSON ≈ littéral Python pour list/nombre/str
+    # [^\]]*\] d'abord : une liste multi-elements (ex. [4.565, 4.565]) contient
+    # une virgule AVANT son ']' final ; sans cette alternative prioritaire,
+    # [^,\n]+ s'arrete a cette virgule interne et laisse un residu du type
+    # '[4.68, 4.68], 4.565]' (litteral Python casse, plante silencieusement
+    # rodMaker.py plus tard). Repli sur [^,\n]+ pour un scalaire (ex. 0.25).
     new_text, n = re.subn(
-        rf"(['\"]{re.escape(key)}['\"]\s*:\s*)[^,\n]+",
+        rf"(['\"]{re.escape(key)}['\"]\s*:\s*)(\[[^\]]*\]|[^,\n]+)",
         rf"\g<1>{literal}",
         text,
     )
     if n:
         f.write_text(new_text)
     return bool(n)
+
+
+def _read_roddict_numbers(case_dir: Path, key: str) -> list[float]:
+    """Relit les nombres associes a une cle de rodDict (apres patch ou valeur
+    par defaut du template), ex. 'rOuterFuel': [4.5] -> [4.5]. Retourne []
+    si la cle est absente (le critere de coherence geometrique est alors
+    ignore plutot que de bloquer sur un template atypique)."""
+    f = case_dir / "rodDict"
+    if not f.exists():
+        return []
+    m = re.search(rf"['\"]{re.escape(key)}['\"]\s*:\s*([^\n]+?),?\s*$",
+                  f.read_text(), flags=re.M)
+    if not m:
+        return []
+    return [float(n) for n in re.findall(r"[-+0-9.eE]+", m.group(1))]
+
+
+def _check_fuel_clad_geometry(case_dir: Path) -> str:
+    """Verifie que la pastille ne chevauche pas la gaine (rOuterFuel <
+    rInnerClad, gap positif). Motif du crash reel observe : surcharger
+    fuel_outer_radius SANS ajuster clad_inner_radius en consequence produit
+    une interference geometrique -> pression de contact initiale absurde ->
+    exception flottante (sinh() dans le modele de fluage Limback) des le
+    premier pas de temps, INDEPENDAMMENT de deltaT (donc non corrigee par le
+    self-healing existant, qui ne sait que reduire le pas de temps).
+    Retourne un message d'erreur si incoherent, "" sinon."""
+    r_fuel = _read_roddict_numbers(case_dir, "rOuterFuel")
+    r_clad_in = _read_roddict_numbers(case_dir, "rInnerClad")
+    if not r_fuel or not r_clad_in:
+        return ""
+    if max(r_fuel) >= min(r_clad_in):
+        return (
+            f"ERREUR : geometrie incoherente - rOuterFuel (max {max(r_fuel)} mm) "
+            f">= rInnerClad (min {min(r_clad_in)} mm) : la pastille chevauche "
+            "la gaine (gap negatif). Ajuste clad_inner_radius en consequence "
+            "(garde un gap positif, ~0.05-0.1 mm typique) : sans ca, le "
+            "solveur diverge immediatement (exception flottante des t=0, "
+            "self-healing sans effet car ce n'est pas un probleme de deltaT)."
+        )
+    r_clad_out = _read_roddict_numbers(case_dir, "rOuterClad")
+    if r_clad_out and max(r_clad_in) >= min(r_clad_out):
+        return (
+            f"ERREUR : geometrie incoherente - rInnerClad (max {max(r_clad_in)} mm) "
+            f">= rOuterClad (min {min(r_clad_out)} mm) : epaisseur de gaine "
+            "negative ou nulle."
+        )
+    return ""
 
 
 # --------------------------------------------------------------------------
@@ -128,6 +180,27 @@ PARAM_MAP = {
     "n_cells_r_fuel":    ("rod", "nCellsRFuel"),
     "wedge_angle":       ("rod", "wedgeAngle"),
 }
+
+
+def _coerce_nombre(valeur):
+    """Convertit en nombre une valeur numerique transmise sous forme de texte.
+
+    Un modele de langage cite volontiers ses arguments (`"4.5"` plutot que
+    `4.5`). Sans cette normalisation, la valeur est ecrite telle quelle dans
+    rodDict — donc entre guillemets — et produit un litteral Python invalide
+    que rodMaker.py refuse ensuite, loin de la cause."""
+    if isinstance(valeur, str):
+        texte = valeur.strip()
+        try:
+            return int(texte)
+        except ValueError:
+            try:
+                return float(texte)
+            except ValueError:
+                return valeur
+    if isinstance(valeur, list):
+        return [_coerce_nombre(v) for v in valeur]
+    return valeur
 
 
 def _apply_params(case_dir: Path, params: dict) -> tuple[list[str], list[str]]:
@@ -164,15 +237,24 @@ class InputCreatorInput(BaseModel):
         description="Nom du sous-dossier dans offbeat_skills/templates/ à "
                     "utiliser comme base (ex. 'fuel_rod_1D_pwr').",
     )
-    params: str = Field(
-        default="{}",
+    # str OU dict : un modele de langage produit spontanement un OBJET pour un
+    # parametre nomme « params ». N'accepter qu'une chaine faisait echouer
+    # l'appel avec « Input should be a valid string », et l'agent rejouait le
+    # meme appel en boucle sans jamais converger (mesure : 30 appels, aucune
+    # creation aboutie). Accepter les deux formes supprime la boucle.
+    params: Union[str, Dict[str, Any]] = Field(
+        default_factory=dict,
         description=(
-            "Paramètres à surcharger, au format JSON. Clés reconnues : "
+            "Paramètres à surcharger, en objet JSON (un dictionnaire est "
+            "accepté directement). Clés reconnues : "
             "end_time, delta_t, write_interval, enrichment, linear_heat_rate, "
             "fuel_outer_radius, fuel_height, clad_inner_radius, "
             "clad_outer_radius, n_cells_r_fuel, wedge_angle. "
-            "Les rayons/hauteurs sont en mm (convention rodDict du template), "
-            "linear_heat_rate en W/m, end_time/delta_t en secondes."
+            "Les rayons/hauteurs sont en MILLIMÈTRES (convention rodDict du "
+            "template : rayon de pastille ~4.5, rayon intérieur de gaine "
+            "~4.565), linear_heat_rate en W/m, end_time/delta_t en secondes. "
+            "N'indiquer que les paramètres réellement demandés : tous les "
+            "autres gardent la valeur validée du template."
         ),
     )
 
@@ -200,25 +282,59 @@ class OffbeatInputCreatorTool(BaseTool):
         self,
         case_dir: str,
         template_name: str = "fuel_rod_1D_pwr",
-        params: str = "{}",
+        params: Union[str, Dict[str, Any], None] = None,
     ) -> str:
         src = TEMPLATES_DIR / template_name
         if not src.exists():
             return (f"ERREUR : template '{template_name}' introuvable. "
                     f"Templates disponibles : {self._list_templates()}")
 
-        try:
-            p = json.loads(params) if params else {}
-        except json.JSONDecodeError as exc:
-            return f"ERREUR : params n'est pas un JSON valide – {exc}"
+        # Accepte indifferemment un dictionnaire ou une chaine JSON.
+        if params is None or params == "":
+            p = {}
+        elif isinstance(params, dict):
+            p = dict(params)
+        else:
+            try:
+                p = json.loads(params)
+            except json.JSONDecodeError as exc:
+                return f"ERREUR : params n'est pas un JSON valide – {exc}"
+        if not isinstance(p, dict):
+            return f"ERREUR : params doit décrire un objet, reçu {type(p).__name__}."
+
+        p = {k: _coerce_nombre(v) for k, v in p.items()}
 
         case = Path(case_dir)
+        # Une creation qui echoue ne doit RIEN laisser d'executable derriere
+        # elle. Sans cette precaution, une copie partielle subsiste et
+        # offbeat_executor accepte de la lancer : le calcul aboutit, se
+        # presente comme un succes, mais tourne avec les valeurs par defaut du
+        # gabarit au lieu des parametres demandes. C'est un resultat faux qui
+        # n'a pas l'air faux. On ne nettoie que si le repertoire n'existait pas
+        # avant : un cas prealablement present appartient a l'utilisateur.
+        cree_par_nous = not case.exists()
+
+        def _annuler():
+            if cree_par_nous and case.exists():
+                shutil.rmtree(case, ignore_errors=True)
+
         try:
             shutil.copytree(src, case, dirs_exist_ok=True)
         except Exception as exc:  # noqa: BLE001
+            _annuler()
             return f"ERREUR lors de la copie du template : {exc}"
 
-        applied, ignored = _apply_params(case, p)
+        try:
+            applied, ignored = _apply_params(case, p)
+        except Exception as exc:  # noqa: BLE001
+            _annuler()
+            return f"ERREUR lors de l'application des paramètres : {exc}"
+
+        geometry_error = _check_fuel_clad_geometry(case)
+        if geometry_error:
+            _annuler()
+            return (geometry_error + "\nLe répertoire du cas a été supprimé : "
+                    "aucun calcul ne peut être lancé sur une géométrie invalide.")
 
         lines = [
             f"Cas OFFBEAT créé dans {case_dir} (template '{template_name}').",

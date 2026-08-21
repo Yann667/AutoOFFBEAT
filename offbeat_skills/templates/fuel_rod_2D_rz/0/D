@@ -1,0 +1,130 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      D;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions          [0 1 0 0 0 0 0];
+
+internalField       uniform (0 0 0);
+
+boundaryField
+{
+    ".*Front|.*Back"
+    {
+        type            wedge;
+    }
+
+    cladOuter
+    {
+        type            coolantPressure;
+
+        coolantPressureList    
+        {
+            file           "$FOAM_CASE/constant/systemPressure";
+            outOfBounds     clamp;
+        };
+
+        traction        uniform (0 0 0);
+        pressure        uniform 15.5e6;
+        relax           1.0;
+        value           $internalField;
+    }
+
+    "fuelOuter|cladInner"
+    {
+        type            gapContact;
+        patchType       regionCoupledOFFBEAT;
+        penaltyFactor   0.1;
+        frictionCoefficient        0;
+        relax           1.0;
+        relaxInterfacePressure           0.1;
+        traction        uniform (0 0 0);
+        pressure        uniform 15.5e5;
+        value           $internalField;
+    }
+
+    "cladBottom|fuelBottom"
+    {
+        type            fixedDisplacementZeroShear;
+        value           $internalField;
+    }
+
+
+    cladTop
+    {
+        type            topCladRingPressure;
+
+        // topCap radius coolant side
+        topCapOuterRadius 5.325e-3;
+
+        // topCap radius plenum side
+        topCapInnerRadius 4.575e-3;
+
+        coolantPressureList    
+        {
+            // Specify location of the file
+            file           "$FOAM_CASE/constant/systemPressure";
+
+            // Treatement for out of bound values
+            outOfBounds     clamp;
+        };
+
+        traction        uniform (0 0 0);
+        pressure        uniform 15.5e6;
+
+        // Relaxation factor for boundary gradient
+        relax           1.0;
+
+        // Plane strain approximation avoids end effect jumps due to coarse axial
+        // discretization
+        planeStrain     on;
+
+        value           $internalField;
+    }
+
+    fuelTop
+    {
+        type                  plenumSpringPressure;
+
+        // Names of fuel top patches
+        fuelTopPatches (fuelTop);
+
+        // Names of cap inner patches 
+        // If the cap is missing from the model, the top 
+        // cladding pach should be used instead
+        topCapInnerPatches (cladTop);
+
+        springModulus         3.5e3;
+        springPreCompression  0.0;
+
+        relax           1.0;
+
+        // Plane strain approximation avoids end effect jumps due to coarse axial
+        // discretization
+        planeStrain     on;
+
+        value           $internalField;
+    }
+
+    fuelInner
+    {
+        type                  gapPressure;
+        relax           1.0;
+
+        value           $internalField;
+    }
+
+}
+
+// ************************************************************************* //

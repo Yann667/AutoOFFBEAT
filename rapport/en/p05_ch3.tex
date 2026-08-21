@@ -1,0 +1,139 @@
+%==============================================================================
+% CHAPTER 3
+%==============================================================================
+\chapter{From reactive agent to digital twin}
+\markboth{Chapter 3 — From reactive agent to digital twin}{}
+
+\section{Scoping: what this twin is, and what it is not}
+\label{sec:cadrage}
+
+It is worth clarifying first what is meant by a ``digital twin of a power
+plant''. A complete digital twin of a plant would handle the full coupled
+multiphysics: neutronics, thermal-hydraulics and fuel performance. It would
+thereby be able to predict the state of a fuel rod from the state of the core,
+and conversely. OFFBEAT, however, only deals with fuel performance. What is
+built here is therefore the digital twin of a \textbf{single fuel rod}, and
+everything outside that domain is treated as a boundary condition.
+
+The second limitation concerns ``real time''. OFFBEAT is a batch solver, one run
+of which takes from a few seconds to several hours, and there is no sensor
+measuring the state of a rod inside the core in real time. In practice there is
+no real time but rather an \textbf{update-driven} refresh of the state: at each
+new operating history, the system re-simulates and updates its prognosis. True
+real time can only come from a \textbf{reduced-order model}, hence block~D5.
+
+Table~\ref{tab:agent-vs-twin} summarises the shift.
+
+\begin{table}[htbp]
+\centering
+\caption[Base agent versus digital twin]{Differences between the base agent and
+the intended digital twin.}
+\label{tab:agent-vs-twin}
+\begin{tabularx}{0.95\textwidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Base agent} & \textbf{Digital twin}\\
+\midrule
+\textbf{When} & after a completed simulation & at each new piece of data\\
+\textbf{What} & creates, runs, post-processes & + monitors safety thresholds\\
+\textbf{Behaviour} & reactive (repairs a crash that occurred) &
+  predictive (announces a hazard before it occurs)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{D1 — The safety analyser}
+
+The first block reads a completed simulation and assigns, criterion by
+criterion, a status: safe, close to the threshold, or exceeded. It mirrors
+exactly the pattern of self-healing — an editable JSON knowledge base, a
+deterministic treatment, and an optional language model fallback to explain in
+plain language the criteria that are exceeded.
+
+Each criterion describes the field to read, the reduction to apply (maximum,
+minimum, largest-magnitude value), the mesh region concerned, the limit and its
+direction — must the quantity stay below or above the threshold? This last point
+proved trickier than it appears: gap width is the only criterion whose danger is
+a value that is \textit{too small}, and this special case was the origin of a
+defect detected late (§\ref{sec:bugs}).
+
+It must be stressed that the thresholds currently written in the base are
+\textbf{indicative values}, explicitly flagged as unvalidated. They are
+published design criteria, not invented values, but their exact magnitude
+depends on the rod and the burnup: validating them with the supervisor is one of
+the direct follow-ups to this work.
+
+\section{D2 — Prognosis}
+
+The second block exploits the fact that a simulation writes several time steps.
+For each non-green criterion, the time evolution of the peak is extracted, a
+linear trend is fitted, and the instant at which the threshold is crossed is
+extrapolated.
+
+The cautious rule adopted is to announce nothing when the trend is not moving
+towards the limit: if the quantity is moving away from it, or is stationary, the
+prognosis says so explicitly rather than producing a meaningless extrapolation.
+This extrapolation obviously remains first-order, valid as long as the phenomena
+involved undergo no regime change.
+
+\section{D3 — Data assimilation}
+
+The third block closes the loop: an operating history file is monitored, its
+last line representing the current state. At each update, the case is rewritten
+with the new parameters, the earlier time steps are cleaned, the simulation is
+re-run and the safety analysis is replayed. It is this cycle that gives meaning
+to the expression ``update-driven''.
+
+\section{D4 — The dashboard}
+
+The web interface was extended with a safety panel: per-criterion gauges,
+refreshed periodically, showing the current value, the limit and the fraction of
+the threshold reached. To this is added an interactive slider-based simulator,
+described below.
+
+\section{D5 — The surrogate}
+
+\subsection{Motivation and principle}
+
+The dashboard highlights a tension: the analysis is instantaneous, but it bears
+on a simulation that has already been run. Exploring a new scenario — what
+happens if the power increases by ten per cent? — requires re-running the
+solver.
+
+Block D5 lifts this limitation through a \textbf{reduced-order model}
+(\textit{surrogate}). A design of experiments is built by crossing two
+parameters, linear heat rate and irradiation duration. For each combination a
+complete OFFBEAT simulation is run and three safety quantities are recorded; a
+statistical model is then fitted to this dataset.
+
+The choice of the sampling domain turned out to be the most consequential
+decision of this whole block. A first version swept durations of a few thousand
+seconds, which made the design of experiments inexpensive;
+section~\ref{sec:validation-emulateur} shows that this apparent economy in fact
+invalidated the surrogate for the only question that matters, and that the
+dataset had to be rebuilt entirely over realistic irradiation durations.
+
+\subsection{Choice of a Gaussian process}
+
+The model adopted is a \textbf{Gaussian process} (kriging), with a Matérn
+kernel. This choice, preferred over polynomial regression, is justified by two
+properties well suited to the very small number of available points:
+
+\begin{itemize}
+  \item a Gaussian process \textbf{interpolates} the training points, which is
+    consistent when they come from a deterministic code rather than from noisy
+    measurements;
+  \item it provides an \textbf{uncertainty} at every prediction point. This
+    error bar is propagated all the way to the interface: the user sees not only
+    the predicted value but the confidence that can be placed in it, which is
+    indispensable as soon as a safety computation is replaced by an
+    approximation.
+\end{itemize}
+
+Validation is carried out by \textit{leave-one-out}: each point is predicted by
+a model refitted on all the others. This is an honest measure of generalisation
+ability, far more meaningful than a goodness-of-fit coefficient over a few dozen
+points. The results are presented in the next chapter, where it will be seen
+that a statistically honest validation can nonetheless mislead if the sampled
+domain is not itself physically relevant.
+
+\clearpage

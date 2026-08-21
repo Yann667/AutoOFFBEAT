@@ -64,6 +64,55 @@ def _load_foam(case_dir: Path, time_step: str = "latestTime"):
     return reader.read()
 
 
+def _load_foam_zoned(case_dir: Path, time_step: str = "latestTime"):
+    """Comme _load_foam, mais active la lecture des cellZones OpenFOAM
+    (fuel/cladding, cf. offbeat_skills/templates/fuel_rod_1D_pwr/rodDict) pour
+    permettre de restreindre un pic (PCT, contrainte de cerclage) a la gaine
+    plutot qu'a tout le domaine. Duplique la logique de _load_foam plutot que
+    de la reutiliser : read_zones ne peut se configurer qu'AVANT le .read()."""
+    import pyvista as pv
+
+    case_dir = Path(case_dir)
+    foam_file = next(case_dir.glob("*.foam"), None)
+    if foam_file is None:
+        foam_file = case_dir / f"{case_dir.name}.foam"
+        foam_file.touch()
+
+    reader = pv.OpenFOAMReader(str(foam_file))
+    reader.reader.SetReadZones(True)
+    reader.reader.SetCopyDataToCellZones(True)
+
+    if time_step == "latestTime":
+        reader.set_active_time_value(reader.time_values[-1])
+    else:
+        reader.set_active_time_value(float(time_step))
+
+    return reader.read()
+
+
+def _find_zone_block(dataset, zone_name: str):
+    """Cherche recursivement un bloc nomme `zone_name` (cellZone OpenFOAM,
+    ex. 'cladding') dans le MultiBlock retourne par _load_foam_zoned.
+    Retourne le bloc combine (UnstructuredGrid) ou None si absent (zone
+    inexistante dans ce cas, ou reader non configure avec read_zones)."""
+    try:
+        n = len(dataset)
+    except TypeError:
+        return None
+    for i in range(n):
+        name = dataset.get_block_name(i)
+        block = dataset[i]
+        if block is None:
+            continue
+        if name is not None and name.strip().lower() == zone_name.lower():
+            return block.combine() if hasattr(block, "combine") else block
+        if hasattr(block, "get_block_name"):  # sous-MultiBlock : descendre
+            found = _find_zone_block(block, zone_name)
+            if found is not None:
+                return found
+    return None
+
+
 def _component(values, component: int | None):
     """Extrait une composante d'un tableau potentiellement multi-composantes.
     OFFBEAT stocke les contraintes comme des tenseurs symétriques à 6
@@ -118,19 +167,54 @@ def _axial_profile(dataset, field: str, n_points: int = 50,
 
 
 def _peak_value(dataset, field: str, component: int | None = None,
-                use_abs: bool = False) -> float | None:
+                use_abs: bool = False, zone: str | None = None) -> float | None:
     """Valeur maximale d'un champ (composante `component` si tensoriel).
     `use_abs=True` retourne la valeur de plus grande amplitude (utile pour
-    une contrainte qui peut être compressive/négative)."""
-    mesh = dataset.combine()
-    if field not in mesh.array_names:
-        return None
-    arr = np.asarray(mesh[field])
-    if component is not None and arr.ndim == 2:
-        arr = arr[:, component]
-    if use_abs:
-        return float(arr[np.argmax(np.abs(arr))])
-    return float(np.max(arr))
+    une contrainte qui peut être compressive/négative). Si `zone` est fourni
+    (ex. 'cladding'), restreint aux cellules de cette cellZone si le reader
+    l'a exposée (cf. _load_foam_zoned), sinon retombe silencieusement sur
+    tout le domaine (comportement inchangé si la zone est indisponible)."""
+    # Ordre des candidats : zone demandee, puis fusion, puis blocs
+    # 'internalMesh'. Ce dernier repli ne sert qu'aux cas MULTI-REGIONS (cas de
+    # verification d'OFFBEAT), ou la fusion perd tous les champs. Le placer
+    # APRES la fusion est essentiel : l'inverse casse la lecture de `gapWidth`,
+    # dont les valeurs utiles vivent sur les patches de frontiere.
+    candidats = []
+    if zone:
+        z = _find_zone_block(dataset, zone)
+        if z is not None:
+            candidats.append(z)
+    try:
+        candidats.append(dataset.combine())
+    except Exception:  # noqa: BLE001
+        pass
+
+    def _walk(mb):
+        try:
+            n = len(mb)
+        except TypeError:
+            return
+        for i in range(n):
+            b = mb[i]
+            if b is None:
+                continue
+            nom = (mb.get_block_name(i) or "").strip().lower()
+            if hasattr(b, "get_block_name"):
+                _walk(b)
+            elif nom == "internalmesh":
+                candidats.append(b)
+
+    _walk(dataset)
+
+    for mesh in candidats:
+        if field in mesh.array_names:
+            arr = np.asarray(mesh[field])
+            if component is not None and arr.ndim == 2:
+                arr = arr[:, component]
+            if use_abs:
+                return float(arr[np.argmax(np.abs(arr))])
+            return float(np.max(arr))
+    return None
 
 
 def _radial_profile_at_midplane(dataset, field: str, n_points: int = 30,
@@ -242,7 +326,7 @@ class OffbeatDataProcessorTool(BaseTool):
             return f"ERREUR : répertoire '{case_dir}' introuvable."
 
         try:
-            dataset = _load_foam(case, time_step)
+            dataset = _load_foam_zoned(case, time_step)
         except ImportError as exc:
             return str(exc)
         except Exception as exc:  # noqa: BLE001
@@ -298,14 +382,19 @@ class OffbeatDataProcessorTool(BaseTool):
                     field, comp, label = "sigmaEq", None, "sigmaEq_vonMises"
                 else:
                     field, comp, label = "sigma", 1, "sigma_yy"
-                # Pic en valeur absolue sur TOUT le domaine : la contrainte de
-                # cerclage est maximale dans la gaine (pas sur l'axe) et peut
-                # être compressive (négative). Analogue au PCT pour la T.
-                s_peak = _peak_value(dataset, field, component=comp, use_abs=True)
+                # Pic en valeur absolue restreint a la cellZone 'cladding' :
+                # sur tout le domaine, le pic peut se trouver dans la pastille
+                # avec un signe different de la contrainte de gaine reelle
+                # (confirme empiriquement, cf. safety_analyzer.py). Repli
+                # silencieux sur tout le domaine si la zone est indisponible.
+                s_peak = _peak_value(dataset, field, component=comp,
+                                     use_abs=True, zone="cladding")
                 if s_peak is not None:
                     results["peak_stress_Pa"] = s_peak
+                    zone_ok = _find_zone_block(dataset, "cladding") is not None
+                    where = "gaine" if zone_ok else "tout le domaine (zone 'cladding' indisponible)"
                     summary_lines.append(
-                        f"Contrainte de cerclage max ({label}, |.| tout le domaine) : "
+                        f"Contrainte de cerclage max ({label}, |.| {where}) : "
                         f"{s_peak/1e6:.2f} MPa"
                     )
                 # Profil le long de l'axe (combustible) à titre indicatif
@@ -320,10 +409,16 @@ class OffbeatDataProcessorTool(BaseTool):
                         figures.append(str(fig_dir / "axial_stress.png"))
 
             if analysis in ("peak_T", "summary"):
-                pct = _peak_value(dataset, "T")
+                # Restreint a la cellZone 'cladding' : sans ca, le "PCT"
+                # renvoyait en realite le T max de TOUT le domaine, c.a.d. le
+                # centre de la pastille (ecart constate ~830 K sur un cas
+                # reel). Repli silencieux sur tout le domaine si indisponible.
+                pct = _peak_value(dataset, "T", zone="cladding")
                 results["peak_clad_T_K"] = pct
                 if pct is not None:
-                    summary_lines.append(f"PCT (Peak Cladding Temperature) : {pct:.1f} K")
+                    zone_ok = _find_zone_block(dataset, "cladding") is not None
+                    note = "" if zone_ok else " (zone 'cladding' indisponible, repli tout-domaine : peut être surestimé)"
+                    summary_lines.append(f"PCT (Peak Cladding Temperature) : {pct:.1f} K{note}")
 
         except Exception as exc:  # noqa: BLE001
             return f"ERREUR post-traitement : {exc}"

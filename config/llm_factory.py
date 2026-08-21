@@ -50,10 +50,19 @@ def get_llm(temperature: float = 0.0, provider: str | None = None) -> BaseChatMo
         # 100% local, zéro coût, données confidentielles (cohérent avec
         # la philosophie "tout en local" d'AutoFLUKA).
         from langchain_ollama import ChatOllama
+        # num_ctx : fenetre de contexte. Ollama la fixe par defaut a 4096
+        # tokens, ce qui est INSUFFISANT pour une architecture a outils : le
+        # prompt systeme et les schemas des outils consomment a eux seuls
+        # ~1900 tokens (47 %) AVANT le premier echange. Des qu'un resultat
+        # d'outil s'y ajoute, la fenetre deborde et le modele part en
+        # glissement de contexte — l'agent semble alors « bloque » sur les
+        # demandes en plusieurs etapes, alors qu'une requete simple repond en
+        # une seconde. Mesure a l'appui, cf. rapport §4.
         return ChatOllama(
             model=os.getenv("OLLAMA_MODEL", "qwen2.5-coder:14b"),
             base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
             temperature=temperature,
+            num_ctx=int(os.getenv("OLLAMA_NUM_CTX", "16384")),
         )
 
     raise ValueError(

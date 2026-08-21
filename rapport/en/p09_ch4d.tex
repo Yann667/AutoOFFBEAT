@@ -1,0 +1,173 @@
+\section{Evaluating the decision layer}
+\label{sec:toolselection}
+
+The preceding sections measure the physical chain and the repair loop. One link
+remained unevaluated, yet central: faced with a request written in natural
+language, does the supervisor choose the right tool?
+
+\subsection{Protocol}
+
+Twenty-six requests were written, covering the six tools exposed to the agent,
+plus four requests for which \emph{no} tool should be called — a greeting, a
+general-knowledge question, a note of thanks. Triggering a tool on these is a
+false positive just as much as a wrong choice is.
+
+The tools are not executed. They are bound to the model, and it is the
+\emph{intent} produced — the list of requested calls — that is recorded. This
+protocol measures selection exactly, with no side effects: no case is created,
+no solver is launched. It takes one pass per request.
+
+It should be stressed that this evaluation was not practicable before the
+hardware acceleration described in section~\ref{sec:latence}. At four minutes
+per invocation, these twenty-six requests would have taken almost two hours;
+they now run in under a minute, which allows several iterations within a single
+working session.
+
+\subsection{Results and diagnosis}
+
+The first campaign gives an overall accuracy of \SI{77}{\percent}. The
+breakdown by tool, however, is very uneven (table~\ref{tab:toolsel}) and points
+to a single culprit: the safety analyser is correctly selected in only one case
+out of four.
+
+\begin{table}[htbp]
+\centering
+\caption[Tool-selection accuracy]{Tool-selection accuracy, before and after
+rewording the descriptions. A case counts as correct if the expected tool is
+called first, or if no tool is called when none is expected.}
+\label{tab:toolsel}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Expected tool} & \textbf{$n$} & \textbf{Before} & \textbf{After}\\
+\midrule
+Case creation & 4 & 4/4 & 4/4\\
+Solver execution & 4 & 4/4 & 4/4\\
+Post-processing & 4 & 3/4 & 3/4\\
+Safety analysis & 4 & \textcolor{cAlert}{\textbf{1/4}} & \textbf{4/4}\\
+Surrogate & 3 & 2/3 & 2/3\\
+Documentation & 3 & 3/3 & 3/3\\
+No tool expected & 4 & 3/4 & 3/4\\
+\midrule
+\textbf{Total} & \textbf{26} & \textbf{20/26 (\SI{77}{\percent})} &
+  \textbf{23/26 (\SI{88}{\percent})}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Examining the three failures is enlightening. On ``check whether a safety
+criterion is exceeded'', the agent calls the executor; on ``analyse the PCMI
+margins and tell me when the limit will be reached'', it calls the surrogate; on
+``is there a risk of fuel melting?'', it calls nothing.
+
+The cause is not the model, but the descriptions supplied. Those of the safety
+analyser and of the surrogate promised exactly the same thing — safety margins,
+per-criterion status, PCMI, gap closure — without ever stating what really
+distinguishes them. Yet that criterion is simple and unambiguous: \textbf{the
+analyser requires an already-simulated case on disk, whereas the surrogate takes
+only numerical parameters}.
+
+\subsection{Correction and re-measurement}
+
+The two descriptions were rewritten to state this condition of use explicitly,
+and to name each other as alternatives not to be confused. No other change was
+made — neither to the model, nor to the tool code, nor to the requests.
+
+The accuracy of the safety analyser rises from \SI{25}{\percent} to
+\SI{100}{\percent}, and the overall accuracy from \SI{77}{\percent} to
+\SI{88}{\percent}.
+
+The lesson goes beyond this particular case. In a tool-based architecture, a
+tool description is not documentation: it is the \emph{programming interface}
+through which the model decides. Two tools whose descriptions overlap are, from
+the model's point of view, indistinguishable — and no amount of model quality
+compensates for that ambiguity. It is also good news in terms of cost: eleven
+accuracy points were gained by rewriting two paragraphs, with no retraining and
+no change of model.
+
+The three remaining errors do not stem from this cause. Two concern wordings
+where the boundary is genuinely debatable — ``quickly estimate the maximum
+temperature'' may legitimately call either the surrogate or post-processing —
+and the third is a documentation call on a general-knowledge question, a benign
+false positive.
+
+\subsection{From selection to execution: a blind spot}
+\label{sec:angle-mort}
+
+The evaluation above measures which tool the agent \emph{chooses}. It says
+nothing about what happens when that call is actually \emph{executed}, since the
+protocol reads the intent without ever triggering it. That choice, justified in
+order to isolate the decision, turned out to be a blind spot: the first attempt
+at end-to-end execution failed completely, on a defect invisible to the
+selection benchmark.
+
+\textbf{A tool schema incompatible with actual use.} The creation tool declared
+its \texttt{params} parameter as a \emph{string} containing JSON. Yet a language
+model spontaneously produces an \emph{object} for an argument so named.
+Validation rejected it, the agent received an error message, and replayed the
+identical call. Measured: \num{30} tool calls, \num{53} messages,
+\SI{179}{\second}, \textbf{no case created at all}. Accepting both forms removed
+the loop.
+
+\textbf{A context window that was too narrow.} A second defect manifested itself
+as freezes on multi-step requests, while a simple question was answered in one
+second. Measurement showed that the system prompt and the tool schemas alone
+consume \textbf{$\sim$\num{1900} tokens, that is \SI{47}{\percent} of the
+\num{4096}-token window} used by default — before any exchange. A single tool
+result was then enough to overflow it. The window was raised to \num{16384}
+tokens.
+
+Table~\ref{tab:bout-en-bout} gives the combined effect of these two corrections
+on the same request.
+
+\begin{table}[htbp]
+\centering
+\caption[End-to-end execution]{End-to-end execution of a four-step request
+(create, simulate, post-process, analyse safety), before and after correcting
+the tool schema and the context window.}
+\label{tab:bout-en-bout}
+\begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Indicator} & \textbf{Before} & \textbf{After}\\
+\midrule
+Tool calls & \num{30} & \textbf{\num{5}}\\
+Messages exchanged & \num{53} & \textbf{\num{11}}\\
+Total duration & \SI{179}{\second} & \textbf{\SI{39}{\second}}\\
+Case created and simulated & \textcolor{cAlert}{\textbf{no}} & \textbf{yes}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The methodological lesson goes beyond these two fixes. A benchmark delimits what
+it can see: measuring selection gave \SI{88}{\percent} success while execution of
+the main task was failing in \SI{100}{\percent} of cases. \textbf{A flattering
+indicator on one link says nothing about the chain.} The complete transcript of
+the successful session is given in appendix~\ref{ann:session}.
+
+\section{Evaluating the documentary assistant}
+\label{sec:rag}
+
+The documentary assistant was the last component of the system not supported by
+any measurement. Its evaluation produced the sharpest result in this whole
+chapter.
+
+\subsection{Protocol}
+
+What determines the quality of a documentary answer is the \textbf{retrieval}
+that precedes it: if the wrong excerpt comes up, the answer will be wrong
+whatever the quality of the language model. It is therefore retrieval alone that
+is measured here.
+
+Fifteen questions were written, each associated with the corpus document that
+actually contains the answer. Two indicators are recorded: is the right document
+the source of the first excerpt (accuracy@1), and does it appear among the four
+retrieved excerpts (recall@4)? The second is the more relevant in practice,
+since the agent receives all four excerpts.
+
+As the corpus contains only four documents, a random draw would already give
+about \SI{33}{\percent} accuracy@1. This threshold serves as a lower reference.
+
+\subsection{A result below chance}
+
+The first campaign gives \SI{27}{\percent} accuracy@1 — that is, \textbf{worse
+than a random draw}. But the truly alarming indicator lies elsewhere: recall@4
+is also \SI{27}{\percent}, exactly the same value.

@@ -22,6 +22,8 @@ numpy>=1.26
 # ── RAG (assistant documentaire) ──────────────────────────────────────────────
 faiss-cpu>=1.8          # magasin vectoriel local (léger, sans serveur)
 pypdf>=4.0              # lecture des PDF du corpus
+langchain-community>=0.3   # tools/rag_retriever.py : FAISS, TextLoader, PyPDFLoader
+langchain-text-splitters>=1.0  # tools/rag_retriever.py : RecursiveCharacterTextSplitter
 # embeddings : Ollama nomic-embed-text (ollama pull nomic-embed-text)
 
 # ── Jumeau numérique D5 : surrogate (émulateur temps réel) ────────────────────
@@ -31,3 +33,4 @@ joblib>=1.3             # persistance du modèle entraîné
 # ── Utilitaires ───────────────────────────────────────────────────────────────
 python-dotenv>=1.0
 pydantic>=2.0
+matplotlib>=3.8         # tools/data_processor.py : figures PNG, backend Agg

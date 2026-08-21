@@ -1,0 +1,223 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.8\textwidth, height=6cm,
+  xlabel={Radius [mm]}, ylabel={Temperature [K]},
+  xmin=0, xmax=5.5, ymin=550, ymax=1450,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\small}, tick label style={font=\scriptsize},
+]
+\addplot[color=cFuel,thick,mark=*,mark size=1.1pt] coordinates {
+ (0.000,1364.72) (0.177,1363.20) (0.354,1359.85) (0.531,1354.77)
+ (0.709,1347.98) (0.886,1339.50) (1.063,1317.51) (1.240,1304.03)
+ (1.417,1288.93) (1.594,1272.23) (1.772,1253.94) (1.949,1234.10)
+ (2.126,1189.82) (2.303,1165.44) (2.480,1139.58) (2.657,1112.27)
+ (2.835,1083.52) (3.012,1021.70) (3.189,988.64) (3.366,954.10)
+ (3.543,918.03) (3.720,880.42) (3.898,841.25) (4.075,758.22)
+ (4.252,714.04) (4.429,667.23) (4.606,633.91) (4.783,626.42)
+ (4.961,615.55) (5.138,608.53) (5.315,601.68)};
+\draw[black!45,dashed] (axis cs:4.5,550) -- (axis cs:4.5,1450);
+\node[font=\tiny,anchor=south west,text=black!65,rotate=90]
+  at (axis cs:4.52,700) {gap / cladding};
+\node[font=\tiny,anchor=north west,text=black!65] at (axis cs:0.15,1340)
+  {pellet};
+\end{axis}
+\end{tikzpicture}
+\caption[Radial temperature profile]{Radial temperature profile at the midplane
+at end of cycle. The drop of about \SI{760}{\kelvin} between the pellet centre
+(\SI{1365}{\kelvin}) and the cladding outer surface (\SI{602}{\kelvin}) is
+dominated by the low conductivity of the fuel and by the thermal resistance of
+the gap.}
+\label{fig:radial}
+\end{figure}
+
+\subsection{Summary of safety margins}
+
+Table~\ref{tab:marges} gives the final state as evaluated by block~D1.
+
+\begin{table}[htbp]
+\centering
+\caption[Safety margins at end of cycle]{Safety margins at end of cycle, after
+the corrections of section~\ref{sec:seuils}. The thresholds remain indicative
+and their validation with the supervisor is still pending.}
+\label{tab:marges}
+\begin{tabularx}{0.95\textwidth}{@{}Xrrc@{}}
+\toprule
+\textbf{Criterion} & \textbf{Value} & \textbf{Limit} & \textbf{Status}\\
+\midrule
+Pellet centreline temperature & \SI{1467}{\kelvin} & \SI{3113}{\kelvin}
+  & safe (\SI{47}{\percent})\\
+Cladding plastic strain (PCMI) & \num{0} &
+  \SI{1.00}{\percent} & safe (\SI{0}{\percent})\\
+Cladding creep strain & \SI{0.36}{\percent} &
+  \SI{1.00}{\percent} & safe (\SI{36}{\percent})\\
+Cladding hoop stress & \SI{79.1}{\mega\pascal} &
+  \SI{250}{\mega\pascal} & safe (\SI{32}{\percent})\\
+Pellet-cladding gap & \SI{-8.0}{\micro\metre} & \SI{5.0}{\micro\metre}
+  & \textcolor{cAlert}{\textbf{exceeded}}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent
+The stress limit here is not a constant: it is read from the \texttt{sigmaY}
+field computed by the solver, and the value reported is the one at the most
+highly loaded point (section~\ref{sec:seuils}).
+
+The rod therefore stays comfortably within the margins on all thermomechanical
+criteria, but pellet-cladding contact is established. This result is expected
+for a rod at the end of a second cycle and is not alarming in itself: it means
+that the operating regime has changed in nature, which is precisely the
+information a digital twin should report.
+
+\section{Validation of the surrogate}
+\label{sec:validation-emulateur}
+
+\subsection{A misleading first training domain}
+
+The first version of the surrogate had been trained on sixteen simulations
+crossing four linear heat rates and four durations between
+\SIrange{2000}{6500}{\second}. Its \textit{leave-one-out} validation gave
+coefficients of determination above $0.998$ on the three quantities tracked. The
+result looked excellent.
+
+It was not. Two observations, made by confronting this domain with the reference
+simulation of the previous section, invalidated it.
+
+First, the rod reaches \textbf{thermal equilibrium within a few thousand
+seconds}. At the two longest durations of the plan, the temperatures differ by
+only a few tenths of a kelvin (table~\ref{tab:saturation}): these levels are
+duplicates. Of the four duration values, only two carried information, and the
+regression problem was in fact almost one-dimensional — power alone sufficed to
+predict the output. The high $R^2$ was therefore mostly measuring how easy the
+problem was.
+
+\begin{table}[htbp]
+\centering
+\caption[Thermal saturation of the first domain]{Thermal saturation in the first
+training domain: beyond \SI{5000}{\second}, the simulated duration no longer
+carries information.}
+\label{tab:saturation}
+\begin{tabularx}{0.8\textwidth}{@{}Xrrr@{}}
+\toprule
+\textbf{Linear heat rate} & \textbf{$T$ at \SI{5000}{\second}} &
+\textbf{$T$ at \SI{6500}{\second}} & \textbf{Difference}\\
+\midrule
+\SI{12}{\kilo\watt\per\metre} & \SI{1036.19}{\kelvin} & \SI{1036.24}{\kelvin}
+  & \SI{0.05}{\kelvin}\\
+\SI{20}{\kilo\watt\per\metre} & \SI{1389.24}{\kelvin} & \SI{1389.35}{\kelvin}
+  & \SI{0.11}{\kelvin}\\
+\SI{28}{\kilo\watt\per\metre} & \SI{1787.59}{\kelvin} & \SI{1787.76}{\kelvin}
+  & \SI{0.17}{\kelvin}\\
+\SI{36}{\kilo\watt\per\metre} & \SI{2186.04}{\kelvin} & \SI{2186.20}{\kelvin}
+  & \SI{0.16}{\kelvin}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Second and above all, the reference simulation runs to \SI{6.3e7}{\second}, that
+is about \textbf{ten thousand times} beyond the upper bound of the training
+domain. Yet the phenomena that matter for safety — swelling, creep, gap closure,
+PCMI — unfold precisely over these long time scales, entirely absent from the
+design of experiments. The surrogate was therefore modelling only the
+\emph{initial thermal transient}, while the dashboard's interactive simulator
+implied that it was predicting safety margins.
+
+\subsection{Rebuilding over a physically relevant domain}
+
+The design of experiments was redone entirely over realistic irradiation
+durations, from \SIrange{7.9e6}{6.3e7}{\second} (about three months to two
+years), crossed with five linear heat rates from
+\SIrange{12}{36}{\kilo\watt\per\metre}, that is \num{25} complete OFFBEAT
+simulations, all of which ran to completion.
+
+This rebuild was made possible only by compiling the solver locally: a two-year
+simulation costs \SI{36}{\second} of computation, so that the complete plan fits
+in about thirty minutes.
+
+The gain is visible in the data themselves. Over the new domain, the minimum gap
+width \textbf{changes sign}, going from \SI{+32}{\micro\metre} to
+\SI{-13}{\micro\metre} depending on the conditions: the surrogate can now learn
+gap closure, and therefore the onset of PCMI. The circumferential strain also
+becomes non-monotonic and changes sign, reflecting the inward creep of the
+cladding before the pellet pushes it back.
+
+Figure~\ref{fig:parite} compares the values predicted by \textit{leave-one-out}
+cross-validation with those computed by OFFBEAT over this new domain.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.62\textwidth, height=6.4cm,
+  xlabel={Maximum temperature computed by OFFBEAT [K]},
+  ylabel={Surrogate prediction [K]},
+  xmin=600, xmax=2300, ymin=600, ymax=2300,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\small}, tick label style={font=\scriptsize},
+  legend pos=north west, legend style={font=\scriptsize,draw=black!30},
+]
+\addplot[only marks,mark=*,mark size=1.9pt,color=cFuel] coordinates {
+ (970.82,988.19) (940.09,943.55) (930.02,937.54) (949.74,934.82)
+ (936.31,959.21) (1186.41,1189.97) (1139.58,1132.33) (1120.10,1097.81)
+ (1142.00,1158.28) (1160.16,1146.84) (1401.84,1387.86) (1328.92,1322.66)
+ (1295.66,1313.92) (1405.90,1402.35) (1417.85,1424.59) (1614.18,1597.11)
+ (1515.43,1563.43) (1556.00,1542.81) (1717.76,1710.48) (1733.75,1741.45)
+ (1845.99,1895.67) (1830.40,1767.51) (1848.80,1895.07) (2061.84,2025.93)
+ (2079.84,2075.28)};
+\addlegendentry{25 simulations}
+\addplot[black!55,dashed,thick,domain=850:2200] {x};
+\addlegendentry{$y=x$}
+\end{axis}
+\end{tikzpicture}
+\caption[Surrogate parity plot]{Parity plot of the surrogate for the maximum
+temperature, in \textit{leave-one-out} validation over the realistic irradiation
+domain. Each point is predicted by a model refitted on the other twenty-four.
+The coefficient of determination is $R^2 = 0.9951$.}
+\label{fig:parite}
+\end{figure}
+
+Table~\ref{tab:surrogate} compares the quality obtained over the two domains.
+
+\begin{table}[htbp]
+\centering
+\caption[Surrogate quality over both domains]{Surrogate quality in
+\textit{leave-one-out} validation over the two training domains. The apparent
+degradation reflects a problem that has become genuinely two-dimensional and
+non-monotonic, not a regression of the method.}
+\label{tab:surrogate}
+\begin{tabularx}{\textwidth}{@{}Xccc@{}}
+\toprule
+\textbf{Predicted quantity} &
+\textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ short domain\\
+ (\SIrange{2}{6.5}{\kilo\second})\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ realistic domain\\
+ (3 months to 2 years)\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}Mean\\ error\end{tabular}}\\
+\midrule
+Maximum temperature & $0.9994$ & $0.9951$ & \SI{19}{\kelvin}\\
+Maximum creep strain & --- & $0.9905$ & \num{1.5e-4}\\
+Minimum gap width & $0.9992$ & $0.9715$ & \SI{1.8}{\micro\metre}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The coefficients fall, and that is the expected result. Over the short domain
+the surrogate was fitting a monotonic relation with a single effective variable;
+over the realistic domain it must reproduce non-monotonic quantities that change
+sign. An $R^2$ of $0.9951$ on a hard problem is worth more than $0.9994$ on a
+trivial one. This episode illustrates a general methodological point: \textbf{a
+validation metric says nothing about the relevance of the domain over which it
+is computed}.
+
+\subsection{Validation on the safety question}
+
+The decisive test does not bear on a coefficient of determination, but on the
+surrogate's ability to answer the question the digital twin is meant to address:
+\emph{when does pellet-cladding contact occur?}
+
+The surrogate was therefore queried at \SI{25}{\kilo\watt\per\metre}, a power
+\textbf{absent from its training set} (which contains only 12, 18, 24, 30 and
+\SI{36}{\kilo\watt\per\metre}), and its prediction compared with the reference
+simulation of the previous section (figure~\ref{fig:pcmi}).

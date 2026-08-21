@@ -1,0 +1,197 @@
+[
+  {
+    "question": "Que contient le répertoire 0 d'un cas OFFBEAT ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Où sont stockées les conditions aux limites de température ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "À quoi sert le fichier solverDict ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Quel répertoire contient les informations de maillage ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Où trouve-t-on la composition initiale du gaz du jeu ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Que contient le dossier system d'un cas ?",
+    "attendu": "offbeat_case_structure.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Quelle commande construit le maillage de calcul ?",
+    "attendu": "offbeat_commands.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Comment lance-t-on le solveur OFFBEAT ?",
+    "attendu": "offbeat_commands.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Quel dictionnaire est lu par blockMesh ?",
+    "attendu": "offbeat_commands.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "README.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "À quoi sert la commande changeDictionary ?",
+    "attendu": "offbeat_commands.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Dans quel ordre exécuter les commandes pour un cas OFFBEAT ?",
+    "attendu": "offbeat_commands.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "README.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": false,
+    "rappel_k": false,
+    "erreur": null
+  },
+  {
+    "question": "Comment ajouter une nouvelle erreur à la base de self-healing ?",
+    "attendu": "HOWTO_ajouter_une_erreur.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": true,
+    "rappel_k": true,
+    "erreur": null
+  },
+  {
+    "question": "Comment provoquer volontairement un crash du solveur ?",
+    "attendu": "HOWTO_ajouter_une_erreur.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": true,
+    "rappel_k": true,
+    "erreur": null
+  },
+  {
+    "question": "Comment extraire un motif regex stable depuis un log de plantage ?",
+    "attendu": "HOWTO_ajouter_une_erreur.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": true,
+    "rappel_k": true,
+    "erreur": null
+  },
+  {
+    "question": "Comment identifier la signature réelle d'une erreur dans le log ?",
+    "attendu": "HOWTO_ajouter_une_erreur.md",
+    "sources": [
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md",
+      "HOWTO_ajouter_une_erreur.md"
+    ],
+    "exact_top1": true,
+    "rappel_k": true,
+    "erreur": null
+  }
+]

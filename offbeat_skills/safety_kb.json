@@ -8,26 +8,34 @@
     "limit": 3113.0,
     "unit": "K",
     "direction": "below",
-    "warning_fraction": 0.90,
+    "warning_fraction": 0.9,
     "criterion": "Temperature a coeur pastille sous la fusion de l'UO2.",
     "diagnosis": "Marge a la fusion du combustible : le centre de la pastille est le point le plus chaud du crayon.",
-    "note": "3113 K (~2840 C) = fusion UO2 fraiche. La limite BAISSE avec le burnup (~-32 K par 10 GWd/tU environ). Valeur indicative a valider avec l'encadrant / la litterature (IAEA, MATPRO).",
-    "references": ["Fusion UO2 ~3113 K (a confirmer)"]
+    "note": "3113.15 K = fusion UO2 non irradie (Brassfield 1968). La limite BAISSE avec le burnup. DEUX correlations publiees coexistent : MATPRO (FHYPRP) -3.2 K/GWj/tU, et FRAPCON-4.0/FRAPTRAN-2.0 (PHYPRP) -0.5 K/GWj/tU, soit ftmelt = 3113.15 - 5*Bu/10000 (Bu en MWj/tU). La seconde SUPERSEDE la premiere : revision proposee par Popov et al. (2000) d'apres Adamson et al. (1985) et Komatsu et al. Retenir -0.5 K/GWj/tU. Ecart des deux correlations a 50 GWj/tU : 135 K. Ref : PNNL-19417 Rev. 2 (2015).",
+    "references": [
+      "Brassfield (1968) — fusion UO2 non irradie 3113.15 K",
+      "Luscher, Geelhood & Porter, PNNL-19417 Rev. 2 (2015), §2.1 PHYPRP",
+      "Popov et al. (2000) ; Adamson et al. (1985) ; Komatsu et al."
+    ]
   },
   {
     "id": "cladding_hoop_strain_pcmi",
     "validated": false,
-    "field": "epsilonCyl",
+    "field": "epsilonP",
     "component": 1,
     "reduction": "max_abs",
+    "zone": "cladding",
     "limit": 0.01,
     "unit": "-",
     "direction": "below",
-    "warning_fraction": 0.80,
+    "warning_fraction": 0.8,
     "criterion": "Deformation circonferentielle (hoop) sous la limite de conception ~1%.",
     "diagnosis": "Marge PCMI (interaction pastille-gaine) : au-dela de ~1% de deformation plastique circonferentielle, risque de rupture de gaine.",
-    "note": "epsilonCyl composante 1 = deformation hoop (theta-theta) en ordre VTK. Le pic sur TOUT le domaine sur-estime la deformation gaine (le pic peut etre dans la pastille) : proxy conservatif v1, a affiner en filtrant la region gaine. Limite 1% a confirmer.",
-    "references": ["Critere de conception ~1% deformation gaine (a confirmer)"]
+    "note": "epsilonP composante 1 = deformation PLASTIQUE hoop (theta-theta, ordre VTK), restreinte a la cellZone 'cladding'. AVANT : le critere lisait epsilonCyl, la deformation TOTALE, alors que son enonce porte sur la deformation plastique. Sur le cas de reference il annoncait 18 % de la limite (1.81e-3) alors que la deformation plastique y est EXACTEMENT NULLE : le total etait integralement elastique (1.03e-3), thermique (2.31e-3) et de fluage (3.55e-3). Erreur conservative, mais mesurant la mauvaise grandeur. Limite 1 % a confirmer.",
+    "references": [
+      "Critere de conception ~1% deformation plastique de gaine (a confirmer)",
+      "PNNL-22549 : seuil de rupture PCMI"
+    ]
   },
   {
     "id": "cladding_hoop_stress",
@@ -35,14 +43,19 @@
     "field": "sigmaCyl",
     "component": 1,
     "reduction": "max_abs",
-    "limit": 350000000.0,
+    "zone": "cladding",
+    "limit": 250000000.0,
     "unit": "Pa",
     "direction": "below",
-    "warning_fraction": 0.80,
+    "warning_fraction": 0.8,
     "criterion": "Contrainte circonferentielle (hoop) sous la limite d'ecoulement de la gaine.",
     "diagnosis": "Marge a la plastification de la gaine (Zircaloy).",
-    "note": "350 MPa = limite d'ecoulement INDICATIVE du Zircaloy ; elle baisse fortement avec la temperature (~200 MPa a 350 C). sigmaCyl composante 1 = hoop (theta-theta) en ordre VTK, pic en valeur absolue sur tout le domaine. A valider avec l'encadrant.",
-    "references": ["Limite d'ecoulement Zircaloy (a confirmer)"]
+    "note": "Compare desormais la contrainte hoop au CHAMP sigmaY calcule par OFFBEAT, point par point (limit_field). sigmaY porte la limite d'ecoulement reellement appliquee par le modele materiau, avec ses dependances en temperature / irradiation / burnup. AVANT : constante figee a 350 MPa alors que le solverDict du gabarit applique 250 MPa — le critere verifiait une limite que la simulation n'utilisait pas (marge annoncee 23 % au lieu de 32 %). Le repli scalaire vaut 250 MPa, aligne sur le gabarit. RESERVE : le gabarit configure plasticStrainVsYieldStress avec un seul point (0, 250e6), donc sigmaY est CONSTANT et ne depend pas encore de la temperature. Enrichir cette table (cf. PNNL-19417, sous-programme CMLIMT) est une decision physique a prendre avec l'encadrant ; le critere en heritera automatiquement.",
+    "references": [
+      "Limite d'ecoulement lue dans le champ sigmaY du solveur",
+      "PNNL-19417 Rev. 2 (2015), sous-programme CMLIMT : correlations Zircaloy"
+    ],
+    "limit_field": "sigmaY"
   },
   {
     "id": "gap_closure_pcmi_onset",
@@ -53,10 +66,30 @@
     "limit": 5e-06,
     "unit": "m",
     "direction": "above",
-    "warning_fraction": 0.50,
+    "warning_fraction": 0.5,
     "criterion": "Largeur de gap pastille-gaine au-dessus d'une marge de securite.",
     "diagnosis": "Debut de PCMI : quand le gap se ferme (gapWidth -> 0), la pastille entre en contact dur avec la gaine et la charge mecaniquement.",
     "note": "Le gap initial vaut typiquement ~80 um. Limite 5 um = marge indicative avant contact. direction 'above' : le danger est un gap TROP PETIT (min du domaine). Sur un run a haut burnup le gap est deja ferme (attendu : statut rouge = contact etabli).",
-    "references": ["Fermeture du gap = debut du PCMI (physique standard)"]
+    "references": [
+      "Fermeture du gap = debut du PCMI (physique standard)"
+    ]
+  },
+  {
+    "id": "cladding_permanent_strain",
+    "validated": false,
+    "field": "epsilonCreepEq",
+    "component": null,
+    "reduction": "max_abs",
+    "zone": "cladding",
+    "limit": 0.01,
+    "unit": "-",
+    "direction": "below",
+    "warning_fraction": 0.8,
+    "criterion": "Deformation permanente de fluage de la gaine.",
+    "diagnosis": "Le fluage est une deformation IRREVERSIBLE : il s'ajoute a la plasticite pour degrader la gaine, meme sans plastification.",
+    "note": "Critere AJOUTE apres avoir constate que la deformation de fluage (3.55e-3 sur le cas de reference) depasse la deformation totale rapportee par l'ancien critere, alors qu'aucune plasticite n'est presente. QUESTION OUVERTE pour l'encadrant : le critere de conception a 1 % porte-t-il sur la deformation plastique seule, ou sur la deformation permanente totale (plastique + fluage) ? La limite de 1 % est ici reprise par defaut et n'est PAS validee.",
+    "references": [
+      "Limite a trancher avec l'encadrant"
+    ]
   }
 ]

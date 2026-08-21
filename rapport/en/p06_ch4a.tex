@@ -1,0 +1,194 @@
+%==============================================================================
+% CHAPTER 4
+%==============================================================================
+\chapter{Results and stress-testing}
+\markboth{Chapter 4 — Results and stress-testing}{}
+
+This chapter gathers the results obtained. It is organised in three stages: the
+physical behaviour reproduced by a reference simulation, the quantitative
+validation of the surrogate, and then the deliberate stress-testing of the
+agent's self-diagnosis capabilities.
+
+\section{Verifying the solver against analytical solutions}
+\label{sec:verification}
+
+Before exploiting the results of the tooled chain, it is worth establishing that
+the solver on which it rests is itself correct. All the results presented later
+in this chapter are matters of \emph{internal consistency}: the solver is
+consistent with itself, the surrogate is consistent with the solver. None
+confronts the chain with an external truth.
+
+For this purpose OFFBEAT distributes a suite of verification cases, some of
+which have a \textbf{closed-form analytical solution}. Three of them, covering
+three distinct areas of physics, were run in the environment of this internship
+and compared with their reference solution (table~\ref{tab:verif}).
+
+\begin{table}[htbp]
+\centering
+\caption[Verification against analytical solutions]{Verification of the solver
+against analytical solutions, run in the internship environment (OpenFOAM
+v2506, OFFBEAT \textit{master} branch). The indicators are those defined by the
+verification scripts shipped with the code.}
+\label{tab:verif}
+\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm}Xl@{}}
+\toprule
+\textbf{Verification case} & \textbf{Physics exercised} &
+\textbf{Deviation from analytical}\\
+\midrule
+Thick cylinder expansion &
+  Elastoplastic mechanics; radial stress at the inner wall,
+  \num{150} points compared &
+  \SI{1.02}{\percent} (max)\newline \SI{0.82}{\percent} (mean)\\
+\addlinespace
+Porosity redistribution &
+  Porosity migration under a thermal gradient &
+  \SI{0.064}{\percent} ($t=\SI{180}{\second}$)\newline
+  \SI{0.16}{\percent} ($t=\SI{360}{\second}$)\\
+\addlinespace
+Actinide redistribution &
+  Thermal diffusion of actinides, Clément's analytical solution &
+  \num{5.4e-3}~\% (Pu)\newline \num{3.2e-3}~\% (Am)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Agreement is good on all three cases: at worst one per cent on the mechanical
+case, which is also the most demanding since it involves a plastification front,
+and deviations of the order of a thousandth of a per cent on the two fuel
+physics cases.
+
+This result does not establish the validity of the agent — it establishes that
+of the solver the agent drives, and therefore that any errors observed
+downstream are attributable to the tooled chain and not to the computational
+core. This is precisely the separation needed to interpret the correctness
+defects of section~\ref{sec:bugs}: none of them came from OFFBEAT.
+
+\vspace{0.2cm}
+\noindent
+\textit{Remark.} A fourth case in the suite (laser heating) could not be run: it
+fails while reading its own dictionaries under OpenFOAM v2506. This is an
+incompatibility between that case and that version of OpenFOAM, independent of
+the work presented here, but it illustrates how fragile verification suites are
+across version upgrades.
+
+\section{Reference simulation over an irradiation cycle}
+
+\subsection{Configuration}
+
+The reference case is a PWR rod subjected to a linear heat rate of
+\SI{25}{\kilo\watt\per\metre} over a simulated duration of \SI{6.3e7}{\second},
+about two years. The geometry is that of the reference template: pellet radius
+\SI{4.5}{\milli\metre}, cladding inner radius \SI{4.565}{\milli\metre}, hence an
+initial gap of \SI{65}{\micro\metre}. Seven states were written during the run.
+
+\subsection{Thermal evolution}
+
+Figure~\ref{fig:temp} shows the evolution of the maximum temperatures of the
+pellet and of the cladding.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=6.2cm,
+  xlabel={Irradiation time [days]},
+  ylabel={Maximum temperature [K]},
+  xmin=0, xmax=760, ymin=250, ymax=1600,
+  grid=major, grid style={cGrid!60,very thin},
+  legend pos=north east, legend style={font=\scriptsize,draw=black!30},
+  label style={font=\small}, tick label style={font=\scriptsize},
+  every axis plot/.append style={thick,mark size=1.6pt},
+]
+\addplot[color=cFuel,mark=*] coordinates {
+  (170.0,1361.75) (354.1,1385.75) (456.9,1488.66)
+  (590.2,1444.20) (710.9,1461.03) (729.2,1467.29)};
+\addlegendentry{Pellet (centreline)}
+\addplot[color=cClad,mark=square*] coordinates {
+  (0,300.0) (170.0,639.09) (354.1,637.71) (456.9,641.51)
+  (590.2,637.90) (710.9,637.39) (729.2,637.39)};
+\addlegendentry{Cladding (PCT)}
+\end{axis}
+\end{tikzpicture}
+\caption[Maximum pellet and cladding temperatures]{Evolution of the maximum
+pellet and cladding temperatures over the cycle. The gap of about
+\SI{800}{\kelvin} between the two curves corresponds to the temperature drop
+across the pellet-cladding gap and the fuel itself.}
+\label{fig:temp}
+\end{figure}
+
+The cladding temperature remains remarkably stable, around \SI{637}{\kelvin},
+which is consistent: it is essentially imposed by the coolant. The pellet
+centreline temperature, by contrast, rises from \SI{1362}{\kelvin} to
+\SI{1467}{\kelvin}, reflecting the progressive degradation of the fuel
+conductivity under irradiation.
+
+\subsection{Gap closure and stress reversal}
+
+The most interesting result appears when the evolution of the pellet-cladding
+gap is set against that of the hoop stress (figure~\ref{fig:gap-stress}).
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=5.4cm,
+  xlabel={Time [days]}, ylabel={Gap width [\si{\micro\metre}]},
+  xmin=0, xmax=760, ymin=-11, ymax=13,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\scriptsize}, tick label style={font=\scriptsize},
+  title style={font=\scriptsize\bfseries}, title={(a) Pellet-cladding gap},
+]
+\addplot[color=cAlert,thick,mark=*,mark size=1.6pt] coordinates {
+  (170.0,10.097) (354.1,0.370) (456.9,-1.959)
+  (590.2,-5.251) (710.9,-7.703) (729.2,-7.997)};
+\addplot[black!55,dashed,thick,domain=0:760,forget plot] {0};
+\node[font=\tiny,anchor=west,text=black!65] at (axis cs:250,1.8) {contact};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\textwidth, height=5.4cm,
+  xlabel={Time [days]},
+  ylabel={Hoop stress [MPa]},
+  xmin=0, xmax=760, ymin=-60, ymax=100,
+  grid=major, grid style={cGrid!60,very thin},
+  label style={font=\scriptsize}, tick label style={font=\scriptsize},
+  title style={font=\scriptsize\bfseries},
+  title={(b) Stress $\sigma_{\theta\theta}$ (cladding)},
+]
+\addplot[color=cClad,thick,mark=square*,mark size=1.6pt] coordinates {
+  (170.0,-43.01) (354.1,-38.23) (456.9,-31.33)
+  (590.2,28.79) (710.9,71.59) (729.2,79.11)};
+\addplot[black!55,dashed,thick,domain=0:760,forget plot] {0};
+\node[font=\tiny,anchor=east,text=black!65] at (axis cs:740,-16) {compression};
+\node[font=\tiny,anchor=east,text=black!65] at (axis cs:740,16) {tension};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\caption[Gap closure and hoop stress]{Pellet-cladding gap closure (a) and hoop
+stress in the cladding (b). The change of sign of the stress coincides with the
+establishment of contact: the cladding, first compressed by the coolant, is then
+put into tension by the pellet.}
+\label{fig:gap-stress}
+\end{figure}
+
+Reading these two curves together constitutes a qualitative validation of the
+model's behaviour. As long as the gap remains open, the cladding is
+\textbf{compressed} by the coolant pressure — the stress is negative, of the
+order of \SI{-43}{\mega\pascal}. The gap closes somewhere around day
+\numrange{354}{457}; the stress then becomes \textbf{positive} and grows to
+\SI{79}{\mega\pascal}. This is exactly the signature of PCMI: the pellet, as it
+swells, puts the cladding into tension. The automatic prognosis (block~D2)
+places the crossing of the closure threshold at about \SI{2.33e7}{\second}, that
+is at one third of the cycle, consistent with the curve.
+
+\subsection{Spatial profiles}
+
+The radial temperature profile at end of cycle (figure~\ref{fig:radial})
+illustrates the temperature drop across the rod.

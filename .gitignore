@@ -30,3 +30,20 @@ offbeat_skills/.rag_index/
 
 # NB : offbeat_skills/.surrogate/ (dataset + modèle entraîné) est VOLONTAIREMENT
 # suivi — il évite de relancer 16 simulations OFFBEAT sur la nouvelle machine.
+
+# ── Handoff / transcripts de session (non pertinents pour le dépôt) ───────────
+handoff/
+
+# ── Réglages d'éditeur locaux ─────────────────────────────────────────────────
+.vscode/
+
+# ── Sortie de compilation LaTeX (le PDF livré est rapport/rapport_PRe_EN.pdf) ─
+rapport/build/
+*.aux
+*.lof
+*.lot
+*.toc
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk

@@ -195,9 +195,10 @@ def _encode_image(path: str) -> str | None:
 _STATUS_COLOR = {"🟢": "#188038", "🟡": "#f9ab00", "🔴": "#d93025", "⚪": "#9aa0a6"}
 _CRIT_LABEL = {
     "fuel_centerline_melt":      "Fusion combustible (T cœur)",
-    "cladding_hoop_strain_pcmi": "PCMI — déformation gaine",
+    "cladding_hoop_strain_pcmi": "PCMI — déformation plastique",
     "cladding_hoop_stress":      "Contrainte gaine (hoop)",
     "gap_closure_pcmi_onset":    "Fermeture du gap",
+    "cladding_permanent_strain": "Déformation permanente (fluage)",
 }
 
 
@@ -266,7 +267,7 @@ def render_safety_panel(case_dir: str):
 
 _TARGET_LABEL = {
     "peak_T":           "T à cœur",
-    "peak_hoop_strain": "Déformation gaine (PCMI)",
+    "peak_creep_strain": "Déformation de fluage",
     "min_gap":          "Gap minimal",
 }
 

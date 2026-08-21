@@ -1,0 +1,277 @@
+[
+  {
+    "requete": "Crée un cas de crayon combustible dans /tmp/essai1 avec une puissance linéique de 25000 W/m",
+    "attendu": "input_creator",
+    "appels": [
+      "input_creator"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 27.18,
+    "erreur": null
+  },
+  {
+    "requete": "Prépare-moi une simulation de barreau REP à 20 kW/m sur 2 ans dans /tmp/essai2",
+    "attendu": "input_creator",
+    "appels": [
+      "input_creator"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 3.69,
+    "erreur": null
+  },
+  {
+    "requete": "Génère un cas avec un rayon de pastille de 4.2 mm dans /tmp/essai3",
+    "attendu": "input_creator",
+    "appels": [
+      "input_creator"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 5.96,
+    "erreur": null
+  },
+  {
+    "requete": "Fabrique un nouveau cas OFFBEAT dans /tmp/essai4 à partir du template fuel_rod_1D_pwr",
+    "attendu": "input_creator",
+    "appels": [
+      "input_creator"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 7.54,
+    "erreur": null
+  },
+  {
+    "requete": "Lance la simulation du cas /tmp/essai1",
+    "attendu": "offbeat_executor",
+    "appels": [
+      "offbeat_executor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 2.77,
+    "erreur": null
+  },
+  {
+    "requete": "Exécute le solveur OFFBEAT sur /tmp/essai2",
+    "attendu": "offbeat_executor",
+    "appels": [
+      "offbeat_executor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 1.7,
+    "erreur": null
+  },
+  {
+    "requete": "Fais tourner le calcul dans /tmp/essai3 et répare automatiquement si ça plante",
+    "attendu": "offbeat_executor",
+    "appels": [
+      "offbeat_executor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 2.63,
+    "erreur": null
+  },
+  {
+    "requete": "Relance /tmp/essai4, le run précédent a échoué",
+    "attendu": "offbeat_executor",
+    "appels": [
+      "offbeat_executor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 1.16,
+    "erreur": null
+  },
+  {
+    "requete": "Trace le profil axial de température du cas /tmp/essai1",
+    "attendu": "data_processor",
+    "appels": [
+      "data_processor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 1.19,
+    "erreur": null
+  },
+  {
+    "requete": "Quelle est la température maximale atteinte dans /tmp/essai2 ?",
+    "attendu": "data_processor",
+    "appels": [],
+    "correct": false,
+    "attendu_present": false,
+    "latence_s": 4.65,
+    "erreur": null
+  },
+  {
+    "requete": "Post-traite les résultats de /tmp/essai3 et donne-moi un résumé",
+    "attendu": "data_processor",
+    "appels": [
+      "data_processor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 0.98,
+    "erreur": null
+  },
+  {
+    "requete": "Montre-moi le profil radial de température au plan médian de /tmp/essai1",
+    "attendu": "data_processor",
+    "appels": [
+      "data_processor"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 1.13,
+    "erreur": null
+  },
+  {
+    "requete": "Est-ce que le cas /tmp/essai1 respecte les marges de sûreté ?",
+    "attendu": "safety_analyzer",
+    "appels": [
+      "offbeat_executor"
+    ],
+    "correct": false,
+    "attendu_present": false,
+    "latence_s": 5.39,
+    "erreur": null
+  },
+  {
+    "requete": "Vérifie si un critère de sûreté est franchi dans /tmp/essai2",
+    "attendu": "safety_analyzer",
+    "appels": [
+      "safety_analyzer"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 1.24,
+    "erreur": null
+  },
+  {
+    "requete": "Y a-t-il un risque de fusion du combustible dans /tmp/essai3 ?",
+    "attendu": "safety_analyzer",
+    "appels": [],
+    "correct": false,
+    "attendu_present": false,
+    "latence_s": 5.33,
+    "erreur": null
+  },
+  {
+    "requete": "Analyse les marges PCMI du cas /tmp/essai4 et dis-moi quand la limite sera atteinte",
+    "attendu": "safety_analyzer",
+    "appels": [
+      "surrogate_predict",
+      "safety_analyzer"
+    ],
+    "correct": false,
+    "attendu_present": true,
+    "latence_s": 10.13,
+    "erreur": null
+  },
+  {
+    "requete": "Sans relancer le solveur, que donnerait un crayon à 30 kW/m après 2 ans ?",
+    "attendu": "surrogate_predict",
+    "appels": [],
+    "correct": false,
+    "attendu_present": false,
+    "latence_s": 6.72,
+    "erreur": null
+  },
+  {
+    "requete": "Estime rapidement la température maximale pour 22 kW/m sur 1 an",
+    "attendu": "surrogate_predict",
+    "appels": [
+      "surrogate_predict"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 5.02,
+    "erreur": null
+  },
+  {
+    "requete": "Prédis instantanément les marges de sûreté à 28 kW/m et 5e7 secondes",
+    "attendu": "surrogate_predict",
+    "appels": [
+      "surrogate_predict"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 4.98,
+    "erreur": null
+  },
+  {
+    "requete": "Comment est structuré un cas OFFBEAT ?",
+    "attendu": "offbeat_knowledge",
+    "appels": [
+      "offbeat_knowledge"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 3.73,
+    "erreur": null
+  },
+  {
+    "requete": "Que dit la documentation OFFBEAT sur le modèle de gap ?",
+    "attendu": "offbeat_knowledge",
+    "appels": [
+      "offbeat_knowledge"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 3.31,
+    "erreur": null
+  },
+  {
+    "requete": "Cherche dans la doc comment définir les conditions aux limites",
+    "attendu": "offbeat_knowledge",
+    "appels": [
+      "offbeat_knowledge"
+    ],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 4.2,
+    "erreur": null
+  },
+  {
+    "requete": "Bonjour, qui es-tu ?",
+    "attendu": null,
+    "appels": [],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 8.11,
+    "erreur": null
+  },
+  {
+    "requete": "Qu'est-ce que le PCMI en physique du combustible ?",
+    "attendu": null,
+    "appels": [
+      "offbeat_knowledge"
+    ],
+    "correct": false,
+    "attendu_present": false,
+    "latence_s": 5.59,
+    "erreur": null
+  },
+  {
+    "requete": "Merci pour ton aide",
+    "attendu": null,
+    "appels": [],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 3.15,
+    "erreur": null
+  },
+  {
+    "requete": "Explique-moi en deux phrases la différence entre un jumeau numérique et une simulation classique",
+    "attendu": null,
+    "appels": [],
+    "correct": true,
+    "attendu_present": true,
+    "latence_s": 8.87,
+    "erreur": null
+  }
+]

@@ -1,0 +1,176 @@
+The correlation of the current reference codes reads
+$T_{\text{melt}} = 3113.15 - 5\,Bu/10000$, with $Bu$ in MWd/tU. It
+\textbf{supersedes} the MATPRO one: the revision, by a factor of \num{6.4}, was
+proposed by Popov \textit{et al.} (2000) on the basis of experimental data from
+Adamson \textit{et al.} (1985) and Komatsu \textit{et al.}, the steep MATPRO
+slope having proved too pessimistic~[11]. It is therefore the value of
+$-0.5$ K/GWd/tU that has been adopted.
+
+\vspace{0.3cm}
+\noindent
+\textit{Practical significance.} At 50 GWd/tU, the discrepancy between the two
+correlations reaches \SI{135}{\kelvin} on the limit. On the reference case of
+this report, where the centreline temperature peaks at \SI{1467}{\kelvin}, both
+give the same verdict with a comfortable margin. The question only becomes
+discriminating for a rod pushed to high burnup — that is, precisely the domain
+where safety analysis has the most value.
+
+%---------------------------------------------------------------- Appendix E --
+\section{Training dataset of the surrogate}
+\label{ann:dataset}
+
+\noindent Full design of experiments: \num{5} values of linear heat rate
+$\times$ \num{5} irradiation durations, that is \num{25} OFFBEAT simulations,
+all of them carried through. Total cost: about \num{30} minutes of computation.
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}Xll@{}}
+\toprule
+\textbf{Variable} & \textbf{Domain explored} & \textbf{Role}\\
+\midrule
+Linear heat rate & 12, 18, 24, 30, \SI{36}{\kilo\watt\per\metre} & input\\
+Irradiation duration & \SIrange{7.9e6}{6.3e7}{\second} (3 months to 2 years)
+  & input\\
+\midrule
+Maximum temperature & \SIrange{930}{2080}{\kelvin} & output\\
+Maximum creep strain & \numrange{9.8e-4}{1.1e-2} & output\\
+Minimum gap width & \SIrange{-13.2}{31.8}{\micro\metre} & output\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Choice of the durations.} The five values are placed just short of the
+tabulated points of the template's power history. A duration that reaches or
+exceeds the last time marker makes the solver fail, for want of a following
+marker to drive the adaptive time step.
+
+\vspace{0.3cm}
+\noindent
+\textit{Sign of the outputs.} A negative gap width signals an interference, that
+is, an established pellet-cladding contact. It is precisely because the domain
+covers this change of sign that the surrogate can learn to date the onset of
+PCMI — which the first version, limited to durations of a few thousand seconds,
+did not allow (§\ref{sec:validation-emulateur}).
+
+\vspace{0.3cm}
+\noindent
+\textit{Range of validity.} The surrogate is reliable only within this domain.
+Any prediction outside it is extrapolation; this is why the uncertainty of the
+Gaussian process is systematically displayed next to the predicted value.
+
+%---------------------------------------------------------------- Appendix F --
+\section{Catalogue of faults in the self-healing benchmark}
+\label{ann:bench}
+
+\noindent Each fault is injected into a \emph{healthy} case generated
+beforehand, so that the corruption is the only variable. The geometric faults
+are injected after creation, deliberately to bypass input validation, the
+purpose of the benchmark being to measure self-healing and not the upstream
+safeguard.
+
+\vspace{0.3cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.5cm}Xcc@{}}
+\toprule
+\textbf{Category} & \textbf{Injected fault} &
+\textbf{\begin{tabular}{@{}c@{}}Correction\\ in base\end{tabular}} &
+\textbf{\begin{tabular}{@{}c@{}}Cause\\ treatable\end{tabular}}\\
+\midrule
+\multirow{2}{=}{Control} & Nominal case \SI{25}{\kilo\watt\per\metre}
+  & --- & ---\\
+ & Nominal case \SI{18}{\kilo\watt\per\metre} & --- & ---\\
+\addlinespace
+\multirow{3}{=}{Numerical} & Power \num{200} times nominal & yes & no\\
+ & Power \num{100} times nominal & yes & no\\
+ & Negative power & yes & no\\
+\addlinespace
+\multirow{3}{=}{Physical consistency} & Pellet wider than the inside of the
+  cladding & no & no\\
+ & Negative cladding thickness & no & no\\
+ & Zero pellet radius & no & no\\
+\addlinespace
+\multirow{3}{=}{Missing file} & Main solver dictionary deleted
+  & no & no\\
+ & Initial temperature field deleted & no & no\\
+ & Control dictionary deleted & no & no\\
+\addlinespace
+\multirow{3}{=}{Invalid entry} & Non-numeric simulated duration & no & no\\
+ & Duration beyond the power history & \textbf{yes} & \textbf{yes}\\
+ & Negative time step & no & no\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textit{Reading the last two columns.} ``Correction in base'' indicates that the
+knowledge base associates a remedy with the expected pattern; ``cause treatable''
+indicates that this remedy can, by its nature, address the root cause. A single
+fault in the catalogue meets both conditions, and it is the only one that
+self-healing resolves (§\ref{sec:epreuve}).
+
+%---------------------------------------------------------------- Appendix G --
+\section{Worked example: a complete session}
+\label{ann:session}
+
+\noindent Transcript of a real session, captured after the corrections of
+section~\ref{sec:angle-mort}. Tool results are abridged; the sequence of calls
+is complete. The session was conducted in French; the request is translated
+here.
+
+\vspace{0.4cm}
+\noindent\textbf{User request}
+\begin{quote}
+\itshape
+Create a PWR fuel rod case in \texttt{/tmp/demo\_agent} with a linear heat rate
+of 22 kW/m over about one year, run the simulation, then tell me whether the
+safety margins are met.
+\end{quote}
+
+\vspace{0.2cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.7cm}
+                                >{\raggedright\arraybackslash}p{3.5cm}X@{}}
+\toprule
+\textbf{\#} & \textbf{Tool called} & \textbf{Result}\\
+\midrule
+1 & \texttt{input\_creator} & Case created, but the agent placed
+  \texttt{template\_name} \emph{inside} the parameters: the key is reported as
+  ignored\\
+\addlinespace
+2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejected}: ``is not a valid
+  OpenFOAM case''. The agent had launched the execution \emph{in parallel} with
+  the creation, before the case existed\\
+\addlinespace
+3 & \texttt{input\_creator} & The agent corrects itself: \texttt{template\_name}
+  is moved back outside the parameters. Case created\\
+\addlinespace
+4 & \texttt{offbeat\_executor} & Mesh generated, simulation successful on the
+  first attempt\\
+\addlinespace
+5 & \texttt{data\_processor} & Axial profile \SIrange{968.7}{1263.5}{\kelvin};
+  radial profile centre \SI{1220.6}{\kelvin}, periphery \SI{601.6}{\kelvin};
+  hoop stress \SI{-38.81}{\mega\pascal}; PCT \SI{634.5}{\kelvin};
+  three figures generated\\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+\noindent
+\textbf{What this session shows.} Step~2 is the most instructive: the agent
+makes a sequencing error — it launches the solver before the case exists — and
+it is the \emph{deterministic safeguard} of the execution tool, not the language
+model, that intercepts it. The agent reads the error message, infers the
+correction and resumes. This is exactly the division of roles the architecture
+aims at: the model orchestrates, the tools validate.
+
+\vspace{0.3cm}
+\noindent
+\textbf{What it also shows.} The request comprised four steps; the agent carried
+out three. It announced that it was going to launch the safety analysis, then
+ended its turn without doing so. Long chaining therefore remains imperfect,
+something the tool-selection benchmark did not measure either: it evaluates only
+the first call, never the conduct of a sequence.
+
+\end{document}
