@@ -27,8 +27,11 @@ langchain-text-splitters>=1.0  # tools/rag_retriever.py : RecursiveCharacterText
 # embeddings : Ollama nomic-embed-text (ollama pull nomic-embed-text)
 
 # ── Jumeau numérique D5 : surrogate (émulateur temps réel) ────────────────────
-scikit-learn>=1.4       # régression de l'émulateur (surface de réponse)
-joblib>=1.3             # persistance du modèle entraîné
+# Borne haute volontaire : model.joblib est un objet scikit-learn sérialisé.
+# Un changement de version majeure casserait le chargement, donc le niveau C de
+# verify.py, qui est le seul à reproduire le cas de référence hors ligne.
+scikit-learn>=1.4,<2.0  # régression de l'émulateur (surface de réponse)
+joblib>=1.3,<2.0        # persistance du modèle entraîné
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
 python-dotenv>=1.0
