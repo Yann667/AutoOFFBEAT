@@ -1,0 +1,23 @@
+# Sans ce fichier, `COPY . .` embarque le venv (1,5 Go) et tout l'historique git.
+.venv/
+.git/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets : jamais dans une image.
+.env
+
+# Sortie de compilation LaTeX et sources du rapport : inutiles a l'execution.
+rapport/build/
+rapport/en/
+
+# Index RAG : reconstruit dans le conteneur.
+offbeat_skills/.rag_index/
+
+# Journaux d'execution locaux.
+AutoOFFBEAT_logs/*.log
+
+# Reglages d'editeur, transcripts de session.
+.vscode/
+handoff/

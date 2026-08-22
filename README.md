@@ -197,6 +197,8 @@ offbeat_skills/
 rapport/                  LaTeX sources; en/ holds the English version by part
 app.py                    Dash web interface
 run_sim.py                LLM-free path: create → run → post-process, from the CLI
+verify.py                 Self-check: re-derives the figures above from committed data
+Dockerfile                OpenFOAM v2506 + OFFBEAT + the Python code (unbuilt, see below)
 ```
 
 The benchmarks are re-runnable and shipped with the code: they are a
@@ -204,20 +206,54 @@ non-regression harness, not one-off measurements.
 
 ---
 
-## Reproducing
+## Verifying it works
 
-Requires Linux (or WSL2): OpenFOAM and OFFBEAT are native Linux codes. Keep
-the project and the cases on the native filesystem; OpenFOAM I/O is severely
+The quickest check needs **nothing but Python**. No OpenFOAM, no OFFBEAT, no
+language model:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python verify.py
+```
+
+`verify.py` runs six levels and prints what passed, what was skipped, and why.
+Levels A to D need only the Python dependencies, and they are the ones that
+re-derive this README's headline figures from the data committed here:
+
+| Level | What it checks | Needs |
+|---|---|---|
+| A | Every module imports | Python only |
+| B | Knowledge bases parse, templates present, 25-point design of experiments | Python only |
+| C | **The surrogate reproduces the reference case**: 1470 K predicted against 1467 K simulated, gap at −7.6 µm against −8.0, closed gap correctly flagged as exceeded | Python only |
+| D | **The benchmark figures recomputed from the raw results**: 77 % → 88 % tool selection, 1/4 → 4/4 on the safety analyser, 27 % retrieval, and the 1/1 · 0/3 · 0/8 self-healing cross-tab | Python only |
+| E | Solver present; optionally runs a full simulation | OpenFOAM + OFFBEAT |
+| F | Model reachable; optionally runs the 26-request benchmark | Ollama |
+
+Levels E and F are **skipped, not failed**, when that software is absent. Add
+`--solver`, `--llm` or `--all` to actually run them.
+
+Level C is the one worth pausing on: the trained model is committed, so anyone
+can reproduce the safety table of the report in half a second, offline, and
+check it against the simulated values.
+
+---
+
+## Running it for real
+
+Requires Linux (or WSL2): OpenFOAM and OFFBEAT are native Linux codes. Keep the
+project and the cases on the native filesystem; OpenFOAM I/O is severely
 degraded on a mounted host filesystem.
 
 ```bash
-# 1. OpenFOAM v2506 + OFFBEAT (master, compiled from source)
+# 1. OpenFOAM v2506, then OFFBEAT compiled from source
 source /usr/lib/openfoam/openfoam2506/etc/bashrc
+git clone https://gitlab.com/foam-for-nuclear/offbeat.git && cd offbeat && make -j$(nproc)
 
 # 2. Python
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env        # then set OFFBEAT_BIN and the LLM provider
+cp .env.example .env        # then set OFFBEAT_BIN
 
 # 3. A local model (the project runs fully offline on Ollama)
 ollama pull qwen2.5:7b
@@ -227,6 +263,7 @@ ollama pull bge-m3          # multilingual embeddings, see the RAG result above
 Then:
 
 ```bash
+python verify.py --all               # everything, including solver and model
 python run_sim.py                    # LLM-free: create → run → post-process
 python app.py                        # web interface, http://localhost:8000
 python -m evaluation.bench_selfhealing
@@ -234,9 +271,32 @@ python -m evaluation.bench_tool_selection
 python -m evaluation.bench_rag
 ```
 
-`run_sim.py` is the "engine path": it exercises the whole physical chain
-without any language model, and is the reliable way to reproduce the numbers
-above.
+`run_sim.py` is the "engine path": it exercises the whole physical chain without
+any language model, and is the reliable way to reproduce the numbers above.
+
+### Docker
+
+The `Dockerfile` builds OpenFOAM v2506 and OFFBEAT from source alongside the
+Python code, which removes the two-hour setup:
+
+```bash
+docker build -t autooffbeat:latest .
+docker run --rm autooffbeat:latest python3 verify.py
+```
+
+The language model is deliberately **not** in the image. Ollama runs on the
+host and the container connects to it:
+
+```bash
+docker run --rm -p 8000:8000 --add-host=host.docker.internal:host-gateway \
+  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 autooffbeat:latest
+```
+
+> **This image has not been built.** Docker is not installed on the development
+> machine. The OpenFOAM tag, the repository address, the branch and the build
+> command all match the local installation that produced the results in this
+> report, but the build itself is unverified. If it fails, `verify.py` on a
+> normal install is the reliable path.
 
 ---
 
