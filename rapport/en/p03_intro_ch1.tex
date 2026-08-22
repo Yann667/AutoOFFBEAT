@@ -10,7 +10,7 @@
 In a nuclear power plant, the management of the fuel rod governs the safety of
 the installation. A fuel rod is a tube a few metres long, made of a stack of
 uranium oxide pellets enclosed in a metallic cladding. It must operate for
-several years under extreme conditions: temperatures above \SI{1000}{\kelvin},
+several years under extreme conditions : temperatures above \SI{1000}{\kelvin},
 intense irradiation, fuel swelling, cladding creep, and more. Predicting its
 evolution is therefore essential in order to minimise risk.
 
@@ -20,7 +20,7 @@ for Reactor Physics and Systems Behaviour of EPFL, at the Paul Scherrer
 Institute and at Texas A\&M University, it is built on the open-source OpenFOAM
 library and solves, using the finite volume method, the coupled thermal and
 mechanical behaviour of a rod in one, two or three dimensions~[1]. Its use
-follows the logic of OpenFOAM: a case is a tree of dictionary files that the
+follows the logic of OpenFOAM : a case is a tree of dictionary files that the
 user must know how to write, a mesh to be generated, a solver to be launched
 from the command line, and VTK-format outputs to be post-processed. The main
 difficulty with OFFBEAT is that this chain of tasks, while powerful, is not very
@@ -36,7 +36,7 @@ project \textbf{AutoFLUKA}~[3], which applies this idea to the particle
 transport code FLUKA.
 
 The project was carried out in two stages. The first consisted in building the
-\textbf{base agent}: a supervisor built on a large language model, orchestrating
+\textbf{base agent} : a supervisor built on a large language model, orchestrating
 domain tools able to create a case, launch the solver, automatically repair
 certain crashes and post-process the results. The second stage extended the
 system towards a \textbf{digital twin} of the fuel rod. This meant monitoring
@@ -46,12 +46,12 @@ returning instantaneous predictions through a reduced-order model.
 \section*{Outline of the report}
 
 The report follows the progression of the work. \textbf{Chapter~1} presents the
-scientific and technical context: the physics of the fuel rod, the OFFBEAT code,
+scientific and technical context : the physics of the fuel rod, the OFFBEAT code,
 and the principles of agents built on language models. \textbf{Chapter~2}
 describes the architecture of the base agent and details its components, in
 particular the self-healing loop, which is its most distinctive contribution.
 \textbf{Chapter~3} sets out the extension towards the digital twin through the
-five building blocks developed. \textbf{Chapter~4} gathers the results: a
+five building blocks developed. \textbf{Chapter~4} gathers the results : a
 reference simulation over a complete irradiation cycle, the validation of the
 surrogate, and above all the systematic stress-testing of the agent's
 self-diagnosis capabilities. \textbf{Chapter~5} returns to the difficulties
@@ -65,7 +65,7 @@ possible directions for continuing the work.
 % CHAPTER 1
 %==============================================================================
 \chapter{Scientific and technical context}
-\markboth{Chapter 1: Scientific and technical context}{}
+\markboth{Chapter 1 : Scientific and technical context}{}
 
 \section{The physics of the fuel rod}
 
@@ -83,7 +83,7 @@ resistance that the heat must cross before reaching the cladding. A radial
 temperature gradient of several hundred kelvins therefore appears between the
 centre of the pellet and its periphery.
 
-Under irradiation, several coupled phenomena modify this geometry:
+Under irradiation, several coupled phenomena modify this geometry :
 \begin{itemize}
   \item the \textbf{densification} and then the \textbf{swelling} of the fuel,
     under the effect of solid and gaseous fission products;
@@ -95,7 +95,7 @@ Under irradiation, several coupled phenomena modify this geometry:
 \end{itemize}
 
 The combined effect is a \textbf{progressive closure of the gap}. Once contact
-is established, the pellet mechanically loads the cladding: this is the
+is established, the pellet mechanically loads the cladding : this is the
 \textbf{pellet-cladding mechanical interaction} (PCMI).
 
 \subsection{Safety criteria}
@@ -150,9 +150,9 @@ The first gathers the so-called \textbf{1.5D} codes, which discretise the rod
 into independent axial slices coupled only through the plenum and the internal
 pressure. \textbf{FRAPCON} and its transient counterpart \textbf{FRAPTRAN}, and
 \textbf{TRANSURANUS}, the European solution, belong to this category~[4, 5].
-Their strength is speed and robustness: they are validated against very large
+Their strength is speed and robustness : they are validated against very large
 experimental databases and remain the reference tools for design studies. Their
-limitation is geometric: azimuthal cracking, a pellet edge or a non-axisymmetric
+limitation is geometric : azimuthal cracking, a pellet edge or a non-axisymmetric
 gradient escape them by construction.
 
 The second generation is \textbf{multidimensional}. \textbf{BISON},
@@ -162,23 +162,23 @@ effects, at the cost of a far higher computational burden (of the order of three
 orders of magnitude compared with a 1.5D code).
 
 OFFBEAT occupies a particular position in this landscape, and this is what
-justifies its choice here: it is \textbf{multidimensional}, \textbf{open
+justifies its choice here : it is \textbf{multidimensional}, \textbf{open
 source}, and built on OpenFOAM, a widely used library. Code-to-code comparisons
 also show good agreement between OFFBEAT and BISON~[2].
 
 \subsection{Solution principle}
 
-On an unstructured mesh, OFFBEAT solves the coupling between:
+On an unstructured mesh, OFFBEAT solves the coupling between :
 \begin{itemize}
-  \item a \textbf{thermal problem}: conduction in the pellet and the cladding,
+  \item a \textbf{thermal problem} : conduction in the pellet and the cladding,
     transfer across the gap by gas conduction and radiation;
-  \item a \textbf{mechanical problem}: elasticity, plasticity and creep, in a
+  \item a \textbf{mechanical problem} : elasticity, plasticity and creep, in a
     cell-centred finite volume formulation;
-  \item \textbf{behavioural models}: burnup, swelling, densification, fission
+  \item \textbf{behavioural models} : burnup, swelling, densification, fission
     gas release, pellet-cladding contact.
 \end{itemize}
 
-An OFFBEAT case inherits the structure of an OpenFOAM case: a
+An OFFBEAT case inherits the structure of an OpenFOAM case : a
 \texttt{0/} directory for the initial fields, \texttt{constant/} for the
 properties and models, \texttt{system/} for the run control. To these is added a
 \texttt{rodDict} file, specific to OFFBEAT, which describes the rod geometry
@@ -189,18 +189,18 @@ cause.
 
 \section{Agents built on language models}
 
-\subsection{Principle: supervisor and tools}
+\subsection{Principle : supervisor and tools}
 
 An \textit{agent}, in the sense used for large language models, is not a model
 that answers questions but a model given the ability to \textbf{act}. The
 mechanism, known as \textit{tool calling}, consists in describing to the model a
 set of available functions (their name, purpose and arguments). Faced with a
-request, the model then produces not text but a structured call: which tool to
+request, the model then produces not text but a structured call : which tool to
 invoke, with which parameters. The program executes the call and returns the
 result, on which the model continues its reasoning. A sequence of such calls
 then leads to an answer to the initial request.
 
-This scheme has a major advantage in a scientific context: the language model
+This scheme has a major advantage in a scientific context : the language model
 computes nothing itself. It invents neither a temperature nor a stress. It
 decides which program to run and interprets what that program returns. The
 physics remains entirely inside the solver.
@@ -212,7 +212,7 @@ which automates the Monte Carlo simulation workflows of the particle transport
 code FLUKA (a supervisor built on LangChain, domain tools for input file
 generation, execution and post-processing, a self-healing loop in case of a
 crash, and a documentary assistant based on semantic search). The motivations
-behind the present work are the same as those of AutoFLUKA: the learning curve
+behind the present work are the same as those of AutoFLUKA : the learning curve
 of a scientific computing code is steep, and the workflows are time-consuming
 and prone to human error.
 
@@ -225,10 +225,10 @@ highlighting, as they delimit the two pieces of work.
 The \textbf{domain}. FLUKA is a transport code; its output quantities are count
 rates and fluences. OFFBEAT is a thermomechanical code whose outputs are
 continuous fields comparable to \textbf{quantified safety criteria}. This
-difference makes possible a feature absent from AutoFLUKA: the automatic
+difference makes possible a feature absent from AutoFLUKA : the automatic
 analysis of safety margins, with its editable threshold base.
 
-\textbf{Prediction}. AutoFLUKA remains reactive: it executes and post-processes.
+\textbf{Prediction}. AutoFLUKA remains reactive : it executes and post-processes.
 The extension towards the digital twin developed here (chapter~3), in particular
 the Gaussian-process surrogate, makes it possible to answer questions without
 re-running the solver.
@@ -240,7 +240,7 @@ accuracy of tool selection (chapter~4).
 
 \section{Scope adopted}
 
-The scope was fixed as follows:
+The scope was fixed as follows :
 \begin{itemize}
   \item the base agent is the priority, and is built \textbf{one block at a
     time}, each tested before moving to the next;

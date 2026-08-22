@@ -34,14 +34,14 @@ Surrogate & Gaussian process (Matérn kernel)\\
 
 \noindent
 \textit{Remark.} The project and the simulation cases must reside on the native
-Linux file system: the input/output of an OpenFOAM case is severely degraded on
+Linux file system : the input/output of an OpenFOAM case is severely degraded on
 a file system mounted from the host.
 
 %---------------------------------------------------------------- Appendix B --
 \section{Structure of an OFFBEAT case and exposed parameters}
 \label{ann:cas}
 
-\noindent An OFFBEAT case is a file tree:
+\noindent An OFFBEAT case is a file tree :
 
 \vspace{0.3cm}
 \noindent
@@ -61,7 +61,7 @@ a file system mounted from the host.
 
 \vspace{0.6cm}
 
-\noindent Parameters exposed by the agent:
+\noindent Parameters exposed by the agent :
 
 \vspace{0.3cm}
 \noindent
@@ -92,7 +92,7 @@ $r_{\text{pellet}} < r_{\text{clad,in}} < r_{\text{clad,out}}$.
 \label{ann:errkb}
 
 \noindent Each entry associates a detection pattern with a diagnosis and a
-correction. Extract of the empirically validated entries:
+correction. Extract of the empirically validated entries :
 
 \vspace{0.3cm}
 \noindent
@@ -100,7 +100,7 @@ correction. Extract of the empirically validated entries:
 \toprule
 \textbf{Identifier} & \textbf{Diagnosis} & \textbf{Correction}\\
 \midrule
-Floating-point exception & Division by zero or non-numeric value: divergence,
+Floating-point exception & Division by zero or non-numeric value : divergence,
   unrealistic conditions, or a material property out of range
   & Reduce the time step\\
 Duration beyond the power history & The simulated duration exceeds the last
@@ -108,15 +108,15 @@ Duration beyond the power history & The simulated duration exceeds the last
   bring the duration just below the last point\\
 Restart impossible & Boundary condition not re-readable from a written time
   step & Clean the time steps and restart cleanly\\
-Inverted geometry & Invalid mesh & None: intervention required\\
+Inverted geometry & Invalid mesh & None : intervention required\\
 Missing dictionary & Entry absent from a configuration file &
-  None: intervention required\\
+  None : intervention required\\
 \bottomrule
 \end{tabularx}
 
 \vspace{0.4cm}
 \noindent\textit{Remark.} An entry inherited from the reference project,
-relating to the Courant number, turned out to be irrelevant to OFFBEAT: the
+relating to the Courant number, turned out to be irrelevant to OFFBEAT : the
 solver contains no advection term, hence no stability condition of that kind. It
 was kept disabled, together with its justification, as a record.
 
@@ -143,7 +143,7 @@ Cladding stress & $\theta\theta$ stress, cladding zone &
   \texttt{sigmaY} field & Limit read from the field computed by the solver
   (fallback \SI{250}{\mega\pascal})\\
 Gap closure & Gap width, minimum & \SI{5}{\micro\metre} &
-  Reversed sense: the danger is a value that is too \emph{small}\\
+  Reversed sense : the danger is a value that is too \emph{small}\\
 \bottomrule
 \end{tabularx}
 
@@ -157,7 +157,7 @@ a prerequisite to any exploitation.
 \vspace{0.4cm}
 \noindent
 \textbf{The decrease of the melting limit with burnup.} The melting temperature
-of $\mathrm{UO_2}$ decreases during irradiation: the fission products and the
+of $\mathrm{UO_2}$ decreases during irradiation : the fission products and the
 plutonium formed enter into solid solution in the matrix and lower the melting
 point, as a solute lowers that of a solvent. The margin to melting therefore
 narrows over the cycle, at the very moment when the centreline temperature is

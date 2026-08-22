@@ -19,8 +19,8 @@
 
 {\Large\bfseries Research Project (PRe)\par}
 
-{\large\bfseries Specialty: \mySpecialty\par}
-{\large\bfseries Academic year: \academicYear\par}
+{\large\bfseries Specialty : \mySpecialty\par}
+{\large\bfseries Academic year : \academicYear\par}
 
 \vspace{1cm}
 
@@ -30,7 +30,7 @@
 
 \vspace{1cm}
 
-% Optional cover illustration: the most telling figure of the report is the
+% Optional cover illustration : the most telling figure of the report is the
 % PCMI dating plot (figure 4.5) or the agent architecture (figure 2.1).
 \framebox[0.8\textwidth][c]{\rule{0pt}{4.5cm}%
   \begin{minipage}{0.75\textwidth}\centering
@@ -52,11 +52,11 @@
 
 \noindent
 \begin{minipage}[t]{0.48\textwidth}
-  \raggedright\large\bfseries Author: \myFirstName{} \myLastName
+  \raggedright\large\bfseries Author : \myFirstName{} \myLastName
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
-  \raggedleft\large\bfseries Class of: \myClass
+  \raggedleft\large\bfseries Class of : \myClass
 \end{minipage}
 
 \vspace{0.8cm}
@@ -77,8 +77,8 @@
 \vspace{0.5cm}
 
 \noindent\begin{minipage}{\textwidth}\centering\bfseries
-  Host organisation: \hostOrganisation\\
-  Address: \hostAddress
+  Host organisation : \hostOrganisation\\
+  Address : \hostAddress
 \end{minipage}
 
 \end{center}
@@ -107,7 +107,7 @@ archived electronically by the ENSTA Paris library.
 \vspace{1.5cm}
 
 \noindent
-Non-confidential work: ``the document is non-confidential. It may therefore be
+Non-confidential work : ``the document is non-confidential. It may therefore be
 consulted online by anyone.''
 
 \vspace{2cm}
@@ -147,14 +147,14 @@ Nuclear fuel performance simulation relies on codes whose use remains
 restricted to specialists. This research project consisted in designing
 \textbf{AutoOFFBEAT}, a conversational agent based on a large language model,
 which automates the simulation workflows of the \textbf{OFFBEAT} code (built on
-OpenFOAM): a supervisor orchestrates domain tools (case generation, execution,
+OpenFOAM) : a supervisor orchestrates domain tools (case generation, execution,
 post-processing, safety analysis) and a self-healing loop diagnoses solver
 crashes from an editable knowledge base. The system was then extended towards a
 \textbf{digital twin} of a fuel rod, including a Gaussian-process surrogate that
 predicts pellet-cladding gap closure within \SI{4.4}{\percent}, in
 \SI{2}{\milli\second} instead of \SI{36}{\second}, for a linear power absent
 from its training set. The second part of the work is the \textbf{measured
-stress-testing} of the system: a benchmark of twelve injected faults shows that
+stress-testing} of the system : a benchmark of twelve injected faults shows that
 self-healing only handles crashes whose root cause the available correction
 actually addresses, and evaluating the decision layer raises tool-selection
 accuracy from \SI{77}{\percent} to \SI{88}{\percent}. These measurements exposed
@@ -178,7 +178,7 @@ La simulation de performance du combustible nucléaire repose sur des codes dont
 la mise en \oe uvre reste réservée à des spécialistes. Ce projet de recherche a
 consisté à concevoir \textbf{AutoOFFBEAT}, un agent conversationnel fondé sur un
 grand modèle de langage, qui automatise les chaînes de calcul du code
-\textbf{OFFBEAT} (bâti sur OpenFOAM)~: un superviseur orchestre des outils de
+\textbf{OFFBEAT} (bâti sur OpenFOAM)~ : un superviseur orchestre des outils de
 domaine (génération de cas, exécution, post-traitement, analyse de sûreté) et
 une boucle d'auto-réparation diagnostique les plantages du solveur à partir
 d'une base de connaissance éditable. Le système a ensuite été étendu vers un
@@ -186,7 +186,7 @@ d'une base de connaissance éditable. Le système a ensuite été étendu vers u
 processus gaussien qui prédit la date de fermeture du jeu pastille-gaine à
 \SI{4.4}{\percent} près, en \SI{2}{\milli\second} au lieu de \SI{36}{\second},
 pour une puissance absente de son apprentissage. Le second volet du travail est
-la \textbf{mise à l'épreuve mesurée} du système~: un banc de douze fautes
+la \textbf{mise à l'épreuve mesurée} du système~ : un banc de douze fautes
 injectées montre que l'auto-réparation ne traite que les plantages dont la cause
 racine relève du correctif disponible, et l'évaluation de la couche de décision
 porte l'exactitude de sélection des outils de \SI{77}{\percent} à
@@ -209,7 +209,7 @@ modèle réduit ; processus gaussien.
 % 6. TABLE OF CONTENTS
 %==============================================================================
 \renewcommand{\contentsname}{Contents}
-% Depth limited to sections: with subsections the table ran to three pages.
+% Depth limited to sections : with subsections the table ran to three pages.
 \setcounter{tocdepth}{1}
 \tableofcontents
 \clearpage
@@ -245,7 +245,7 @@ Appendix D & Safety criteria knowledge base (\texttt{safety\_kb.json})
 Appendix E & Surrogate training dataset & \pageref{ann:dataset}\\
 Appendix F & Fault catalogue of the self-healing benchmark
            & \pageref{ann:bench}\\
-Appendix G & Worked example: a complete agent session
+Appendix G & Worked example : a complete agent session
            & \pageref{ann:session}\\
 \bottomrule
 \end{tabularx}

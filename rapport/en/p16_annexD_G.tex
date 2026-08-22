@@ -1,6 +1,6 @@
 The correlation of the current reference codes reads
 $T_{\text{melt}} = 3113.15 - 5\,Bu/10000$, with $Bu$ in MWd/tU. It
-\textbf{supersedes} the MATPRO one: the revision, by a factor of \num{6.4}, was
+\textbf{supersedes} the MATPRO one : the revision, by a factor of \num{6.4}, was
 proposed by Popov \textit{et al.} (2000) on the basis of experimental data from
 Adamson \textit{et al.} (1985) and Komatsu \textit{et al.}, the steep MATPRO
 slope having proved too pessimistic~[11]. It is therefore the value of
@@ -19,9 +19,9 @@ where safety analysis has the most value.
 \section{Training dataset of the surrogate}
 \label{ann:dataset}
 
-\noindent Full design of experiments: \num{5} values of linear heat rate
+\noindent Full design of experiments : \num{5} values of linear heat rate
 $\times$ \num{5} irradiation durations, that is \num{25} OFFBEAT simulations,
-all of them carried through. Total cost: about \num{30} minutes of computation.
+all of them carried through. Total cost : about \num{30} minutes of computation.
 
 \vspace{0.3cm}
 \noindent
@@ -111,7 +111,7 @@ fault in the catalogue meets both conditions, and it is the only one that
 self-healing resolves (§\ref{sec:epreuve}).
 
 %---------------------------------------------------------------- Appendix G --
-\section{Worked example: a complete session}
+\section{Worked example : a complete session}
 \label{ann:session}
 
 \noindent Transcript of a real session, captured after the corrections of
@@ -136,14 +136,14 @@ safety margins are met.
 \textbf{\#} & \textbf{Tool called} & \textbf{Result}\\
 \midrule
 1 & \texttt{input\_creator} & Case created, but the agent placed
-  \texttt{template\_name} \emph{inside} the parameters: the key is reported as
+  \texttt{template\_name} \emph{inside} the parameters : the key is reported as
   ignored\\
 \addlinespace
-2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejected}: ``is not a valid
+2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejected} : ``is not a valid
   OpenFOAM case''. The agent had launched the execution \emph{in parallel} with
   the creation, before the case existed\\
 \addlinespace
-3 & \texttt{input\_creator} & The agent corrects itself: \texttt{template\_name}
+3 & \texttt{input\_creator} & The agent corrects itself : \texttt{template\_name}
   is moved back outside the parameters. Case created\\
 \addlinespace
 4 & \texttt{offbeat\_executor} & Mesh generated, simulation successful on the
@@ -158,19 +158,19 @@ safety margins are met.
 
 \vspace{0.4cm}
 \noindent
-\textbf{What this session shows.} Step~2 is the most instructive: the agent
+\textbf{What this session shows.} Step~2 is the most instructive : the agent
 makes a sequencing error, launching the solver before the case exists, and
 it is the \emph{deterministic safeguard} of the execution tool, not the language
 model, that intercepts it. The agent reads the error message, infers the
 correction and resumes. This is the division of roles the architecture
-aims at: the model orchestrates, the tools validate.
+aims at : the model orchestrates, the tools validate.
 
 \vspace{0.3cm}
 \noindent
 \textbf{What it also shows.} The request comprised four steps; the agent carried
 out three. It announced that it was going to launch the safety analysis, then
 ended its turn without doing so. Long chaining therefore remains imperfect,
-something the tool-selection benchmark did not measure either: it evaluates only
+something the tool-selection benchmark did not measure either : it evaluates only
 the first call, never the conduct of a sequence.
 
 \end{document}

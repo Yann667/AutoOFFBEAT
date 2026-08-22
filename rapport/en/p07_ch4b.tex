@@ -61,13 +61,13 @@ Pellet-cladding gap & \SI{-8.0}{\micro\metre} & \SI{5.0}{\micro\metre}
 \end{table}
 
 \noindent
-The stress limit here is not a constant: it is read from the \texttt{sigmaY}
+The stress limit here is not a constant : it is read from the \texttt{sigmaY}
 field computed by the solver, and the value reported is the one at the most
 highly loaded point (section~\ref{sec:seuils}).
 
 The rod therefore stays comfortably within the margins on all thermomechanical
 criteria, but pellet-cladding contact is established. This result is expected
-for a rod at the end of a second cycle and is not alarming in itself: it means
+for a rod at the end of a second cycle and is not alarming in itself : it means
 that the operating regime has changed in nature, which is precisely the
 information a digital twin should report.
 
@@ -87,16 +87,16 @@ simulation of the previous section, invalidated it.
 
 First, the rod reaches \textbf{thermal equilibrium within a few thousand
 seconds}. At the two longest durations of the plan, the temperatures differ by
-only a few tenths of a kelvin (table~\ref{tab:saturation}): these levels are
+only a few tenths of a kelvin (table~\ref{tab:saturation}) : these levels are
 duplicates. Of the four duration values, only two carried information, and the
-regression problem was in fact almost one-dimensional: power alone sufficed to
+regression problem was in fact almost one-dimensional : power alone sufficed to
 predict the output. The high $R^2$ was therefore mostly measuring how easy the
 problem was.
 
 \begin{table}[htbp]
 \centering
 \caption[Thermal saturation of the first domain]{Thermal saturation in the first
-training domain: beyond \SI{5000}{\second}, the simulated duration no longer
+training domain : beyond \SI{5000}{\second}, the simulated duration no longer
 carries information.}
 \label{tab:saturation}
 \begin{tabularx}{0.8\textwidth}{@{}Xrrr@{}}
@@ -132,13 +132,13 @@ years), crossed with five linear heat rates from
 \SIrange{12}{36}{\kilo\watt\per\metre}, that is \num{25} complete OFFBEAT
 simulations, all of which ran to completion.
 
-This rebuild was made possible only by compiling the solver locally: a two-year
+This rebuild was made possible only by compiling the solver locally : a two-year
 simulation costs \SI{36}{\second} of computation, so that the complete plan fits
 in about thirty minutes.
 
 The gain is visible in the data themselves. Over the new domain, the minimum gap
 width \textbf{changes sign}, going from \SI{+32}{\micro\metre} to
-\SI{-13}{\micro\metre} depending on the conditions: the surrogate can now learn
+\SI{-13}{\micro\metre} depending on the conditions : the surrogate can now learn
 gap closure, and therefore the onset of PCMI. The circumferential strain also
 becomes non-monotonic and changes sign, reflecting the inward creep of the
 cladding before the pellet pushes it back.
@@ -207,14 +207,14 @@ The coefficients fall, and that is the expected result. Over the short domain
 the surrogate was fitting a monotonic relation with a single effective variable;
 over the realistic domain it must reproduce non-monotonic quantities that change
 sign. An $R^2$ of $0.9951$ on a hard problem is worth more than $0.9994$ on a
-trivial one. What caught me out here is that I had checked
-\textbf{how well the model fitted}, and never \textbf{what I had asked it to
+trivial one. What caught us out here is that we had checked
+\textbf{how well the model fitted}, and never \textbf{what we had asked it to
 fit}.
 
 \subsection{Validation on the safety question}
 
 The decisive test does not bear on a coefficient of determination, but on the
-surrogate's ability to answer the question the digital twin is meant to address:
+surrogate's ability to answer the question the digital twin is meant to address :
 \emph{when does pellet-cladding contact occur?}
 
 The surrogate was therefore queried at \SI{25}{\kilo\watt\per\metre}, a power

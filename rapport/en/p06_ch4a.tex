@@ -2,25 +2,25 @@
 % CHAPTER 4
 %==============================================================================
 \chapter{Results and stress-testing}
-\markboth{Chapter 4: Results and stress-testing}{}
+\markboth{Chapter 4 : Results and stress-testing}{}
 
-This chapter gathers the results obtained: first the physical behaviour that a
+This chapter gathers the results obtained : first the physical behaviour that a
 reference simulation reproduces, then the quantitative validation of the
-surrogate, and finally what happened when I set out to break the agent on
-purpose. The last part is the longest, and it is where I learned the most.
+surrogate, and finally what happened when we set out to break the agent on
+purpose. The last part is the longest, and it is where we learned the most.
 
 \section{Verifying the solver against analytical solutions}
 \label{sec:verification}
 
-Before exploiting anything the chain produces, I had to satisfy myself that the
+Before exploiting anything the chain produces, we had to satisfy ourselves that the
 solver underneath it is correct. All the results presented later
-in this chapter are matters of \emph{internal consistency}: the solver is
+in this chapter are matters of \emph{internal consistency} : the solver is
 consistent with itself, the surrogate is consistent with the solver. None
 confronts the chain with an external truth.
 
 For this purpose OFFBEAT distributes a suite of verification cases, some of
-which have a \textbf{closed-form analytical solution}. I ran three of them, covering three
-distinct areas of physics, on my own installation and compared the output with
+which have a \textbf{closed-form analytical solution}. We ran three of them, covering three
+distinct areas of physics, on our own installation and compared the output with
 the reference solution (table~\ref{tab:verif}).
 
 \begin{table}[htbp]
@@ -53,7 +53,7 @@ Actinide redistribution &
 \end{tabularx}
 \end{table}
 
-Agreement is good on all three cases: at worst one per cent on the mechanical
+Agreement is good on all three cases : at worst one per cent on the mechanical
 case, which is also the most demanding since it involves a plastification front,
 and deviations of the order of a thousandth of a per cent on the two fuel
 physics cases.
@@ -62,11 +62,11 @@ This result does not establish the validity of the agent; it establishes that
 of the solver the agent drives, and therefore that any errors observed
 downstream are attributable to the tooled chain and not to the computational
 core. This is precisely the separation needed to interpret the correctness
-defects of section~\ref{sec:bugs}: none of them came from OFFBEAT.
+defects of section~\ref{sec:bugs} : none of them came from OFFBEAT.
 
 \vspace{0.2cm}
 \noindent
-\textit{Remark.} A fourth case in the suite (laser heating) could not be run: it
+\textit{Remark.} A fourth case in the suite (laser heating) could not be run : it
 fails while reading its own dictionaries under OpenFOAM v2506. This is an
 incompatibility between that case and that version of OpenFOAM, independent of
 the work presented here, but it illustrates how fragile verification suites are
@@ -78,7 +78,7 @@ across version upgrades.
 
 The reference case is a PWR rod subjected to a linear heat rate of
 \SI{25}{\kilo\watt\per\metre} over a simulated duration of \SI{6.3e7}{\second},
-about two years. The geometry is that of the reference template: pellet radius
+about two years. The geometry is that of the reference template : pellet radius
 \SI{4.5}{\milli\metre}, cladding inner radius \SI{4.565}{\milli\metre}, hence an
 initial gap of \SI{65}{\micro\metre}. Seven states were written during the run.
 
@@ -118,7 +118,7 @@ across the pellet-cladding gap and the fuel itself.}
 \end{figure}
 
 The cladding temperature remains remarkably stable, around \SI{637}{\kelvin},
-which is consistent: it is essentially imposed by the coolant. The pellet
+which is consistent : it is essentially imposed by the coolant. The pellet
 centreline temperature, by contrast, rises from \SI{1362}{\kelvin} to
 \SI{1467}{\kelvin}, reflecting the progressive degradation of the fuel
 conductivity under irradiation.
@@ -173,17 +173,17 @@ gap is set against that of the hoop stress (figure~\ref{fig:gap-stress}).
 \end{minipage}
 \caption[Gap closure and hoop stress]{Pellet-cladding gap closure (a) and hoop
 stress in the cladding (b). The change of sign of the stress coincides with the
-establishment of contact: the cladding, first compressed by the coolant, is then
+establishment of contact : the cladding, first compressed by the coolant, is then
 put into tension by the pellet.}
 \label{fig:gap-stress}
 \end{figure}
 
-Read together, these two curves are what convinced me the model behaves as it
+Read together, these two curves are what convinced us the model behaves as it
 should. As long as the gap remains open, the cladding is
-\textbf{compressed} by the coolant pressure: the stress is negative, of the
+\textbf{compressed} by the coolant pressure : the stress is negative, of the
 order of \SI{-43}{\mega\pascal}. The gap closes somewhere around day
 \numrange{354}{457}; the stress then becomes \textbf{positive} and grows to
-\SI{79}{\mega\pascal}. This is the signature of PCMI: the pellet, as it
+\SI{79}{\mega\pascal}. This is the signature of PCMI : the pellet, as it
 swells, puts the cladding into tension. The automatic prognosis (block~D2)
 places the crossing of the closure threshold at about \SI{2.33e7}{\second}, that
 is at one third of the cycle, consistent with the curve.

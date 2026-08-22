@@ -39,12 +39,12 @@ computed by OFFBEAT. The zero crossing, the onset of PCMI, is predicted at
 
 The surrogate places gap closure at \textbf{\num{387} days}, against
 \textbf{\num{370} days} obtained by interpolating the states computed by
-OFFBEAT: a deviation of \SI{4.4}{\percent}, that is sixteen days over a two-year
+OFFBEAT : a deviation of \SI{4.4}{\percent}, that is sixteen days over a two-year
 cycle. The cost of the prediction is \SI{2}{\milli\second}, against
 \SI{36}{\second} for the complete simulation, an acceleration factor of about
 \num{18000}.
 
-This result validates the surrogate where it matters: no longer on its ability
+This result validates the surrogate where it matters : no longer on its ability
 to reproduce an equilibrium temperature, but on its ability to \emph{date a
 safety event} by interpolating between operating conditions it has never seen.
 
@@ -62,25 +62,25 @@ what the agent can repair on its own.
 
 \subsection{Protocol}
 
-I built a benchmark on the principle of \textbf{fault injection}. The creation
-tool generates a healthy case, I corrupt it in one controlled way, and the
+We built a benchmark on the principle of \textbf{fault injection}. The creation
+tool generates a healthy case, we corrupt it in one controlled way, and the
 executor then receives it with self-healing enabled.
-Fourteen cases were processed: twelve faults spread over four root-cause
+Fourteen cases were processed : twelve faults spread over four root-cause
 categories, plus two healthy cases serving as controls.
 
 The outcome of each case is classified along two deliberately
-\textbf{independent} axes:
+\textbf{independent} axes :
 \begin{itemize}
   \item \textbf{detected}, did a pattern from the knowledge base recognise the
     error, as opposed to falling back on the language model;
   \item \textbf{repaired}, did the case eventually run.
 \end{itemize}
 
-Separating these two axes is the point of the protocol: it is the ``detected but
+Separating these two axes is the point of the protocol : it is the ``detected but
 not repaired'' cell that materialises the gap between a \emph{symptom}
 recognised in a log and a \emph{cause} actually addressed.
 
-Each fault is further labelled a priori according to two distinct criteria: does
+Each fault is further labelled a priori according to two distinct criteria : does
 the base offer a correction for this pattern, and can that correction, by its
 nature, address the root cause? A fault for which the base \emph{believes} it
 can intervene while the remedy targets only the symptom is the heart of the
@@ -92,7 +92,7 @@ Table~\ref{tab:selfheal} gives the results by category.
 
 \begin{table}[htbp]
 \centering
-\caption[Self-healing benchmark]{Self-healing benchmark: 14 cases, of which 12
+\caption[Self-healing benchmark]{Self-healing benchmark : 14 cases, of which 12
 injected faults. The ``stopped at meshing'' column marks the cases intercepted
 by the mesher before the solver was even launched.}
 \label{tab:selfheal}
@@ -112,9 +112,9 @@ Invalid dictionary entry & 3 & 2/3 & \textbf{1/3} & 1/3\\
 \end{tabularx}
 \end{table}
 
-The detection rate is reasonable: nine faults out of twelve are recognised by a
+The detection rate is reasonable : nine faults out of twelve are recognised by a
 pattern, the language model fallback having been called upon only twice. The
-repair rate, on the other hand, is very low: of the twelve injected faults,
+repair rate, on the other hand, is very low : of the twelve injected faults,
 \textbf{only one} was repaired.
 
 The cross-tabulation of table~\ref{tab:selfheal-croise} explains why, and
@@ -140,7 +140,7 @@ No correction in the base for this pattern & 0/8\\
 
 Self-healing therefore repairs \emph{exactly} the faults whose root cause falls
 within the scope of the available correction, and only those. The middle row is
-the most instructive: in those three cases the pattern is recognised, the
+the most instructive : in those three cases the pattern is recognised, the
 diagnosis is displayed, the correction fires, and fails every time, consuming
 the full budget of three attempts each time. The mechanism gives the appearance
 of working while it structurally cannot succeed.
@@ -153,11 +153,11 @@ Three distinct failure mechanisms emerge.
 \num{100} to \num{200} times nominal, or negative) trigger a floating-point
 exception in the creep model. The pattern matches, and the associated correction
 reduces the time step. But no reduction of the time step can fix a physically
-absurd input: the cause lies upstream of the solver. The agent therefore applies
+absurd input : the cause lies upstream of the solver. The agent therefore applies
 an ineffective remedy three times in a row.
 
 \textbf{The correction is undone by the solver.} One case is particularly
-revealing: the time-step reduction is indeed applied and the first computation
+revealing : the time-step reduction is indeed applied and the first computation
 step succeeds, but OFFBEAT's adaptive time-step controller, seeing that all is
 going well, immediately increases the step again and causes a new divergence. A
 robust repair should act on the \emph{maximum} allowed time step, not on the
@@ -168,7 +168,7 @@ brought to light a defect that one-off trials had not revealed. The correction
 associated with exceeding the power history reduced the simulated duration by
 \SI{1}{\percent} per attempt. To bring a duration of \SI{1.5e8}{\second} below a
 table ending at \SI{1.26e8}{\second} would have required \textbf{eighteen}
-attempts for a budget of \textbf{three}: the correction could mathematically
+attempts for a budget of \textbf{three} : the correction could mathematically
 never succeed. It was replaced by a deterministic computation, which reads the
 time tables actually present in the case and targets an admissible value
 directly. After correction, this case, the only one whose root cause did fall
@@ -178,7 +178,7 @@ within an available correction, goes from failure to success in two attempts.
 
 The ``stopped at meshing'' column of table~\ref{tab:selfheal} deserves to be
 read against the grain. Two of the three geometric faults are intercepted by the
-mesher \emph{before} the solver starts: \texttt{blockMesh} refuses to build an
+mesher \emph{before} the solver starts : \texttt{blockMesh} refuses to build an
 impossible geometry. This is not a failure of self-healing, it is a safeguard
 doing its job. Counting these cases as failures, as a first version of the
 benchmark did, amounted to penalising the system for correctly rejecting an
@@ -192,7 +192,7 @@ structurally unsuited to \textbf{physical consistency} errors and to
 \textbf{configuration} errors, which account for eleven of the twelve faults in
 this benchmark.
 
-The practical consequence is a shift of effort: rather than endlessly enriching
+The practical consequence is a shift of effort : rather than endlessly enriching
 the base of crash patterns, it is more profitable to \textbf{validate the inputs
 before execution}. A case that cannot be physically valid should never reach the
 solver. A first geometric validation was added to that end (§\ref{sec:bugs}).

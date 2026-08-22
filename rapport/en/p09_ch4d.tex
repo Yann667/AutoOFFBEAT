@@ -2,19 +2,19 @@
 \label{sec:toolselection}
 
 The preceding sections measure the physical chain and the repair loop. One link
-remained unevaluated, yet central: faced with a request written in natural
+remained unevaluated, yet central : faced with a request written in natural
 language, does the supervisor choose the right tool?
 
 \subsection{Protocol}
 
-I wrote twenty-six requests covering the six tools exposed to the agent, plus
-four for which \emph{no} tool should be called: a greeting, a general-knowledge
+We wrote twenty-six requests covering the six tools exposed to the agent, plus
+four for which \emph{no} tool should be called : a greeting, a general-knowledge
 question, a note of thanks. Triggering a tool on these is a
 false positive just as much as a wrong choice is.
 
 The tools are not executed. They are bound to the model, and it is the
 \emph{intent} produced, the list of requested calls, that is recorded. This
-protocol isolates selection cleanly, with no side effects: no case is created,
+protocol isolates selection cleanly, with no side effects : no case is created,
 no solver is launched. It takes one pass per request.
 
 This evaluation was simply not practicable before the hardware acceleration of
@@ -27,7 +27,7 @@ working session.
 
 The first campaign gives an overall accuracy of \SI{77}{\percent}. The
 breakdown by tool, however, is very uneven (table~\ref{tab:toolsel}) and points
-to a single culprit: the safety analyser is correctly selected in only one case
+to a single culprit : the safety analyser is correctly selected in only one case
 out of four.
 
 \begin{table}[htbp]
@@ -62,7 +62,7 @@ margins and tell me when the limit will be reached'', it calls the surrogate; on
 The cause is not the model, but the descriptions supplied. Those of the safety
 analyser and of the surrogate promised exactly the same thing (safety margins,
 per-criterion status, PCMI, gap closure) without ever stating what really
-distinguishes them. Yet that criterion is simple and unambiguous: \textbf{the
+distinguishes them. Yet that criterion is simple and unambiguous : \textbf{the
 analyser requires an already-simulated case on disk, whereas the surrogate takes
 only numerical parameters}.
 
@@ -70,15 +70,15 @@ only numerical parameters}.
 
 The two descriptions were rewritten to state this condition of use explicitly,
 and to name each other as alternatives not to be confused. No other change was
-made: neither to the model, nor to the tool code, nor to the requests.
+made : neither to the model, nor to the tool code, nor to the requests.
 
 The accuracy of the safety analyser rises from \SI{25}{\percent} to
 \SI{100}{\percent}, and the overall accuracy from \SI{77}{\percent} to
 \SI{88}{\percent}.
 
-I had written those descriptions the way one writes documentation, for a human
-who would read both and tell them apart. The measurement showed me they are what
-the model actually decides on: where mine overlapped, it had nothing to choose
+We had written those descriptions the way one writes documentation, for a human
+who would read both and tell them apart. The measurement showed us they are what
+the model actually decides on : where mine overlapped, it had nothing to choose
 by. The encouraging part is the cost, eleven accuracy points for rewriting two
 paragraphs, with no retraining and no change of model.
 
@@ -87,13 +87,13 @@ where the boundary is genuinely debatable, since ``quickly estimate the maximum
 temperature'' may legitimately call either the surrogate or post-processing, and the third is a documentation call on a general-knowledge question, a benign
 false positive.
 
-\subsection{From selection to execution: a blind spot}
+\subsection{From selection to execution : a blind spot}
 \label{sec:angle-mort}
 
 The evaluation above measures which tool the agent \emph{chooses}. It says
 nothing about what happens when that call is actually \emph{executed}, since the
 protocol reads the intent without ever triggering it. That choice, justified in
-order to isolate the decision, turned out to be a blind spot: the first attempt
+order to isolate the decision, turned out to be a blind spot : the first attempt
 at end-to-end execution failed completely, on a defect invisible to the
 selection benchmark.
 
@@ -101,7 +101,7 @@ selection benchmark.
 its \texttt{params} parameter as a \emph{string} containing JSON. Yet a language
 model spontaneously produces an \emph{object} for an argument so named.
 Validation rejected it, the agent received an error message, and replayed the
-identical call. Measured: \num{30} tool calls, \num{53} messages,
+identical call. Measured : \num{30} tool calls, \num{53} messages,
 \SI{179}{\second}, \textbf{no case created at all}. Accepting both forms removed
 the loop.
 
@@ -134,10 +134,10 @@ Case created and simulated & \textcolor{cAlert}{\textbf{no}} & \textbf{yes}\\
 \end{tabularx}
 \end{table}
 
-These two fixes taught me something about my own benchmark. I had been
+These two fixes taught us something about our own benchmark. We had been
 reporting \SI{88}{\percent} success while the task the agent is actually for was
-failing every time, because I had only ever measured the link I had thought to
-instrument. \textbf{I now try to run the whole chain before trusting a figure
+failing every time, because we had only ever measured the link we had thought to
+instrument. \textbf{we now try to run the whole chain before trusting a figure
 that describes one part of it.} The complete transcript of
 the successful session is given in appendix~\ref{ann:session}.
 
@@ -151,12 +151,12 @@ chapter.
 \subsection{Protocol}
 
 What determines the quality of a documentary answer is the \textbf{retrieval}
-that precedes it: if the wrong excerpt comes up, the answer will be wrong
+that precedes it : if the wrong excerpt comes up, the answer will be wrong
 whatever the quality of the language model. It is therefore retrieval alone that
 is measured here.
 
-I wrote fifteen questions and, for each one, noted which corpus document
-actually contains the answer. Two indicators come out of this: whether the right
+We wrote fifteen questions and, for each one, noted which corpus document
+actually contains the answer. Two indicators come out of this : whether the right
 document is the source of the first excerpt (accuracy@1), and whether it appears
 among the four retrieved excerpts (recall@4). The second is the more relevant in practice,
 since the agent receives all four excerpts.
@@ -167,5 +167,5 @@ about \SI{33}{\percent} accuracy@1. This threshold serves as a lower reference.
 \subsection{A result below chance}
 
 The first campaign gives \SI{27}{\percent} accuracy@1, that is \textbf{worse
-than a random draw}. But the truly alarming indicator lies elsewhere: recall@4
+than a random draw}. But the truly alarming indicator lies elsewhere : recall@4
 is also \SI{27}{\percent}, exactly the same value.
