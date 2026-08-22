@@ -70,11 +70,11 @@ Recall@4 reaches \SI{100}{\percent}: the agent now always receives the right
 document among its four excerpts. The multilingual model has become the
 project's default.
 
-This case completes the two preceding ones and forms a pattern with them: none
-of these three failures (overlapping tool descriptions, degenerate training
-domain, cross-lingual retrieval) was visible without measurement, and each was
-fixed without rewriting any application code. What was missing was not
-technique, but \emph{instrumentation}.
+Taken with the two preceding cases, this one showed me a pattern in my own way
+of working. None of these three failures (overlapping tool descriptions,
+degenerate training domain, cross-lingual retrieval) was visible without
+measurement, and none of them needed application code to be rewritten. What I
+had been missing was not technique, but \emph{the habit of measuring}.
 
 \section{Confronting the criterion with what the solver computes}
 \label{sec:seuils}
@@ -171,10 +171,10 @@ $\mathbf{0.9905}$ (table~\ref{tab:surrogate}). The correct quantity turns out to
 be the easier one to learn as well. The prediction of the gap closure date, the
 main result of section~\ref{sec:validation-emulateur}, is unchanged.
 
-This is one more illustration of the coupling between components believed to be
-independent: a correctness fix in the threshold base silently invalidated a
-learning target two layers away. It was detected only because every change was
-followed by an end-to-end check.
+I had thought of these two components as independent: a correctness fix in the
+threshold base silently invalidated a learning target two layers away. I only
+caught it because I had got into the habit of re-running the whole chain after
+each change.
 
 \section{Correctness defects identified and fixed}
 \label{sec:bugs}

@@ -76,13 +76,11 @@ The accuracy of the safety analyser rises from \SI{25}{\percent} to
 \SI{100}{\percent}, and the overall accuracy from \SI{77}{\percent} to
 \SI{88}{\percent}.
 
-The lesson goes beyond this particular case. In a tool-based architecture, a
-tool description is not documentation: it is the \emph{programming interface}
-through which the model decides. Two tools whose descriptions overlap are, from
-the model's point of view, indistinguishable, and no amount of model quality
-compensates for that ambiguity. It is also good news in terms of cost: eleven
-accuracy points were gained by rewriting two paragraphs, with no retraining and
-no change of model.
+I had written those descriptions the way one writes documentation, for a human
+who would read both and tell them apart. The measurement showed me they are what
+the model actually decides on: where mine overlapped, it had nothing to choose
+by. The encouraging part is the cost, eleven accuracy points for rewriting two
+paragraphs, with no retraining and no change of model.
 
 The three remaining errors do not stem from this cause. Two concern wordings
 where the boundary is genuinely debatable, since ``quickly estimate the maximum
@@ -136,10 +134,11 @@ Case created and simulated & \textcolor{cAlert}{\textbf{no}} & \textbf{yes}\\
 \end{tabularx}
 \end{table}
 
-The methodological lesson goes beyond these two fixes. A benchmark delimits what
-it can see: measuring selection gave \SI{88}{\percent} success while execution of
-the main task was failing in \SI{100}{\percent} of cases. \textbf{A flattering
-indicator on one link says nothing about the chain.} The complete transcript of
+These two fixes taught me something about my own benchmark. I had been
+reporting \SI{88}{\percent} success while the task the agent is actually for was
+failing every time, because I had only ever measured the link I had thought to
+instrument. \textbf{I now try to run the whole chain before trusting a figure
+that describes one part of it.} The complete transcript of
 the successful session is given in appendix~\ref{ann:session}.
 
 \section{Evaluating the documentary assistant}

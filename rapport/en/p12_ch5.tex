@@ -25,15 +25,16 @@ interface, was available and should be preferred.
 Second, a misleading error message cost time: the log stated that the graphics
 driver was too old, whereas it was up to date. That message in fact came from a
 check relating to the stack that had not been selected, unrelated to the route
-actually in use. The lesson is a classic one but worth retaining: an explicit
-error message is not necessarily a \emph{relevant} error message.
+actually in use. I spent a long time trying to update a driver that was already up to date,
+because the message said so explicitly. It had not occurred to me to ask which
+code path had produced it.
 
 Third, a second installation of the same service, made by mistake inside the
 Linux environment instead of the host system, was silently intercepting every
 request. The measurements obtained were therefore those of the slow
-configuration, even though the fast one was in place. This confusion illustrates
-a methodological point: when two equivalent services share a port, no
-measurement is reliable until one has checked \emph{which} of them answers.
+configuration, even though the fast one was in place. I had been measuring for two days without suspecting that my figures
+described a service other than the one I thought I was addressing. I now check
+which process actually answers on a port before recording any timing.
 
 \subsection{Compiling the solver}
 
@@ -42,16 +43,18 @@ the project's internal documentation was no longer valid. The actual public
 repository had to be identified, and its build structure turned out to differ
 from the one described. Compilation itself then proceeded without error.
 
-This episode led to a more general remark: a project's documentation ages, and
-wrong documentation costs more than absent documentation, because it actively
-points in the wrong direction.
+I lost half a day before thinking to check whether the address itself was
+still valid. Absent documentation would have sent me straight to looking for the
+public repository; the wrong address kept me searching in the right place for
+something that was no longer there.
 
 \subsection{Undeclared dependencies}
 
 Porting to a fresh machine revealed three Python libraries used by the code but
 absent from the dependency list. They were present by accident on the original
-machine. This kind of defect only shows up during a transfer, which argues for
-performing such a transfer \emph{early} rather than at the end of a project.
+machine. This kind of defect only shows up during a transfer. Had I moved the project
+to a second machine earlier, I would have found them at a point where fixing the
+dependency list cost nothing.
 
 \section{False starts and reorientations}
 
@@ -79,10 +82,10 @@ It was wrong. In the case of hoop stress, the extremum retained lay inside the
 pellet and carried a sign opposite to the actual stress in the cladding: tension reported where the cladding was in compression. An approximation
 prudent in principle had turned into a qualitatively false result.
 
-The lesson drawn goes beyond this particular case: a choice documented as
-conservative must be \emph{verified} to be so, not assumed. The correction was
-validated on a real case, where it did change the strain result by a factor of
-five and reversed the sign of the stress.
+What I take from this is that I had written the word ``conservative'' in a
+comment without ever testing whether it held. Testing it took a single case: the
+correction changed the strain result by a factor of five and reversed the sign
+of the stress.
 
 \subsection{A rigorous validation of an uninteresting problem}
 
@@ -108,13 +111,14 @@ simulation ran to \SI{6.3e7}{\second} when the surrogate had never seen beyond
 \SI{6500}{\second}. A ratio of ten thousand between the training domain and the
 domain of use cannot be read off an $R^2$.
 
-The lesson is twofold. On the one hand, a validation metric only qualifies the
-fit to a dataset, never the relevance of that dataset: a model can be
-impeccably validated and nonetheless useless. On the other hand, the practical
+I draw two things from this. First, I had read my cross-validation score as
+evidence that the model was good, when it only told me the model fitted the data
+I had given it. I now try to read a metric together with the domain it was
+computed on. On the other hand, the practical
 constraint that had dictated the choice, the cost of building the design of
 experiments, had disappeared once the solver was compiled locally, without my
-re-examining the decision it had motivated. Design assumptions deserve to be
-re-evaluated when the constraints that justified them change.
+re-examining the decision it had motivated. I had not gone back over a
+decision once the reason for it had disappeared.
 
 \subsection{On the use of a programming assistant}
 
@@ -126,8 +130,9 @@ The assistance proved very effective for producing structured code and for
 exploring an unfamiliar codebase. It proved, on the other hand, incapable of
 detecting on its own the correctness defects of table~\ref{tab:bugs}: these were
 found only by \emph{confronting numerical results with a physical expectation}: why is the cladding temperature equal to the pellet centreline temperature? why
-is a closed gap reported as safe? Physical judgement remains the decisive link,
-and this observation applies equally to the agent developed here.
+is a closed gap reported as safe? What I could not delegate was
+knowing what the number ought to look like, and I expect the same limit applies
+to the agent I built.
 
 \clearpage
 
