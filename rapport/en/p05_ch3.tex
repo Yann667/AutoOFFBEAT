@@ -7,13 +7,14 @@
 \section{Scoping: what this twin is, and what it is not}
 \label{sec:cadrage}
 
-It is worth clarifying first what is meant by a ``digital twin of a power
-plant''. A complete digital twin of a plant would handle the full coupled
+I should say first what I mean by a ``digital twin of a power plant'', because
+the phrase promises more than what I built. A complete digital twin of a plant
+would handle the full coupled
 multiphysics: neutronics, thermal-hydraulics and fuel performance. It would
 thereby be able to predict the state of a fuel rod from the state of the core,
-and conversely. OFFBEAT, however, only deals with fuel performance. What is
-built here is therefore the digital twin of a \textbf{single fuel rod}, and
-everything outside that domain is treated as a boundary condition.
+and conversely. OFFBEAT, however, only deals with fuel performance. What I built is therefore the digital twin
+of a \textbf{single fuel rod}, and everything outside that domain enters as a
+boundary condition.
 
 The second limitation concerns ``real time''. OFFBEAT is a batch solver, one run
 of which takes from a few seconds to several hours, and there is no sensor
@@ -44,8 +45,8 @@ the intended digital twin.}
 \section{D1: The safety analyser}
 
 The first block reads a completed simulation and assigns, criterion by
-criterion, a status: safe, close to the threshold, or exceeded. It mirrors
-exactly the pattern of self-healing: an editable JSON knowledge base, a
+criterion, a status: safe, close to the threshold, or exceeded. It follows
+the same pattern as self-healing: an editable JSON knowledge base, a
 deterministic treatment, and an optional language model fallback to explain in
 plain language the criteria that are exceeded.
 
@@ -57,8 +58,8 @@ proved trickier than it appears: gap width is the only criterion whose danger is
 a value that is \textit{too small}, and this special case was the origin of a
 defect detected late (§\ref{sec:bugs}).
 
-It must be stressed that the thresholds currently written in the base are
-\textbf{indicative values}, explicitly flagged as unvalidated. They are
+I want to be explicit about the thresholds currently written in the base: they
+are \textbf{indicative values}, and the code flags them as unvalidated. They are
 published design criteria, not invented values, but their exact magnitude
 depends on the rod and the burnup: validating them with the supervisor is one of
 the direct follow-ups to this work.
@@ -66,8 +67,8 @@ the direct follow-ups to this work.
 \section{D2: Prognosis}
 
 The second block exploits the fact that a simulation writes several time steps.
-For each non-green criterion, the time evolution of the peak is extracted, a
-linear trend is fitted, and the instant at which the threshold is crossed is
+For each non-green criterion I extract the time evolution of the peak, fit a
+linear trend to it, and read off the instant at which the threshold would be
 extrapolated.
 
 The cautious rule adopted is to announce nothing when the trend is not moving
@@ -130,7 +131,7 @@ properties well suited to the very small number of available points:
     approximation.
 \end{itemize}
 
-Validation is carried out by \textit{leave-one-out}: each point is predicted by
+I validate by \textit{leave-one-out}: each point is predicted by
 a model refitted on all the others. This is an honest measure of generalisation
 ability, far more meaningful than a goodness-of-fit coefficient over a few dozen
 points. The results are presented in the next chapter, where it will be seen

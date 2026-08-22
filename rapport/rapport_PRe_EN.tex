@@ -752,7 +752,7 @@ model goes through a single factory driven by a configuration file. Three
 providers are supported: fully local execution through Ollama, and two remote
 services. The rest of the code is unaware of which one is in use.
 
-This choice had two beneficial consequences. First, the whole development could
+Two things followed from this choice. The whole development could
 be carried out \textbf{at no inference cost}, with a seven-billion-parameter
 model running locally. Second, the factory distinguishes the supervisor model
 from the \textit{debugging} model: it becomes possible to entrust routine
@@ -880,13 +880,14 @@ unavailable: it must never prevent basic operation.
 \section{Scoping: what this twin is, and what it is not}
 \label{sec:cadrage}
 
-It is worth clarifying first what is meant by a ``digital twin of a power
-plant''. A complete digital twin of a plant would handle the full coupled
+I should say first what I mean by a ``digital twin of a power plant'', because
+the phrase promises more than what I built. A complete digital twin of a plant
+would handle the full coupled
 multiphysics: neutronics, thermal-hydraulics and fuel performance. It would
 thereby be able to predict the state of a fuel rod from the state of the core,
-and conversely. OFFBEAT, however, only deals with fuel performance. What is
-built here is therefore the digital twin of a \textbf{single fuel rod}, and
-everything outside that domain is treated as a boundary condition.
+and conversely. OFFBEAT, however, only deals with fuel performance. What I built is therefore the digital twin
+of a \textbf{single fuel rod}, and everything outside that domain enters as a
+boundary condition.
 
 The second limitation concerns ``real time''. OFFBEAT is a batch solver, one run
 of which takes from a few seconds to several hours, and there is no sensor
@@ -917,8 +918,8 @@ the intended digital twin.}
 \section{D1: The safety analyser}
 
 The first block reads a completed simulation and assigns, criterion by
-criterion, a status: safe, close to the threshold, or exceeded. It mirrors
-exactly the pattern of self-healing: an editable JSON knowledge base, a
+criterion, a status: safe, close to the threshold, or exceeded. It follows
+the same pattern as self-healing: an editable JSON knowledge base, a
 deterministic treatment, and an optional language model fallback to explain in
 plain language the criteria that are exceeded.
 
@@ -930,8 +931,8 @@ proved trickier than it appears: gap width is the only criterion whose danger is
 a value that is \textit{too small}, and this special case was the origin of a
 defect detected late (§\ref{sec:bugs}).
 
-It must be stressed that the thresholds currently written in the base are
-\textbf{indicative values}, explicitly flagged as unvalidated. They are
+I want to be explicit about the thresholds currently written in the base: they
+are \textbf{indicative values}, and the code flags them as unvalidated. They are
 published design criteria, not invented values, but their exact magnitude
 depends on the rod and the burnup: validating them with the supervisor is one of
 the direct follow-ups to this work.
@@ -939,8 +940,8 @@ the direct follow-ups to this work.
 \section{D2: Prognosis}
 
 The second block exploits the fact that a simulation writes several time steps.
-For each non-green criterion, the time evolution of the peak is extracted, a
-linear trend is fitted, and the instant at which the threshold is crossed is
+For each non-green criterion I extract the time evolution of the peak, fit a
+linear trend to it, and read off the instant at which the threshold would be
 extrapolated.
 
 The cautious rule adopted is to announce nothing when the trend is not moving
@@ -1003,7 +1004,7 @@ properties well suited to the very small number of available points:
     approximation.
 \end{itemize}
 
-Validation is carried out by \textit{leave-one-out}: each point is predicted by
+I validate by \textit{leave-one-out}: each point is predicted by
 a model refitted on all the others. This is an honest measure of generalisation
 ability, far more meaningful than a goodness-of-fit coefficient over a few dozen
 points. The results are presented in the next chapter, where it will be seen
@@ -1017,24 +1018,24 @@ domain is not itself physically relevant.
 \chapter{Results and stress-testing}
 \markboth{Chapter 4: Results and stress-testing}{}
 
-This chapter gathers the results obtained. It is organised in three stages: the
-physical behaviour reproduced by a reference simulation, the quantitative
-validation of the surrogate, and then the deliberate stress-testing of the
-agent's self-diagnosis capabilities.
+This chapter gathers the results obtained: first the physical behaviour that a
+reference simulation reproduces, then the quantitative validation of the
+surrogate, and finally what happened when I set out to break the agent on
+purpose. The last part is the longest, and it is where I learned the most.
 
 \section{Verifying the solver against analytical solutions}
 \label{sec:verification}
 
-Before exploiting the results of the tooled chain, it is worth establishing that
-the solver on which it rests is itself correct. All the results presented later
+Before exploiting anything the chain produces, I had to satisfy myself that the
+solver underneath it is correct. All the results presented later
 in this chapter are matters of \emph{internal consistency}: the solver is
 consistent with itself, the surrogate is consistent with the solver. None
 confronts the chain with an external truth.
 
 For this purpose OFFBEAT distributes a suite of verification cases, some of
-which have a \textbf{closed-form analytical solution}. Three of them, covering
-three distinct areas of physics, were run in the environment of this internship
-and compared with their reference solution (table~\ref{tab:verif}).
+which have a \textbf{closed-form analytical solution}. I ran three of them, covering three
+distinct areas of physics, on my own installation and compared the output with
+the reference solution (table~\ref{tab:verif}).
 
 \begin{table}[htbp]
 \centering
@@ -1191,12 +1192,12 @@ put into tension by the pellet.}
 \label{fig:gap-stress}
 \end{figure}
 
-Reading these two curves together constitutes a qualitative validation of the
-model's behaviour. As long as the gap remains open, the cladding is
+Read together, these two curves are what convinced me the model behaves as it
+should. As long as the gap remains open, the cladding is
 \textbf{compressed} by the coolant pressure: the stress is negative, of the
 order of \SI{-43}{\mega\pascal}. The gap closes somewhere around day
 \numrange{354}{457}; the stress then becomes \textbf{positive} and grows to
-\SI{79}{\mega\pascal}. This is exactly the signature of PCMI: the pellet, as it
+\SI{79}{\mega\pascal}. This is the signature of PCMI: the pellet, as it
 swells, puts the cladding into tension. The automatic prognosis (block~D2)
 places the crossing of the closure threshold at about \SI{2.33e7}{\second}, that
 is at one third of the cycle, consistent with the curve.
@@ -1492,9 +1493,9 @@ what the agent can repair on its own.
 
 \subsection{Protocol}
 
-A benchmark was built on the principle of \textbf{fault injection}. A healthy
-case is first generated by the creation tool, then corrupted in a controlled
-manner, and finally submitted to the executor with self-healing enabled.
+I built a benchmark on the principle of \textbf{fault injection}. The creation
+tool generates a healthy case, I corrupt it in one controlled way, and the
+executor then receives it with self-healing enabled.
 Fourteen cases were processed: twelve faults spread over four root-cause
 categories, plus two healthy cases serving as controls.
 
@@ -1635,18 +1636,18 @@ language, does the supervisor choose the right tool?
 
 \subsection{Protocol}
 
-Twenty-six requests were written, covering the six tools exposed to the agent,
-plus four requests for which \emph{no} tool should be called: a greeting, a
-general-knowledge question, a note of thanks. Triggering a tool on these is a
+I wrote twenty-six requests covering the six tools exposed to the agent, plus
+four for which \emph{no} tool should be called: a greeting, a general-knowledge
+question, a note of thanks. Triggering a tool on these is a
 false positive just as much as a wrong choice is.
 
 The tools are not executed. They are bound to the model, and it is the
 \emph{intent} produced, the list of requested calls, that is recorded. This
-protocol measures selection exactly, with no side effects: no case is created,
+protocol isolates selection cleanly, with no side effects: no case is created,
 no solver is launched. It takes one pass per request.
 
-It should be stressed that this evaluation was not practicable before the
-hardware acceleration described in section~\ref{sec:latence}. At four minutes
+This evaluation was simply not practicable before the hardware acceleration of
+section~\ref{sec:latence}. At four minutes
 per invocation, these twenty-six requests would have taken almost two hours;
 they now run in under a minute, which allows several iterations within a single
 working session.
@@ -1783,10 +1784,10 @@ that precedes it: if the wrong excerpt comes up, the answer will be wrong
 whatever the quality of the language model. It is therefore retrieval alone that
 is measured here.
 
-Fifteen questions were written, each associated with the corpus document that
-actually contains the answer. Two indicators are recorded: is the right document
-the source of the first excerpt (accuracy@1), and does it appear among the four
-retrieved excerpts (recall@4)? The second is the more relevant in practice,
+I wrote fifteen questions and, for each one, noted which corpus document
+actually contains the answer. Two indicators come out of this: whether the right
+document is the source of the first excerpt (accuracy@1), and whether it appears
+among the four retrieved excerpts (recall@4). The second is the more relevant in practice,
 since the agent receives all four excerpts.
 
 As the corpus contains only four documents, a random draw would already give
@@ -2108,9 +2109,8 @@ chapter.
 \chapter{Difficulties, false starts and schedule}
 \markboth{Chapter 5: Difficulties, false starts and schedule}{}
 
-This chapter reports the obstacles encountered. It is not a catalogue of
-anecdotes: each of these difficulties changed a design decision or a working
-method.
+This chapter reports the obstacles I ran into. I have kept only the ones that
+changed a design decision or the way I worked; the rest were just lost time.
 
 \section{Technical difficulties}
 
@@ -2955,7 +2955,7 @@ safety margins are met.
 makes a sequencing error, launching the solver before the case exists, and
 it is the \emph{deterministic safeguard} of the execution tool, not the language
 model, that intercepts it. The agent reads the error message, infers the
-correction and resumes. This is exactly the division of roles the architecture
+correction and resumes. This is the division of roles the architecture
 aims at: the model orchestrates, the tools validate.
 
 \vspace{0.3cm}

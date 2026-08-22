@@ -90,7 +90,7 @@ model goes through a single factory driven by a configuration file. Three
 providers are supported: fully local execution through Ollama, and two remote
 services. The rest of the code is unaware of which one is in use.
 
-This choice had two beneficial consequences. First, the whole development could
+Two things followed from this choice. The whole development could
 be carried out \textbf{at no inference cost}, with a seven-billion-parameter
 model running locally. Second, the factory distinguishes the supervisor model
 from the \textit{debugging} model: it becomes possible to entrust routine

@@ -7,18 +7,18 @@ language, does the supervisor choose the right tool?
 
 \subsection{Protocol}
 
-Twenty-six requests were written, covering the six tools exposed to the agent,
-plus four requests for which \emph{no} tool should be called: a greeting, a
-general-knowledge question, a note of thanks. Triggering a tool on these is a
+I wrote twenty-six requests covering the six tools exposed to the agent, plus
+four for which \emph{no} tool should be called: a greeting, a general-knowledge
+question, a note of thanks. Triggering a tool on these is a
 false positive just as much as a wrong choice is.
 
 The tools are not executed. They are bound to the model, and it is the
 \emph{intent} produced, the list of requested calls, that is recorded. This
-protocol measures selection exactly, with no side effects: no case is created,
+protocol isolates selection cleanly, with no side effects: no case is created,
 no solver is launched. It takes one pass per request.
 
-It should be stressed that this evaluation was not practicable before the
-hardware acceleration described in section~\ref{sec:latence}. At four minutes
+This evaluation was simply not practicable before the hardware acceleration of
+section~\ref{sec:latence}. At four minutes
 per invocation, these twenty-six requests would have taken almost two hours;
 they now run in under a minute, which allows several iterations within a single
 working session.
@@ -155,10 +155,10 @@ that precedes it: if the wrong excerpt comes up, the answer will be wrong
 whatever the quality of the language model. It is therefore retrieval alone that
 is measured here.
 
-Fifteen questions were written, each associated with the corpus document that
-actually contains the answer. Two indicators are recorded: is the right document
-the source of the first excerpt (accuracy@1), and does it appear among the four
-retrieved excerpts (recall@4)? The second is the more relevant in practice,
+I wrote fifteen questions and, for each one, noted which corpus document
+actually contains the answer. Two indicators come out of this: whether the right
+document is the source of the first excerpt (accuracy@1), and whether it appears
+among the four retrieved excerpts (recall@4). The second is the more relevant in practice,
 since the agent receives all four excerpts.
 
 As the corpus contains only four documents, a random draw would already give

@@ -4,24 +4,24 @@
 \chapter{Results and stress-testing}
 \markboth{Chapter 4: Results and stress-testing}{}
 
-This chapter gathers the results obtained. It is organised in three stages: the
-physical behaviour reproduced by a reference simulation, the quantitative
-validation of the surrogate, and then the deliberate stress-testing of the
-agent's self-diagnosis capabilities.
+This chapter gathers the results obtained: first the physical behaviour that a
+reference simulation reproduces, then the quantitative validation of the
+surrogate, and finally what happened when I set out to break the agent on
+purpose. The last part is the longest, and it is where I learned the most.
 
 \section{Verifying the solver against analytical solutions}
 \label{sec:verification}
 
-Before exploiting the results of the tooled chain, it is worth establishing that
-the solver on which it rests is itself correct. All the results presented later
+Before exploiting anything the chain produces, I had to satisfy myself that the
+solver underneath it is correct. All the results presented later
 in this chapter are matters of \emph{internal consistency}: the solver is
 consistent with itself, the surrogate is consistent with the solver. None
 confronts the chain with an external truth.
 
 For this purpose OFFBEAT distributes a suite of verification cases, some of
-which have a \textbf{closed-form analytical solution}. Three of them, covering
-three distinct areas of physics, were run in the environment of this internship
-and compared with their reference solution (table~\ref{tab:verif}).
+which have a \textbf{closed-form analytical solution}. I ran three of them, covering three
+distinct areas of physics, on my own installation and compared the output with
+the reference solution (table~\ref{tab:verif}).
 
 \begin{table}[htbp]
 \centering
@@ -178,12 +178,12 @@ put into tension by the pellet.}
 \label{fig:gap-stress}
 \end{figure}
 
-Reading these two curves together constitutes a qualitative validation of the
-model's behaviour. As long as the gap remains open, the cladding is
+Read together, these two curves are what convinced me the model behaves as it
+should. As long as the gap remains open, the cladding is
 \textbf{compressed} by the coolant pressure: the stress is negative, of the
 order of \SI{-43}{\mega\pascal}. The gap closes somewhere around day
 \numrange{354}{457}; the stress then becomes \textbf{positive} and grows to
-\SI{79}{\mega\pascal}. This is exactly the signature of PCMI: the pellet, as it
+\SI{79}{\mega\pascal}. This is the signature of PCMI: the pellet, as it
 swells, puts the cladding into tension. The automatic prognosis (block~D2)
 places the crossing of the closure threshold at about \SI{2.33e7}{\second}, that
 is at one third of the cycle, consistent with the curve.
