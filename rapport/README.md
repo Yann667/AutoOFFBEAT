@@ -86,7 +86,6 @@ Chercher `\color{red}` dans le source : chaque occurrence signale un passage
 
 - note de (non) confidentialité : choisir parmi les trois variantes ;
 - remerciements : à personnaliser (ordre hiérarchique + fonctions) ;
-- planning du stage : ajuster les semaines aux dates réelles ;
 - bibliographie : compléter la référence AutoFLUKA, vérifier les références
   OFFBEAT sur les versions publiées, dater les consultations d'URL.
 
@@ -95,7 +94,6 @@ Chercher `\color{red}` dans le source : chaque occurrence signale un passage
 - **Les seuils de `safety_kb.json` sont présentés comme non validés** dans tout
   le rapport (§ Annexe D notamment). Si l'encadrant les valide d'ici la remise,
   mettre à jour le texte en conséquence.
-- **Dates et durée du stage** : le planning est en 16 semaines, à ajuster.
 - Faire relire l'orthographe (les consignes y insistent).
 
 ## Ce que contient le rapport
@@ -106,7 +104,7 @@ Chercher `\color{red}` dans le source : chaque occurrence signale un passage
 | Ch. 2 | Architecture de l'agent : superviseur, outils, auto-réparation, RAG |
 | Ch. 3 | Jumeau numérique D1→D5 (sûreté, pronostic, assimilation, tableau de bord, émulateur) |
 | Ch. 4 | Résultats : simulation 2 ans, validation de l'émulateur, mise à l'épreuve du self-healing, défauts de justesse corrigés |
-| Ch. 5 | Difficultés, fausses routes, planning |
+| Ch. 5 | Difficultés et fausses routes |
 | Annexes | Environnement, structure d'un cas, bases de connaissance, jeu de données |
 
 **Toutes les valeurs numériques proviennent de runs réels** (cas
