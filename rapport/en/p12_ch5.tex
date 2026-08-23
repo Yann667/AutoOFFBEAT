@@ -112,7 +112,7 @@ domain of use cannot be read off an $R^2$.
 
 We draw two things from this. First, we had read our cross-validation score as
 evidence that the model was good, when it only told us the model fitted the data
-We had given it. We now try to read a metric together with the domain it was
+we had given it. We now try to read a metric together with the domain it was
 computed on. On the other hand, the practical
 constraint that had dictated the choice, the cost of building the design of
 experiments, had disappeared once the solver was compiled locally, without our
@@ -141,52 +141,46 @@ to the agent we built.
 \section*{Internship schedule}
 \addcontentsline{toc}{section}{Internship schedule}
 
-\vspace{0.4cm}
-
-\noindent
-\textit{\color{red}[To be adjusted to the actual internship dates. The phases
-below reflect the order in which the work was actually built.]}
-
 \vspace{0.6cm}
 
 \begin{table}[htbp]
 \centering
-\caption[Internship schedule by phase]{Progress of the internship by phase.}
+\caption[Internship schedule by phase]{Progress of the internship by phase, over the eleven weeks from \dateFrom{} to \dateTo.}
 \label{tab:planning}
 \small
 \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}
                                 >{\raggedright\arraybackslash}p{4.3cm}X@{}}
 \toprule
-\textbf{Period} & \textbf{Phase} & \textbf{Deliverable / milestone}\\
+\textbf{Period (2026)} & \textbf{Phase} & \textbf{Deliverable / milestone}\\
 \midrule
-Weeks 1--2 & Familiarisation
+13--26 Apr & Familiarisation
   & Fuel physics, first steps with OpenFOAM and OFFBEAT, study of the
     reference project AutoFLUKA\\
 \addlinespace
-Weeks 3--4 & Software foundation
+27 Apr--3 May & Software foundation
   & Project tree, provider-agnostic language model factory, development
     environment\\
 \addlinespace
-Weeks 5--6 & Execution and self-healing
+4--17 May & Execution and self-healing
   & Solver execution tool validated on a real case; error pattern base and
     repair loop\\
 \addlinespace
-Weeks 7--8 & Complete agent
+18--24 May & Complete agent
   & Supervisor, case generation tool, post-processing; first end-to-end
     chaining\\
 \addlinespace
-Weeks 9--10 & Interface and documentation
+25--31 May & Interface and documentation
   & Web interface, documentary assistant based on semantic search\\
 \addlinespace
-Weeks 11--13 & Digital twin
-  & Safety analyser, prognosis, assimilation, dashboard, Gaussian-process
+1--14 Jun & Digital-twin prototype
+    & Safety analyser, prognosis, history update, dashboard, Gaussian-process
     surrogate\\
 \addlinespace
-Weeks 14--15 & Validation and consolidation
+15--21 Jun & Validation and consolidation
   & Reference simulation over a complete cycle, stress-testing of self-healing,
     correction of the correctness defects\\
 \addlinespace
-Week 16 & Writing up
+22 Jun--1 Jul & Writing up
   & Report and defence\\
 \bottomrule
 \end{tabularx}

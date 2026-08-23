@@ -1,6 +1,6 @@
 %==============================================================================
 %  Projet de Recherche (PRe), ENSTA Paris
-%  AutoOFFBEAT : an LLM agent and digital twin for the OFFBEAT fuel
+%  AutoOFFBEAT : an LLM agent and digital-twin prototype for the OFFBEAT fuel
 %  performance code.
 %
 %  English version. Compile with :  ./compiler.sh   (three pdflatex passes)
@@ -85,7 +85,7 @@
 \newcommand{\reportTitle}{A Conversational Agent for Nuclear Fuel
   Performance Simulation}
 \newcommand{\reportSubtitle}{Automating the OFFBEAT code and building a
-  digital twin of a PWR fuel rod}
+    digital-twin prototype for a PWR fuel rod}
 %==============================================================================
 
 %--------------------------------------------- heading styles (guidelines) ----
@@ -116,7 +116,7 @@
 \fancyhead[C]{\itshape\bfseries\small\reportTitle}
 \fancyfoot[C]{%
   \footnotesize\itshape \myLastName{} \myFirstName{} / \hostOrganisation{} /\\
-  \textcolor{red}{\bfseries\confidentialityNotice}%
+  {\bfseries\confidentialityNotice}%
 }
 \fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
@@ -128,7 +128,7 @@
   \fancyhead[C]{\itshape\bfseries\small\reportTitle}
   \fancyfoot[C]{%
     \footnotesize\itshape \myLastName{} \myFirstName{} / \hostOrganisation{} /\\
-    \textcolor{red}{\bfseries\confidentialityNotice}}
+    {\bfseries\confidentialityNotice}}
   \fancyfoot[R]{\thepage}
   \renewcommand{\headrulewidth}{0.4pt}
 }
@@ -198,10 +198,9 @@
 
 \vspace{1.0cm}
 
-{\color{red}\fbox{\begin{minipage}{0.85\textwidth}\centering
+{\fbox{\begin{minipage}{0.85\textwidth}\centering
   {\large\bfseries Confidentiality statement}\\[2pt]
-  {\small\bfseries \confidentialityNotice\\
-  (state the type of confidentiality and, where applicable, its end date)}
+  {\small\bfseries \confidentialityNotice}
 \end{minipage}}}
 
 \vspace{1.0cm}
@@ -306,13 +305,14 @@ which automates the simulation workflows of the \textbf{OFFBEAT} code (built on
 OpenFOAM) : a supervisor orchestrates domain tools (case generation, execution,
 post-processing, safety analysis) and a self-healing loop diagnoses solver
 crashes from an editable knowledge base. The system was then extended towards a
-\textbf{digital twin} of a fuel rod, including a Gaussian-process surrogate that
-predicts pellet-cladding gap closure within \SI{4.4}{\percent}, in
-\SI{2}{\milli\second} instead of \SI{36}{\second}, for a linear power absent
-from its training set. The second part of the work is the \textbf{measured
-stress-testing} of the system : a benchmark of twelve injected faults shows that
-self-healing only handles crashes whose root cause the available correction
-actually addresses, and evaluating the decision layer raises tool-selection
+\textbf{digital-twin prototype} of a fuel rod, including a Gaussian-process
+surrogate which, on a first test, places pellet-cladding gap closure within
+\SI{4.4}{\percent} in \SI{2}{\milli\second} instead of \SI{36}{\second},
+for a linear power absent from its \num{25} training points. The second part of
+the work is the \textbf{measured stress-testing} of the system through two
+engineering benchmarks : on twelve injected faults, self-healing handled only
+the crash whose root cause the available correction actually addresses, and
+evaluating the decision layer on twenty-six requests raised tool-selection
 accuracy from \SI{77}{\percent} to \SI{88}{\percent}. These measurements exposed
 fourteen defects, none of which raised any visible error, among them a confusion
 between cladding and pellet temperature (\SI{830}{\kelvin} discrepancy) and a
@@ -320,7 +320,8 @@ surrogate validated over a degenerate domain.
 
 \vspace{0.35cm}
 \noindent\textbf{\underline{Keywords:}}\\[2pt]
-Nuclear fuel performance ; OFFBEAT ; OpenFOAM ; LLM agent ; digital twin ;
+Nuclear fuel performance ; OFFBEAT ; OpenFOAM ; LLM agent ; digital-twin
+prototype ;
 safety analysis ; pellet-cladding mechanical interaction (PCMI) ;
 surrogate model ; Gaussian process.
 
@@ -874,8 +875,8 @@ unavailable : it must never prevent basic operation.
 %==============================================================================
 % CHAPTER 3
 %==============================================================================
-\chapter{From reactive agent to digital twin}
-\markboth{Chapter 3 : From reactive agent to digital twin}{}
+\chapter{Towards a fuel-rod digital twin}
+\markboth{Chapter 3 : Towards a fuel-rod digital twin}{}
 
 \section{Scoping : what this twin is, and what it is not}
 \label{sec:cadrage}
@@ -900,8 +901,8 @@ Table~\ref{tab:agent-vs-twin} summarises the shift.
 
 \begin{table}[htbp]
 \centering
-\caption[Base agent versus digital twin]{Differences between the base agent and
-the intended digital twin.}
+\caption[Base agent versus digital-twin prototype]{Differences between the base
+agent and the digital-twin prototype aimed at here.}
 \label{tab:agent-vs-twin}
 \begin{tabularx}{0.95\textwidth}{@{}lXX@{}}
 \toprule
@@ -948,12 +949,20 @@ towards the limit : if the quantity is moving away from it, or is stationary, th
 pronostic says so explicitly rather than producing a meaningless extrapolation.
 This extrapolation is of first-order, hence valid as long as there is no regime change.
 
-\section{D3 : Data assimilation}
+\section{D3 : Operating-history update}
 
 The third block closes the loop : an operating history file is monitored, its
 last line representing the current state. At each update, the case is rewritten
 with the new parameters, the earlier time steps are cleaned, the simulation is
 re-run and the safety analysis is replayed. This cycle is the "update-driven" part.
+
+We first called this block \emph{data assimilation}, and that name was wrong.
+Assimilation combines an observation with the model state and updates the
+uncertainty on that state, as a Kalman filter does. Nothing of the sort happens
+here : the operating history is an \textbf{input} that we replay, not a
+measurement we reconcile with a prediction. Genuine assimilation would require
+in-core measurements, which do not exist for a single rod, and an explicit
+representation of the model uncertainty. It stays a longer-term goal.
 
 \section{D4 : The dashboard}
 
@@ -1281,7 +1290,7 @@ for a rod at the end of a second cycle and is not alarming in itself : it means
 that the operating regime has changed in nature, which is precisely the
 information a digital twin should report.
 
-\section{Validation of the surrogate}
+\section{Initial validation of the surrogate}
 \label{sec:validation-emulateur}
 
 \subsection{A misleading first training domain}
@@ -1421,7 +1430,7 @@ trivial one. What caught us out here is that we had checked
 \textbf{how well the model fitted}, and never \textbf{what we had asked it to
 fit}.
 
-\subsection{Validation on the safety question}
+\subsection{A first test on the safety question}
 
 The decisive test does not bear on a coefficient of determination, but on the
 surrogate's ability to answer the question the digital twin is meant to address :
@@ -1477,9 +1486,12 @@ cycle. The cost of the prediction is \SI{2}{\milli\second}, against
 \SI{36}{\second} for the complete simulation, an acceleration factor of about
 \num{18000}.
 
-This result validates the surrogate where it matters : no longer on its ability
-to reproduce an equilibrium temperature, but on its ability to \emph{date a
-safety event} by interpolating between operating conditions it has never seen.
+This is an encouraging first result, and it bears on what matters : no longer
+the ability to reproduce an equilibrium temperature, but the ability to
+\emph{date a safety event} by interpolating between operating conditions the
+model has never seen. It rests, however, on \textbf{one} unseen power and
+\num{25} training points, so it establishes a prototype worth pursuing rather
+than a validated model.
 
 Two reservations nonetheless remain. The validation rests on twenty-five points,
 which is still few; and nothing guarantees validity \textbf{outside} the training domain; a surrogate extrapolates poorly by construction, as the first
@@ -1571,12 +1583,13 @@ No correction in the base for this pattern & 0/8\\
 \end{tabularx}
 \end{table}
 
-Self-healing therefore repairs \emph{exactly} the faults whose root cause falls
-within the scope of the available correction, and only those. The middle row is
-the most instructive : in those three cases the pattern is recognised, the
-diagnosis is displayed, the correction fires, and fails every time, consuming
-the full budget of three attempts each time. The mechanism gives the appearance
-of working while it structurally cannot succeed.
+Over these twelve faults, self-healing repaired the one whose root cause fell
+within the scope of an available correction, and none of the others. The numbers
+are too small to carry a rate, but the middle row is worth reading closely : in
+those three cases the pattern is recognised, the diagnosis is displayed, the
+correction fires, and fails every time, consuming the full budget of three
+attempts. On this catalogue at least, the mechanism gives the appearance of
+working where it cannot succeed.
 
 \subsection{Analysis of the failures}
 
@@ -1619,11 +1632,13 @@ invalid input; hence the addition of this column.
 
 \subsection{Lesson}
 
-Pattern-based self-healing is suited to errors that are \emph{genuinely}
-numerical, for which adjusting a resolution parameter makes sense. It is
-structurally unsuited to \textbf{physical consistency} errors and to
-\textbf{configuration} errors, which account for eleven of the twelve faults in
-this benchmark.
+What this catalogue suggests is that pattern-based self-healing suits errors
+that are \emph{genuinely} numerical, for which adjusting a resolution parameter
+makes sense, and does little for \textbf{physical consistency} errors or
+\textbf{configuration} errors. Those account for eleven of the twelve faults
+injected here. The catalogue was written by us, so it reflects the failures we
+thought to provoke rather than a representative sample of what breaks in
+practice.
 
 The practical consequence is a shift of effort : rather than endlessly enriching
 the base of crash patterns, it is more profitable to \textbf{validate the inputs
@@ -1647,6 +1662,12 @@ The tools are not executed. They are bound to the model, and it is the
 \emph{intent} produced, the list of requested calls, that is recorded. This
 protocol isolates selection cleanly, with no side effects : no case is created,
 no solver is launched. It takes one pass per request.
+
+Twenty-six requests is an engineering benchmark, not a statistical sample :
+three or four cases per tool are enough to expose a systematic confusion, which
+is what happened, but far too few to attach a confidence interval to any of the
+rates below. We read them as a before-and-after on the same fixed set, not as a
+measurement of how the agent would behave on arbitrary requests.
 
 This evaluation was simply not practicable before the hardware acceleration of
 section~\ref{sec:latence}. At four minutes
@@ -2219,7 +2240,7 @@ domain of use cannot be read off an $R^2$.
 
 We draw two things from this. First, we had read our cross-validation score as
 evidence that the model was good, when it only told us the model fitted the data
-We had given it. We now try to read a metric together with the domain it was
+we had given it. We now try to read a metric together with the domain it was
 computed on. On the other hand, the practical
 constraint that had dictated the choice, the cost of building the design of
 experiments, had disappeared once the solver was compiled locally, without our
@@ -2248,52 +2269,46 @@ to the agent we built.
 \section*{Internship schedule}
 \addcontentsline{toc}{section}{Internship schedule}
 
-\vspace{0.4cm}
-
-\noindent
-\textit{\color{red}[To be adjusted to the actual internship dates. The phases
-below reflect the order in which the work was actually built.]}
-
 \vspace{0.6cm}
 
 \begin{table}[htbp]
 \centering
-\caption[Internship schedule by phase]{Progress of the internship by phase.}
+\caption[Internship schedule by phase]{Progress of the internship by phase, over the eleven weeks from \dateFrom{} to \dateTo.}
 \label{tab:planning}
 \small
 \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.6cm}
                                 >{\raggedright\arraybackslash}p{4.3cm}X@{}}
 \toprule
-\textbf{Period} & \textbf{Phase} & \textbf{Deliverable / milestone}\\
+\textbf{Period (2026)} & \textbf{Phase} & \textbf{Deliverable / milestone}\\
 \midrule
-Weeks 1--2 & Familiarisation
+13--26 Apr & Familiarisation
   & Fuel physics, first steps with OpenFOAM and OFFBEAT, study of the
     reference project AutoFLUKA\\
 \addlinespace
-Weeks 3--4 & Software foundation
+27 Apr--3 May & Software foundation
   & Project tree, provider-agnostic language model factory, development
     environment\\
 \addlinespace
-Weeks 5--6 & Execution and self-healing
+4--17 May & Execution and self-healing
   & Solver execution tool validated on a real case; error pattern base and
     repair loop\\
 \addlinespace
-Weeks 7--8 & Complete agent
+18--24 May & Complete agent
   & Supervisor, case generation tool, post-processing; first end-to-end
     chaining\\
 \addlinespace
-Weeks 9--10 & Interface and documentation
+25--31 May & Interface and documentation
   & Web interface, documentary assistant based on semantic search\\
 \addlinespace
-Weeks 11--13 & Digital twin
-  & Safety analyser, prognosis, assimilation, dashboard, Gaussian-process
+1--14 Jun & Digital-twin prototype
+    & Safety analyser, prognosis, history update, dashboard, Gaussian-process
     surrogate\\
 \addlinespace
-Weeks 14--15 & Validation and consolidation
+15--21 Jun & Validation and consolidation
   & Reference simulation over a complete cycle, stress-testing of self-healing,
     correction of the correctness defects\\
 \addlinespace
-Week 16 & Writing up
+22 Jun--1 Jul & Writing up
   & Report and defence\\
 \bottomrule
 \end{tabularx}
@@ -2412,9 +2427,6 @@ evaluated rather than the first call alone.
 \addcontentsline{toc}{chapter}{Bibliography}
 \markboth{Bibliography}{Bibliography}
 
-\vspace{0.3cm}
-\noindent\textit{\color{red}[References to be completed and checked, in particular the reference papers on OFFBEAT, to be cited in their published
-version.]}
 \vspace{0.6cm}
 
 \section*{Journal articles}
@@ -2424,43 +2436,43 @@ version.]}
 \item[{[1]}]
 SCOLARO, Alessandro, CLIFFORD, Ivor, FIORINA, Carlo, PAUTZ, Andreas.
 The OFFBEAT multi-dimensional fuel behavior solver.
-\textit{Nuclear Engineering and Design}, 2020, vol.~358, 110416.
-\textit{\color{red}[references to be checked against the published version]}
+\textit{Nuclear Engineering and Design}, 2020, vol.~358, article 110416.
 
 \item[{[2]}]
-SCOLARO, Alessandro \textit{et al.}
-Extension of the OFFBEAT fuel performance code to finite strains and
-validation against LOCA experiments.
-\textit{Nuclear Engineering and Design}, 2023.
-\textit{\color{red}[volume and pagination to be completed]}
+BRUNETTO, Edoardo Luciano, SCOLARO, Alessandro, FIORINA, Carlo, PAUTZ, Andreas.
+Extension of the OFFBEAT fuel performance code to finite strains and validation
+against LOCA experiments.
+\textit{Nuclear Engineering and Design}, 2023, vol.~406, article 112232.
+DOI 10.1016/j.nucengdes.2023.112232.
 
 \item[{[3]}]
 NDUM NDUM, Zavier, TAO, Jian, FORD, John, LIU, Yang.
-AutoFLUKA : A Large Language Model Based Framework for Automating Monte Carlo
-Simulations in FLUKA. \textit{arXiv preprint} arXiv:2410.15222, 19 October 2024.
-DOI 10.48550/arXiv.2410.15222.
-\textit{\color{red}[a journal version exists in Energy and AI (2025);
-check volume and article number before submission]}
+Automating Monte Carlo simulations in nuclear engineering with domain
+knowledge-embedded large language model agents.
+\textit{Energy and AI}, 2025, vol.~21, article 100555.
+DOI 10.1016/j.egyai.2025.100555.
+Preprint circulated as \textit{AutoFLUKA: A Large Language Model Based Framework
+for Automating Monte Carlo Simulations in FLUKA}, arXiv:2410.15222,
+19 October 2024.
 
 \item[{[4]}]
 GEELHOOD, Kenneth J., LUSCHER, Walter G.
-FRAPCON and FRAPTRAN codes : fuel rod performance analysis codes under normal
-and accident conditions. In : \textit{Advances in Nuclear Fuel Chemistry}.
-Elsevier, 2020.
-\textit{\color{red}[pagination to be completed]}
+FRAPCON and FRAPTRAN codes: fuel rod performance analysis codes under normal and
+accident conditions. In: WANG, Jun, LI, Xin, ALLISON, Chris, HOHORST, Judith
+(eds.), \textit{Nuclear Power Plant Design and Analysis Codes: Development,
+Validation, and Application}. Woodhead Publishing Series in Energy, Elsevier,
+2020, chapter~7. DOI 10.1016/B978-0-12-818190-4.00007-3.
 
 \item[{[5]}]
 LASSMANN, Klaus.
-TRANSURANUS : a fuel rod analysis code ready for use.
+TRANSURANUS: a fuel rod analysis code ready for use.
 \textit{Journal of Nuclear Materials}, 1992, vol.~188, p.~295--302.
-\textit{\color{red}[reference to be checked]}
 
 \item[{[6]}]
-WILLIAMSON, Richard L. \textit{et al.}
+WILLIAMSON, Richard L., HALES, Jason D., NOVASCONE, Stephen R.,
+TONKS, Michael R., GASTON, Derek R., PERMANN, Cody J. \textit{et al.}
 Multidimensional multiphysics simulation of nuclear fuel behavior.
-\textit{Journal of Nuclear Materials}, 2012, vol.~423, no.~1-3,
-p.~149--163.
-\textit{\color{red}[reference to be checked]}
+\textit{Journal of Nuclear Materials}, 2012, vol.~423, no.~1-3, p.~149--163.
 
 \end{list}
 
@@ -2473,30 +2485,33 @@ PACIFIC NORTHWEST NATIONAL LABORATORY.
 \textit{Pellet-Cladding Mechanical Interaction Failure Threshold for Reactivity
 Initiated Accidents}. Report PNNL-22549.
 \url{https://www.pnnl.gov/main/publications/external/technical_reports/PNNL-22549.pdf}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item[{[8]}]
 U.S. NUCLEAR REGULATORY COMMISSION.
 \textit{Pellet Cladding Interaction Fuel Failures during Anticipated
 Operational Occurrences}. Document ML14107A179.
 \url{https://www.nrc.gov/docs/ML1410/ML14107A179.pdf}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item[{[9]}]
 INTERNATIONAL ATOMIC ENERGY AGENCY.
 \textit{Technical and economic limits to fuel burnup extension}.
 IAEA-TECDOC-1299, Vienna, 2002.
 \url{https://www-pub.iaea.org/MTCD/Publications/PDF/te_1299_web.pdf}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item[{[10]}]
-U.S. NUCLEAR REGULATORY COMMISSION. \textit{10 CFR 50.46 : Acceptance criteria
-for emergency core cooling systems for light-water nuclear power reactors}.
-\textit{\color{red}[to be checked and completed]}
+U.S. NUCLEAR REGULATORY COMMISSION.
+\textit{Acceptance criteria for emergency core cooling systems for light-water
+nuclear power reactors}. Code of Federal Regulations, Title~10, Part~50,
+Section~50.46.
+\url{https://www.nrc.gov/reading-rm/doc-collections/cfr/part050/part050-0046.html}
+(accessed 23 August 2026).
 
 \item[{[11]}]
 LUSCHER, Walter G., GEELHOOD, Kenneth J., PORTER, Ian E.
-\textit{Material Property Correlations : Comparisons between FRAPCON-4.0,
+\textit{Material Property Correlations: Comparisons between FRAPCON-4.0,
 FRAPTRAN-2.0, and MATPRO}. Report PNNL-19417 Rev.~2, Pacific Northwest
 National Laboratory, prepared for the U.S. Department of Energy, September 2015.
 \S~2.1 (\textit{Fuel Melting Temperature}, subroutine PHYPRP).
@@ -2510,27 +2525,27 @@ National Laboratory, prepared for the U.S. Department of Energy, September 2015.
 \item
 FOAM-FOR-NUCLEAR. \textit{OFFBEAT Documentation} [online].
 \url{https://foam-for-nuclear.gitlab.io/offbeat/}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item
 FOAM-FOR-NUCLEAR. \textit{OFFBEAT source repository} [online].
 \url{https://gitlab.com/foam-for-nuclear/offbeat}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item
 OPENCFD LTD. \textit{OpenFOAM v2506 User Guide} [online].
 \url{https://www.openfoam.com/documentation/}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item
 SMARTLABNUCLEAR. \textit{AutoFLUKA} [online].
 \url{https://github.com/SmartLabNuclear/AutoFLUKA}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \item
 LANGCHAIN. \textit{LangChain / LangGraph documentation} [online].
 \url{https://python.langchain.com/}
-(accessed \textit{[date]}).
+(accessed 23 August 2026).
 
 \end{list}
 
@@ -2559,8 +2574,9 @@ Burnup & Taux de combustion & Energy extracted per unit mass of fuel; a measure
 Cladding & Gaine & Metallic tube (Zircaloy) surrounding the fuel\\
 Coolant & Caloporteur & Fluid removing heat from the core\\
 Creep & Fluage & Slow deformation under constant stress\\
-Data assimilation & Assimilation de données & Update of a model from new
-  operating data\\
+Operating-history update & Mise à jour par historique d'exploitation &
+  Replay of a model on a new operating history. Distinct from \emph{data
+  assimilation}, which reconciles an observation with the model state\\
 Densification & Densification & Volume reduction of the fuel early in
   irradiation\\
 Digital twin & Jumeau numérique & Numerical model of a physical system, kept up

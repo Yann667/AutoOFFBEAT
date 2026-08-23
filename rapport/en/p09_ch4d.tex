@@ -17,6 +17,12 @@ The tools are not executed. They are bound to the model, and it is the
 protocol isolates selection cleanly, with no side effects : no case is created,
 no solver is launched. It takes one pass per request.
 
+Twenty-six requests is an engineering benchmark, not a statistical sample :
+three or four cases per tool are enough to expose a systematic confusion, which
+is what happened, but far too few to attach a confidence interval to any of the
+rates below. We read them as a before-and-after on the same fixed set, not as a
+measurement of how the agent would behave on arbitrary requests.
+
 This evaluation was simply not practicable before the hardware acceleration of
 section~\ref{sec:latence}. At four minutes
 per invocation, these twenty-six requests would have taken almost two hours;

@@ -42,10 +42,9 @@
 
 \vspace{1.0cm}
 
-{\color{red}\fbox{\begin{minipage}{0.85\textwidth}\centering
+{\fbox{\begin{minipage}{0.85\textwidth}\centering
   {\large\bfseries Confidentiality statement}\\[2pt]
-  {\small\bfseries \confidentialityNotice\\
-  (state the type of confidentiality and, where applicable, its end date)}
+  {\small\bfseries \confidentialityNotice}
 \end{minipage}}}
 
 \vspace{1.0cm}
@@ -150,13 +149,14 @@ which automates the simulation workflows of the \textbf{OFFBEAT} code (built on
 OpenFOAM) : a supervisor orchestrates domain tools (case generation, execution,
 post-processing, safety analysis) and a self-healing loop diagnoses solver
 crashes from an editable knowledge base. The system was then extended towards a
-\textbf{digital twin} of a fuel rod, including a Gaussian-process surrogate that
-predicts pellet-cladding gap closure within \SI{4.4}{\percent}, in
-\SI{2}{\milli\second} instead of \SI{36}{\second}, for a linear power absent
-from its training set. The second part of the work is the \textbf{measured
-stress-testing} of the system : a benchmark of twelve injected faults shows that
-self-healing only handles crashes whose root cause the available correction
-actually addresses, and evaluating the decision layer raises tool-selection
+\textbf{digital-twin prototype} of a fuel rod, including a Gaussian-process
+surrogate which, on a first test, places pellet-cladding gap closure within
+\SI{4.4}{\percent} in \SI{2}{\milli\second} instead of \SI{36}{\second},
+for a linear power absent from its \num{25} training points. The second part of
+the work is the \textbf{measured stress-testing} of the system through two
+engineering benchmarks : on twelve injected faults, self-healing handled only
+the crash whose root cause the available correction actually addresses, and
+evaluating the decision layer on twenty-six requests raised tool-selection
 accuracy from \SI{77}{\percent} to \SI{88}{\percent}. These measurements exposed
 fourteen defects, none of which raised any visible error, among them a confusion
 between cladding and pellet temperature (\SI{830}{\kelvin} discrepancy) and a
@@ -164,7 +164,8 @@ surrogate validated over a degenerate domain.
 
 \vspace{0.35cm}
 \noindent\textbf{\underline{Keywords:}}\\[2pt]
-Nuclear fuel performance ; OFFBEAT ; OpenFOAM ; LLM agent ; digital twin ;
+Nuclear fuel performance ; OFFBEAT ; OpenFOAM ; LLM agent ; digital-twin
+prototype ;
 safety analysis ; pellet-cladding mechanical interaction (PCMI) ;
 surrogate model ; Gaussian process.
 

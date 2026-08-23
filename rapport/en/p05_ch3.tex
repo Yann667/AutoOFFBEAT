@@ -1,8 +1,8 @@
 %==============================================================================
 % CHAPTER 3
 %==============================================================================
-\chapter{From reactive agent to digital twin}
-\markboth{Chapter 3 : From reactive agent to digital twin}{}
+\chapter{Towards a fuel-rod digital twin}
+\markboth{Chapter 3 : Towards a fuel-rod digital twin}{}
 
 \section{Scoping : what this twin is, and what it is not}
 \label{sec:cadrage}
@@ -27,8 +27,8 @@ Table~\ref{tab:agent-vs-twin} summarises the shift.
 
 \begin{table}[htbp]
 \centering
-\caption[Base agent versus digital twin]{Differences between the base agent and
-the intended digital twin.}
+\caption[Base agent versus digital-twin prototype]{Differences between the base
+agent and the digital-twin prototype aimed at here.}
 \label{tab:agent-vs-twin}
 \begin{tabularx}{0.95\textwidth}{@{}lXX@{}}
 \toprule
@@ -75,12 +75,20 @@ towards the limit : if the quantity is moving away from it, or is stationary, th
 pronostic says so explicitly rather than producing a meaningless extrapolation.
 This extrapolation is of first-order, hence valid as long as there is no regime change.
 
-\section{D3 : Data assimilation}
+\section{D3 : Operating-history update}
 
 The third block closes the loop : an operating history file is monitored, its
 last line representing the current state. At each update, the case is rewritten
 with the new parameters, the earlier time steps are cleaned, the simulation is
 re-run and the safety analysis is replayed. This cycle is the "update-driven" part.
+
+We first called this block \emph{data assimilation}, and that name was wrong.
+Assimilation combines an observation with the model state and updates the
+uncertainty on that state, as a Kalman filter does. Nothing of the sort happens
+here : the operating history is an \textbf{input} that we replay, not a
+measurement we reconcile with a prediction. Genuine assimilation would require
+in-core measurements, which do not exist for a single rod, and an explicit
+representation of the model uncertainty. It stays a longer-term goal.
 
 \section{D4 : The dashboard}
 

@@ -44,9 +44,12 @@ cycle. The cost of the prediction is \SI{2}{\milli\second}, against
 \SI{36}{\second} for the complete simulation, an acceleration factor of about
 \num{18000}.
 
-This result validates the surrogate where it matters : no longer on its ability
-to reproduce an equilibrium temperature, but on its ability to \emph{date a
-safety event} by interpolating between operating conditions it has never seen.
+This is an encouraging first result, and it bears on what matters : no longer
+the ability to reproduce an equilibrium temperature, but the ability to
+\emph{date a safety event} by interpolating between operating conditions the
+model has never seen. It rests, however, on \textbf{one} unseen power and
+\num{25} training points, so it establishes a prototype worth pursuing rather
+than a validated model.
 
 Two reservations nonetheless remain. The validation rests on twenty-five points,
 which is still few; and nothing guarantees validity \textbf{outside} the training domain; a surrogate extrapolates poorly by construction, as the first
@@ -138,12 +141,13 @@ No correction in the base for this pattern & 0/8\\
 \end{tabularx}
 \end{table}
 
-Self-healing therefore repairs \emph{exactly} the faults whose root cause falls
-within the scope of the available correction, and only those. The middle row is
-the most instructive : in those three cases the pattern is recognised, the
-diagnosis is displayed, the correction fires, and fails every time, consuming
-the full budget of three attempts each time. The mechanism gives the appearance
-of working while it structurally cannot succeed.
+Over these twelve faults, self-healing repaired the one whose root cause fell
+within the scope of an available correction, and none of the others. The numbers
+are too small to carry a rate, but the middle row is worth reading closely : in
+those three cases the pattern is recognised, the diagnosis is displayed, the
+correction fires, and fails every time, consuming the full budget of three
+attempts. On this catalogue at least, the mechanism gives the appearance of
+working where it cannot succeed.
 
 \subsection{Analysis of the failures}
 
@@ -186,11 +190,13 @@ invalid input; hence the addition of this column.
 
 \subsection{Lesson}
 
-Pattern-based self-healing is suited to errors that are \emph{genuinely}
-numerical, for which adjusting a resolution parameter makes sense. It is
-structurally unsuited to \textbf{physical consistency} errors and to
-\textbf{configuration} errors, which account for eleven of the twelve faults in
-this benchmark.
+What this catalogue suggests is that pattern-based self-healing suits errors
+that are \emph{genuinely} numerical, for which adjusting a resolution parameter
+makes sense, and does little for \textbf{physical consistency} errors or
+\textbf{configuration} errors. Those account for eleven of the twelve faults
+injected here. The catalogue was written by us, so it reflects the failures we
+thought to provoke rather than a representative sample of what breaks in
+practice.
 
 The practical consequence is a shift of effort : rather than endlessly enriching
 the base of crash patterns, it is more profitable to \textbf{validate the inputs

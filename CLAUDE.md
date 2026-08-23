@@ -37,7 +37,8 @@ Le superviseur LangChain oriente ces outils selon la demande de l'utilisateur.
 5. **Surrogate** (`tools/surrogate.py`) : émulateur par processus gaussien
    (noyau de Matérn), prédiction + incertitude.
 6. **Twin Monitor** (`tools/twin_monitor.py`) : surveillance, pronostic de
-   franchissement de seuil, tableau de bord.
+   franchissement de seuil, mise a jour par historique d'exploitation, tableau
+   de bord. Ce n'est pas de l'assimilation de donnees au sens propre.
 7. **RAG Retriever** (`tools/rag_retriever.py`) : assistant documentaire.
    L'embedding DOIT être multilingue : le corpus est bilingue.
 

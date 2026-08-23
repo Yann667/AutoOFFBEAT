@@ -1,6 +1,6 @@
 # AutoOFFBEAT
 
-**An LLM agent and digital twin for the OFFBEAT nuclear fuel performance code.**
+**An LLM agent and digital-twin prototype for the OFFBEAT nuclear fuel performance code.**
 
 ENSTA Paris *Projet de Recherche* (PRe), carried out at SPEIT, Shanghai Jiao
 Tong University · April to July 2026
@@ -18,7 +18,7 @@ an OpenFOAM-based fuel behaviour solver, from requests written in plain
 language. A supervisor built on LangChain orchestrates domain tools; the tools,
 not the model, do the physics.
 
-The system was then extended into a **digital twin** of a PWR fuel rod: safety
+The system was then extended into a **digital-twin prototype** for a PWR fuel rod: safety
 criteria monitoring, threshold-crossing prognosis, a dashboard, and a
 Gaussian-process surrogate that returns a simulation's outcome in milliseconds
 with a calibrated uncertainty.
@@ -68,7 +68,7 @@ switches from compression to tension at that moment.
 The stress limit is not a constant: it is read point-by-point from the
 `sigmaY` field the solver itself computes.
 
-### Surrogate: dating a safety event, not just fitting a curve
+### Surrogate: a first test on dating a safety event
 
 | | Value |
 |---|---|
@@ -79,11 +79,12 @@ The stress limit is not a constant: it is read point-by-point from the
 
 At a linear power **absent from its training set**. Leave-one-out R² on the
 realistic domain: 0.9951 (temperature), 0.9905 (creep strain), 0.9715 (gap
-width).
+width). This rests on 25 training points and one unseen power, so it is an
+initial validation of a prototype, not a validated model.
 
 ### Measured evaluations
 
-| Benchmark | Before | After | What the fix was |
+| Engineering benchmark | Before | After | What the fix was |
 |---|---|---|---|
 | Tool selection (26 requests) | 77 % | **88 %** | Rewrote two overlapping tool descriptions |
 | ↳ safety analyser alone | 25 % | **100 %** | " |
@@ -99,7 +100,9 @@ technique, but instrumentation.
 
 ### Self-healing: what it can and cannot repair
 
-Fault injection, 14 cases (12 faults + 2 healthy controls):
+Fault injection, 14 cases (12 faults + 2 healthy controls). These are
+engineering benchmarks on a catalogue we wrote ourselves, not a statistical
+sample: they expose systematic behaviour, they do not support general rates.
 
 | Situation | Repaired |
 |---|---|
@@ -182,7 +185,7 @@ tools/
   data_processor.py       pyvista post-processing, zone-aware (fuel vs cladding)
   safety_analyzer.py      Evaluates the safety criteria
   surrogate.py            Gaussian-process surrogate (Matérn kernel)
-  twin_monitor.py         Digital twin: monitoring, prognosis, dashboard
+  twin_monitor.py         Operating-history update, prognosis, dashboard
   rag_retriever.py        Documentary assistant (FAISS + multilingual embeddings)
 evaluation/
   bench_selfhealing.py    Fault injection, 14 cases

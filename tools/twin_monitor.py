@@ -1,5 +1,9 @@
 """
-twin_monitor.py : Boucle d'assimilation de donnees du jumeau numerique (D3).
+twin_monitor.py : Boucle de mise a jour par historique d'exploitation (D3).
+
+Ce n'est PAS de l'assimilation de donnees au sens propre : aucune observation
+n'est reconciliee avec l'etat du modele, aucune incertitude n'est mise a jour.
+L'historique d'exploitation est une ENTREE qu'on rejoue.
 
 Brique 3 du jumeau numerique (cf. GUIDE.md Partie 2). Fait le lien entre des
 donnees d'exploitation (historique de puissance, conditions caloporteur...) et
@@ -69,7 +73,7 @@ def _digest(path: Path) -> str:
 
 def assimilate_once(case_dir: Path, data_csv: Path,
                     prognosis: bool = True) -> str:
-    """Un cycle complet d'assimilation : patch des conditions -> re-simulation
+    """Un cycle complet de mise a jour : patch des conditions -> re-simulation
     -> analyse de surete. Retourne le rapport de surete (texte)."""
     params = _csv_to_params(data_csv)
     creator_report = ""
@@ -89,7 +93,7 @@ def assimilate_once(case_dir: Path, data_csv: Path,
         case_dir=str(case_dir), prognosis=prognosis)
 
     return ("\n".join([
-        "=== Cycle d'assimilation ===",
+        "=== Cycle de mise a jour ===",
         creator_report,
         clean_report,
         "--- Execution ---",
@@ -101,7 +105,7 @@ def assimilate_once(case_dir: Path, data_csv: Path,
 
 def watch(case_dir: Path, data_csv: Path, poll_s: int = 30,
           max_cycles: int | None = None, prognosis: bool = True):
-    """Surveille `data_csv` et lance un cycle d'assimilation a chaque
+    """Surveille `data_csv` et lance un cycle de mise a jour a chaque
     changement. Boucle synchrone : un run doit finir avant d'en lancer un
     autre (pas d'empilement de simulations). `max_cycles` borne le nombre de
     cycles (None = illimite). Ctrl-C pour arreter."""
@@ -133,7 +137,7 @@ def watch(case_dir: Path, data_csv: Path, poll_s: int = 30,
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(
-        description="Boucle d'assimilation du jumeau numerique (crayon).")
+        description="Boucle de mise a jour par historique d'exploitation (crayon).")
     ap.add_argument("--case-dir", required=True, help="Cas OFFBEAT a piloter.")
     ap.add_argument("--data-csv", required=True, help="CSV de donnees d'exploitation.")
     ap.add_argument("--poll-s", type=int, default=30, help="Periode de scrutation (s).")
