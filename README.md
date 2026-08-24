@@ -201,6 +201,7 @@ rapport/                  LaTeX sources; en/ holds the English version by part
 app.py                    Dash web interface
 run_sim.py                LLM-free path: create → run → post-process, from the CLI
 verify.py                 Self-check: re-derives the figures above from committed data
+explore.py                Interactive 3D viewer for a simulated case (needs a display)
 Dockerfile                OpenFOAM v2506 + OFFBEAT + the Python code (unbuilt, see below)
 ```
 
