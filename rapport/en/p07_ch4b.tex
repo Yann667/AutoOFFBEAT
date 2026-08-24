@@ -1,36 +1,29 @@
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.8\textwidth, height=6cm,
-  xlabel={Radius [mm]}, ylabel={Temperature [K]},
-  xmin=0, xmax=5.5, ymin=550, ymax=1450,
-  grid=major, grid style={cGrid!60,very thin},
-  label style={font=\small}, tick label style={font=\scriptsize},
-]
-\addplot[color=cFuel,thick,mark=*,mark size=1.1pt] coordinates {
- (0.000,1364.72) (0.177,1363.20) (0.354,1359.85) (0.531,1354.77)
- (0.709,1347.98) (0.886,1339.50) (1.063,1317.51) (1.240,1304.03)
- (1.417,1288.93) (1.594,1272.23) (1.772,1253.94) (1.949,1234.10)
- (2.126,1189.82) (2.303,1165.44) (2.480,1139.58) (2.657,1112.27)
- (2.835,1083.52) (3.012,1021.70) (3.189,988.64) (3.366,954.10)
- (3.543,918.03) (3.720,880.42) (3.898,841.25) (4.075,758.22)
- (4.252,714.04) (4.429,667.23) (4.606,633.91) (4.783,626.42)
- (4.961,615.55) (5.138,608.53) (5.315,601.68)};
-\draw[black!45,dashed] (axis cs:4.5,550) -- (axis cs:4.5,1450);
-\node[font=\tiny,anchor=south west,text=black!65,rotate=90]
-  at (axis cs:4.52,700) {gap / cladding};
-\node[font=\tiny,anchor=north west,text=black!65] at (axis cs:0.15,1340)
-  {pellet};
-\end{axis}
-\end{tikzpicture}
-\caption[Radial temperature profile]{Radial temperature profile at the midplane
-at end of cycle. The drop of about \SI{760}{\kelvin} between the pellet centre
-(\SI{1365}{\kelvin}) and the cladding outer surface (\SI{602}{\kelvin}) is
-dominated by the low conductivity of the fuel and by the thermal resistance of
-the gap.}
-\label{fig:radial}
+\includegraphics[width=\textwidth]{carte_thermique.png}
+\caption[Temperature distribution at end of cycle]{Temperature of the rod at end
+of cycle. (a)~axial--radial section, radial scale exaggerated $\times$\num{600};
+the axial maximum sits near \SI{0.5}{\metre}, following the cosine power
+profile. (b)~cross-section at mid-plane. (c)~radial profile at mid-plane, drawn
+separately because the cladding spans only \SI{35}{\kelvin} against
+\SI{870}{\kelvin} for the whole rod and is therefore flattened on a shared
+colour scale.}
+\label{fig:carte}
 \end{figure}
+
+Two readings are worth drawing out. The temperature falls by
+\SI{763}{\kelvin} between the pellet centre (\SI{1365}{\kelvin} at mid-plane)
+and the cladding outer surface (\SI{602}{\kelvin}), and almost all of that drop
+happens \emph{inside the pellet} : the low conductivity of $\mathrm{UO_2}$
+dominates.
+
+The gap accounts for only \SI{33}{\kelvin} of it, and that number is itself a
+result. An open gap filled with helium is a poor conductor and would drop
+several hundred kelvins; \SI{33}{\kelvin} means its thermal resistance has
+collapsed, which is what happens once the pellet touches the cladding. The map
+therefore confirms gap closure a second time, independently of the
+\texttt{gapWidth} field and of the stress reversal of
+figure~\ref{fig:gap-stress}.
 
 \subsection{Summary of safety margins}
 
