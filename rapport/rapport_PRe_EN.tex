@@ -259,8 +259,8 @@ archived electronically by the ENSTA Paris library.
 \vspace{1.5cm}
 
 \noindent
-Non-confidential work : ``the document is non-confidential. It may therefore be
-consulted online by anyone.''
+Non-confidential work : "the document is non-confidential. It may therefore be
+consulted online by anyone."
 
 \vspace{2cm}
 
@@ -435,8 +435,8 @@ accessible.
 
 \section*{Subject and objective}
 
-The objective set at the start of the internship was to \textit{``build an agent
-on the nuclear fuel performance code OFFBEAT''}. The task was therefore to design
+The objective set at the start of the internship was to \textit{"build an agent
+on the nuclear fuel performance code OFFBEAT"}. The task was therefore to design
 a system able to bridge a request expressed in natural language and the actual
 execution of an OFFBEAT simulation, taking inspiration from the open-source
 project \textbf{AutoFLUKA}~[3], which applies this idea to the particle
@@ -493,10 +493,10 @@ centre of the pellet and its periphery.
 Under irradiation, several coupled phenomena modify this geometry :
 \begin{itemize}
   \item the \textbf{densification} and then the \textbf{swelling} of the fuel,
-    under the effect of solid and gaseous fission products;
-  \item the \textbf{relocation} of the fragments of the cracked pellet;
+    under the effect of solid and gaseous fission products ;
+  \item the \textbf{relocation} of the fragments of the cracked pellet ;
   \item the \textbf{creep} of the cladding, which slowly deforms under the
-    coolant pressure (about \SI{15.5}{\mega\pascal} in a PWR);
+    coolant pressure (about \SI{15.5}{\mega\pascal} in a PWR) ;
   \item the \textbf{release of fission gases} (xenon, krypton), which degrades
     the conductivity of the gap and raises the internal pressure.
 \end{itemize}
@@ -528,7 +528,7 @@ be confirmed according to the rod and the burnup considered.}
 \textbf{Criterion} & \textbf{Indicative limit} & \textbf{Quantity} &
 \textbf{OFFBEAT}\\
 \midrule
-Pellet centreline melting & $T < \SI{3113}{\kelvin}$ (fresh $\mathrm{UO_2}$;
+Pellet centreline melting & $T < \SI{3113}{\kelvin}$ (fresh $\mathrm{UO_2}$ ;
   decreases with burnup) & Maximum temperature & yes\\
 Cladding temperature (PCT, LOCA criterion) & $< \SI{1477}{\kelvin}$
   (\SI{1204}{\celsius}) & Temperature in the cladding & if transient modelled\\
@@ -578,9 +578,9 @@ also show good agreement between OFFBEAT and BISON~[2].
 On an unstructured mesh, OFFBEAT solves the coupling between :
 \begin{itemize}
   \item a \textbf{thermal problem} : conduction in the pellet and the cladding,
-    transfer across the gap by gas conduction and radiation;
+    transfer across the gap by gas conduction and radiation ;
   \item a \textbf{mechanical problem} : elasticity, plasticity and creep, in a
-    cell-centred finite volume formulation;
+    cell-centred finite volume formulation ;
   \item \textbf{behavioural models} : burnup, swelling, densification, fission
     gas release, pellet-cladding contact.
 \end{itemize}
@@ -629,7 +629,7 @@ effort could be concentrated on what is specific to nuclear fuel, namely the
 physical content of the knowledge bases. Three differences are worth
 highlighting, as they delimit the two pieces of work.
 
-The \textbf{domain}. FLUKA is a transport code; its output quantities are count
+The \textbf{domain}. FLUKA is a transport code ; its output quantities are count
 rates and fluences. OFFBEAT is a thermomechanical code whose outputs are
 continuous fields comparable to \textbf{quantified safety criteria}. This
 difference makes possible a feature absent from AutoFLUKA : the automatic
@@ -650,10 +650,10 @@ accuracy of tool selection (chapter~4).
 The scope was fixed as follows :
 \begin{itemize}
   \item the base agent is the priority, and is built \textbf{one block at a
-    time}, each tested before moving to the next;
+    time}, each tested before moving to the next ;
   \item the code must remain \textbf{independent of the language model
-    provider}, so that it can run entirely locally and at no cost;
-  \item the digital twin strand is only started once the base agent is stable;
+    provider}, so that it can run entirely locally and at no cost ;
+  \item the digital twin strand is only started once the base agent is stable ;
   \item the scale adopted is the \textbf{single fuel rod}.
 \end{itemize}
 
@@ -837,7 +837,7 @@ two-stage strategy, shown in figure~\ref{fig:selfheal}.
   \draw[fl] (llm) -- (stop);
 \end{tikzpicture}
 \caption[Self-healing loop]{Self-healing loop. Deterministic pattern-based
-diagnosis is attempted first; the language model only intervenes as a last
+diagnosis is attempted first ; the language model only intervenes as a last
 resort and its diagnosis is never applied automatically.}
 \label{fig:selfheal}
 \end{figure}
@@ -878,7 +878,7 @@ unavailable : it must never prevent basic operation.
 \section{Scoping : what this twin is, and what it is not}
 \label{sec:cadrage}
 
-We should say first what we mean by a ``digital twin of a power plant'', because
+We should say first what we mean by a "digital twin of a power plant", because
 the phrase promises more than what we built. A complete digital twin of a plant
 would handle the full coupled
 multiphysics : neutronics, thermal-hydraulics and fuel performance. It would
@@ -887,7 +887,7 @@ and conversely. OFFBEAT, however, only deals with fuel performance. What we buil
 of a \textbf{single fuel rod}, and everything outside that domain enters as a
 boundary condition.
 
-The second limitation concerns ``real time''. OFFBEAT is a batch solver, one run
+The second limitation concerns "real time". OFFBEAT is a batch solver, one run
 of which takes from a few seconds to several hours, and there is no sensor
 measuring the state of a rod inside the core in real time. In practice there is
 no real time but rather an \textbf{update-driven} refresh of the state : at each
@@ -1002,7 +1002,7 @@ properties well suited to the very small number of available points :
 \begin{itemize}
   \item a Gaussian process \textbf{interpolates} the training points, which is
     consistent when they come from a deterministic code rather than from noisy
-    measurements;
+    measurements ;
   \item it provides an \textbf{uncertainty} at every prediction point. This
     error bar is propagated all the way to the interface : the user sees not only
     the predicted value but the confidence that can be placed in it, which is
@@ -1059,7 +1059,7 @@ verification scripts shipped with the code.}
 \textbf{Deviation from analytical}\\
 \midrule
 Thick cylinder expansion &
-  Elastoplastic mechanics; radial stress at the inner wall,
+  Elastoplastic mechanics ; radial stress at the inner wall,
   \num{150} points compared &
   \SI{1.02}{\percent} (max)\newline \SI{0.82}{\percent} (mean)\\
 \addlinespace
@@ -1080,7 +1080,7 @@ case, which is also the most demanding since it involves a plastification front,
 and deviations of the order of a thousandth of a per cent on the two fuel
 physics cases.
 
-This result does not establish the validity of the agent; it establishes that
+This result does not establish the validity of the agent ; it establishes that
 of the solver the agent drives, and therefore that any errors observed
 downstream are attributable to the tooled chain and not to the computational
 core. This is precisely the separation needed to interpret the correctness
@@ -1255,7 +1255,7 @@ by a factor of \num{600}, the rod is \SI{5.3}{\milli\metre} in radius for
 \centering
 \includegraphics[width=\textwidth]{carte_thermique.png}
 \caption[Temperature distribution at end of cycle]{Temperature of the rod at end
-of cycle. (a)~axial--radial section, radial scale exaggerated $\times$\num{600};
+of cycle. (a)~axial--radial section, radial scale exaggerated $\times$\num{600} ;
 the axial maximum sits near \SI{0.5}{\metre}, following the cosine power
 profile. (b)~cross-section at mid-plane. (c)~radial profile at mid-plane, drawn
 separately because the cladding spans only \SI{35}{\kelvin} against
@@ -1272,7 +1272,7 @@ dominates.
 
 The gap accounts for only \SI{33}{\kelvin} of it, and that number is itself a
 result. An open gap filled with helium is a poor conductor and would drop
-several hundred kelvins; \SI{33}{\kelvin} means its thermal resistance has
+several hundred kelvins ; \SI{33}{\kelvin} means its thermal resistance has
 collapsed, which is what happens once the pellet touches the cladding. The map
 therefore confirms gap closure a second time, independently of the
 \texttt{gapWidth} field and of the stress reversal of
@@ -1444,7 +1444,7 @@ Minimum gap width & $0.9992$ & $0.9715$ & \SI{1.8}{\micro\metre}\\
 \end{table}
 
 The coefficients fall, and that is the expected result. Over the short domain
-the surrogate was fitting a monotonic relation with a single effective variable;
+the surrogate was fitting a monotonic relation with a single effective variable ;
 over the realistic domain it must reproduce non-monotonic quantities that change
 sign. An $R^2$ of $0.9951$ on a hard problem is worth more than $0.9994$ on a
 trivial one. What caught us out here is that we had checked
@@ -1455,7 +1455,7 @@ fit}.
 
 The decisive test does not bear on a coefficient of determination, but on the
 surrogate's ability to answer the question the digital twin is meant to address :
-\emph{when does pellet-cladding contact occur?}
+\emph{when does pellet-cladding contact occur ?}
 
 The surrogate was therefore queried at \SI{25}{\kilo\watt\per\metre}, a power
 \textbf{absent from its training set} (which contains only 12, 18, 24, 30 and
@@ -1500,14 +1500,14 @@ computed by OFFBEAT. The zero crossing, the onset of PCMI, is predicted at
 \label{fig:pcmi}
 \end{figure}
 
-The surrogate places gap closure at \textbf{\num{387} days}, against
-\textbf{\num{370} days} obtained by interpolating the states computed by
+The surrogate places gap closure at \textbf{387 days}, against
+\textbf{370 days} obtained by interpolating the states computed by
 OFFBEAT : a deviation of \SI{4.4}{\percent}, that is sixteen days over a two-year
 cycle. The cost of the prediction is \SI{2}{\milli\second}, against
 \SI{36}{\second} for the complete simulation, an acceleration factor of about
-\num{18000}.
+18000 times.
 
-This is an encouraging first result, and it bears on what matters : no longer
+This is an encouraging first result and there is no longer
 the ability to reproduce an equilibrium temperature, but the ability to
 \emph{date a safety event} by interpolating between operating conditions the
 model has never seen. It rests, however, on \textbf{one} unseen power and
@@ -1515,15 +1515,15 @@ model has never seen. It rests, however, on \textbf{one} unseen power and
 than a validated model.
 
 Two reservations nonetheless remain. The validation rests on twenty-five points,
-which is still few; and nothing guarantees validity \textbf{outside} the training domain; a surrogate extrapolates poorly by construction, as the first
-version demonstrated spectacularly. This is precisely why the uncertainty
+which is still few. Also, nothing guarantees validity \textbf{outside} the training domain as it is extrapolaiton and it is by construction not performative on this as the first
+version demonstrated. This is why the uncertainty
 provided by the Gaussian process is systematically reported at the interface
-alongside the predicted value.
+alongside the predicted value. It is more an indicator to hint at a value rather than a prediction to be confident about.
 
 \section{Stress-testing self-healing}
 \label{sec:epreuve}
 
-The aim of this section is to delimit, in a measured rather than anecdotal way,
+The aim of this section is to delimit, in a measured way,
 what the agent can repair on its own.
 
 \subsection{Protocol}
@@ -1538,17 +1538,16 @@ The outcome of each case is classified along two deliberately
 \textbf{independent} axes :
 \begin{itemize}
   \item \textbf{detected}, did a pattern from the knowledge base recognise the
-    error, as opposed to falling back on the language model;
-  \item \textbf{repaired}, did the case eventually run.
+    error, as opposed to falling back on the language model
+  \item \textbf{repaired}, did the case eventually run
 \end{itemize}
 
-Separating these two axes is the point of the protocol : it is the ``detected but
-not repaired'' cell that materialises the gap between a \emph{symptom}
+Separating these two axes is the point of the protocol : it is the "detected but
+not repaired" cell that materialises the gap between a \emph{symptom}
 recognised in a log and a \emph{cause} actually addressed.
 
 Each fault is further labelled a priori according to two distinct criteria : does
-the base offer a correction for this pattern, and can that correction, by its
-nature, address the root cause? A fault for which the base \emph{believes} it
+the base offer a correction for this pattern, and can that correction address the root cause ? A fault for which the base \emph{believes} it
 can intervene while the remedy targets only the symptom is the heart of the
 problem studied here.
 
@@ -1559,7 +1558,7 @@ Table~\ref{tab:selfheal} gives the results by category.
 \begin{table}[htbp]
 \centering
 \caption[Self-healing benchmark]{Self-healing benchmark : 14 cases, of which 12
-injected faults. The ``stopped at meshing'' column marks the cases intercepted
+injected faults. The "stopped at meshing" column marks the cases intercepted
 by the mesher before the solver was even launched.}
 \label{tab:selfheal}
 \begin{tabularx}{\textwidth}{@{}Xcccc@{}}
@@ -1635,21 +1634,19 @@ brought to light a defect that one-off trials had not revealed. The correction
 associated with exceeding the power history reduced the simulated duration by
 \SI{1}{\percent} per attempt. To bring a duration of \SI{1.5e8}{\second} below a
 table ending at \SI{1.26e8}{\second} would have required \textbf{eighteen}
-attempts for a budget of \textbf{three} : the correction could mathematically
-never succeed. It was replaced by a deterministic computation, which reads the
+attempts whereas there are only \textbf{three}. The correction could not succeed. It was replaced by a deterministic computation, which reads the
 time tables actually present in the case and targets an admissible value
 directly. After correction, this case, the only one whose root cause did fall
 within an available correction, goes from failure to success in two attempts.
 
-\subsection{A nuance about the ``successful'' failures}
+\subsection{A nuance about the "successful" failures}
 
-The ``stopped at meshing'' column of table~\ref{tab:selfheal} deserves to be
+The "stopped at meshing" column of table~\ref{tab:selfheal} deserves to be
 read against the grain. Two of the three geometric faults are intercepted by the
-mesher \emph{before} the solver starts : \texttt{blockMesh} refuses to build an
-impossible geometry. This is not a failure of self-healing, it is a safeguard
-doing its job. Counting these cases as failures, as a first version of the
-benchmark did, amounted to penalising the system for correctly rejecting an
-invalid input; hence the addition of this column.
+mesher \emph{before} the solver starts. \texttt{blockMesh} refuses to build an
+impossible geometry. This is not a failure of self-healing, it is a safeguard working. Counting these cases as failures, as a first version of the
+benchmark did, was penalising the system for correctly rejecting an
+invalid input, hence the addition of this column.
 
 \subsection{Lesson}
 
@@ -1657,20 +1654,20 @@ What this catalogue suggests is that pattern-based self-healing suits errors
 that are \emph{genuinely} numerical, for which adjusting a resolution parameter
 makes sense, and does little for \textbf{physical consistency} errors or
 \textbf{configuration} errors. Those account for eleven of the twelve faults
-injected here. The catalogue was written by us, so it reflects the failures we
-thought to provoke rather than a representative sample of what breaks in
-practice.
+injected here. The catalogue was written by hand, so it reflects the failures
+thought about rather than a representative sample of what breaks in
+practice. It would then need to be extended with a journal of the different failures that can actually occur in the system.
 
-The practical consequence is a shift of effort : rather than endlessly enriching
-the base of crash patterns, it is more profitable to \textbf{validate the inputs
+The practical consequence was a change of focus. Rather than enriching more and more
+the base of crash patterns, it was more profitable to \textbf{validate the inputs
 before execution}. A case that cannot be physically valid should never reach the
 solver. A first geometric validation was added to that end (§\ref{sec:bugs}).
 \section{Evaluating the decision layer}
 \label{sec:toolselection}
 
 The preceding sections measure the physical chain and the repair loop. One link
-remained unevaluated, yet central : faced with a request written in natural
-language, does the supervisor choose the right tool?
+remained unevaluated : faced with a request written in natural
+language, does the supervisor choose the right tool ?
 
 \subsection{Protocol}
 
@@ -1692,7 +1689,7 @@ measurement of how the agent would behave on arbitrary requests.
 
 This evaluation was simply not practicable before the hardware acceleration of
 section~\ref{sec:latence}. At four minutes
-per invocation, these twenty-six requests would have taken almost two hours;
+per invocation, these twenty-six requests would have taken almost two hours ;
 they now run in under a minute, which allows several iterations within a single
 working session.
 
@@ -1700,7 +1697,7 @@ working session.
 
 The first campaign gives an overall accuracy of \SI{77}{\percent}. The
 breakdown by tool, however, is very uneven (table~\ref{tab:toolsel}) and points
-to a single culprit : the safety analyser is correctly selected in only one case
+to one direction : the safety analyser is correctly selected in only one case
 out of four.
 
 \begin{table}[htbp]
@@ -1727,10 +1724,10 @@ No tool expected & 4 & 3/4 & 3/4\\
 \end{tabularx}
 \end{table}
 
-Examining the three failures is enlightening. On ``check whether a safety
-criterion is exceeded'', the agent calls the executor; on ``analyse the PCMI
-margins and tell me when the limit will be reached'', it calls the surrogate; on
-``is there a risk of fuel melting?'', it calls nothing.
+Examining the three failures is enlightening. On "check whether a safety
+criterion is exceeded", the agent calls the executor ; on "analyse the PCMI
+margins and tell me when the limit will be reached", it calls the surrogate ; on
+"is there a risk of fuel melting ?", it calls nothing.
 
 The cause is not the model, but the descriptions supplied. Those of the safety
 analyser and of the surrogate promised exactly the same thing (safety margins,
@@ -1756,8 +1753,8 @@ by. The encouraging part is the cost, eleven accuracy points for rewriting two
 paragraphs, with no retraining and no change of model.
 
 The three remaining errors do not stem from this cause. Two concern wordings
-where the boundary is genuinely debatable, since ``quickly estimate the maximum
-temperature'' may legitimately call either the surrogate or post-processing, and the third is a documentation call on a general-knowledge question, a benign
+where the boundary is genuinely debatable, since "quickly estimate the maximum
+temperature" may legitimately call either the surrogate or post-processing, and the third is a documentation call on a general-knowledge question, a benign
 false positive.
 
 \subsection{From selection to execution : a blind spot}
@@ -1853,7 +1850,7 @@ onto a single source.
 Examining the corpus provides the explanation. It is \textbf{bilingual}, and the
 split is clear-cut : the two files that actually document OFFBEAT (the structure
 of a case and the list of commands) are in \textbf{English}, since they come
-from the code repository; the documents added by the project are in
+from the code repository ; the documents added by the project are in
 \textbf{French}.
 
 Yet the agent is driven in French. The embedding model in use then matches
@@ -1867,7 +1864,7 @@ correctly retrieve the English documents.
 \centering
 \caption[Effect of language on retrieval]{Effect of the question language on
 documentary retrieval, with corpus and model unchanged. The retrieval mechanism
-works; it is crossing the language barrier that fails.}
+works ; it is crossing the language barrier that fails.}
 \label{tab:rag-langue}
 \begin{tabularx}{0.92\textwidth}{@{}Xcc@{}}
 \toprule
@@ -1947,7 +1944,7 @@ and only then reduced :
 \]
 
 This point-by-point computation is not a cosmetic refinement. The stress peak and
-the minimum of the limit are not at the same location; comparing the maximum of
+the minimum of the limit are not at the same location ; comparing the maximum of
 one with the minimum of the other yields a result that corresponds to no point of
 the rod. On a test case built for the purpose, the naive criterion concludes
 \SI{83}{\percent} of the limit where the correct computation gives
@@ -1973,7 +1970,7 @@ exactly zero.}
 \label{tab:deformations}
 \begin{tabularx}{0.9\textwidth}{@{}Xcc@{}}
 \toprule
-\textbf{Component} & \textbf{Maximum value} & \textbf{Reversible?}\\
+\textbf{Component} & \textbf{Maximum value} & \textbf{Reversible ?}\\
 \midrule
 Total (\texttt{epsilonCyl}, read by the old criterion) & \num{1.81e-3} & ---\\
 \midrule
@@ -2040,16 +2037,16 @@ use and subsequently fixed.}
 \textbf{Component} & \textbf{Symptom} & \textbf{Cause and scope}\\
 \midrule
 Safety analyser & A closed, hence negative, pellet-cladding gap was reported as
-  safe & The ratio to the limit is computed by division; a negative value
+  safe & The ratio to the limit is computed by division ; a negative value
   reverses its sign. The only exceeded criterion of the reference case was
   masked\\
 \addlinespace
-Post-processing & The ``maximum cladding temperature'' read
+Post-processing & The "maximum cladding temperature" read
   \SI{1467}{\kelvin} & The extremum was taken over the whole mesh, hence at the
   pellet centreline. A \SI{830}{\kelvin} discrepancy with the true value
   (\SI{637}{\kelvin})\\
 \addlinespace
-Safety analyser & Cladding stress and strain overestimated & Same cause; the
+Safety analyser & Cladding stress and strain overestimated & Same cause ; the
   sign itself was wrong, tension being reported where the cladding is in
   compression\\
 \addlinespace
@@ -2073,9 +2070,9 @@ Tool descriptions & The safety analyser was selected only once in four &
   Overlap with the surrogate description, without stating the distinguishing
   criterion (§\ref{sec:toolselection})\\
 \addlinespace
-Field reading & All criteria reported ``field absent'' on a multi-region case &
+Field reading & All criteria reported "field absent" on a multi-region case &
   Merging the mesh blocks includes the regions without data and loses the
-  fields; detected by carrying the tools over to the verification cases
+  fields ; detected by carrying the tools over to the verification cases
   (§\ref{sec:verification})\\
 \addlinespace
 Documentary assistant & Retrieval performing worse than a random draw &
@@ -2083,7 +2080,7 @@ Documentary assistant & Retrieval performing worse than a random draw &
   reached the English documentation (§\ref{sec:rag})\\
 \addlinespace
 Creation tool schema & The agent looped without ever creating a case & The
-  parameter was declared as a JSON string where a model produces an object;
+  parameter was declared as a JSON string where a model produces an object ;
   30 calls without success (§\ref{sec:angle-mort})\\
 \addlinespace
 Context window & Freezes on multi-step requests & \num{4096} tokens by default,
@@ -2092,11 +2089,11 @@ Context window & Freezes on multi-step requests & \num{4096} tokens by default,
 \addlinespace
 Cladding stress threshold & The criterion checked \SI{350}{\mega\pascal} while
   the solver applies \SI{250}{\mega\pascal} & Frozen constant, out of sync with
-  the material model; margin displayed as \SI{23}{\percent} instead of
+  the material model ; margin displayed as \SI{23}{\percent} instead of
   \SI{32}{\percent} (§\ref{sec:seuils})\\
 \addlinespace
 PCMI criterion & Reported \SI{18}{\percent} of a plastic-strain limit & Read the
-  \emph{total} strain; the plastic part is exactly zero, and creep, which is
+  \emph{total} strain ; the plastic part is exactly zero, and creep, which is
   irreversible, was not monitored (§\ref{sec:seuils})\\
 \bottomrule
 \end{tabularx}
@@ -2105,10 +2102,10 @@ PCMI criterion & Reported \SI{18}{\percent} of a plastic-strain limit & Read the
 The two defects concerning cladding quantities, the maximum temperature and the
 hoop stress, share a common origin, worth spelling out because it is
 instructive. The mesh of a rod contains both the pellet and the cladding. Taking
-the maximum of a field ``over the domain'' therefore amounts, for temperature,
+the maximum of a field "over the domain" therefore amounts, for temperature,
 to measuring the pellet centreline, the hottest region, whereas the criterion
 bears on the cladding. The initial code was aware of this and documented the
-choice as a conservative approximation; the analysis showed that it was not
+choice as a conservative approximation ; the analysis showed that it was not
 always so, since in the case of stress it reversed the sign of the result.
 
 The fix consisted in exploiting the \textit{cell zones} defined by OFFBEAT,
@@ -2154,7 +2151,7 @@ chapter.
 \markboth{Chapter 5 : Difficulties and false starts}{}
 
 This chapter reports the obstacles we ran into. We have kept only the ones that
-changed a design decision or the way we worked; the rest were just lost time.
+changed a design decision or the way we worked ; the rest were just lost time.
 
 \section{Technical difficulties}
 
@@ -2193,7 +2190,7 @@ from the one described. Compilation itself then proceeded without error.
 
 We lost half a day before thinking to check whether the address itself was
 still valid. Absent documentation would have sent us straight to looking for the
-public repository; the wrong address kept us searching in the right place for
+public repository ; the wrong address kept us searching in the right place for
 something that was no longer there.
 
 \subsection{Undeclared dependencies}
@@ -2230,7 +2227,7 @@ It was wrong. In the case of hoop stress, the extremum retained lay inside the
 pellet and carried a sign opposite to the actual stress in the cladding : tension reported where the cladding was in compression. An approximation
 prudent in principle had turned into a qualitatively false result.
 
-What we take from this is that we had written the word ``conservative'' in a
+What we take from this is that we had written the word "conservative" in a
 comment without ever testing whether it held. Testing it took a single case : the
 correction changed the strain result by a factor of five and reversed the sign
 of the stress.
@@ -2277,8 +2274,8 @@ of the internship concerns this very class of tools.
 The assistance proved very effective for producing structured code and for
 exploring an unfamiliar codebase. It proved, on the other hand, incapable of
 detecting on its own the correctness defects of table~\ref{tab:bugs} : these were
-found only by \emph{confronting numerical results with a physical expectation} : why is the cladding temperature equal to the pellet centreline temperature? why
-is a closed gap reported as safe? What we could not delegate was
+found only by \emph{confronting numerical results with a physical expectation} : why is the cladding temperature equal to the pellet centreline temperature ? why
+is a closed gap reported as safe ? What we could not delegate was
 knowing what the number ought to look like, and we expect the same limit applies
 to the agent we built.
 
@@ -2315,7 +2312,7 @@ instead of \SI{36}{\second}.
 
 The second strand of the work, less expected at the outset, is the
 \textbf{measured stress-testing of the system}. A fault-injection benchmark
-quantified the actual reach of self-healing; an evaluation of the decision layer
+quantified the actual reach of self-healing ; an evaluation of the decision layer
 measured, then improved by eleven points, the accuracy of tool selection. Both
 benchmarks are re-runnable and delivered with the code : they constitute a
 non-regression harness for the rest of the project.
@@ -2331,12 +2328,12 @@ the signature of contact in simulation curves, is the clearest technical gain.
 
 The second concerns the software architecture of systems built on language
 models. The principle that structures the whole project (the model orchestrates,
-it does not compute; deterministic first, model as fallback) carries well beyond
+it does not compute ; deterministic first, model as fallback) carries well beyond
 OFFBEAT.
 
 The third is methodological, and is perhaps the most important. The most
 dangerous defects encountered were not crashes but wrong results that did not
-look wrong. No automatic tool flagged them; they were found by confronting a
+look wrong. No automatic tool flagged them ; they were found by confronting a
 numerical value with a physical expectation. A safety computation chain is not
 validated by checking that it runs, but by checking that what it produces makes
 sense.
@@ -2361,7 +2358,7 @@ nature of the problem and remains an open question.
 
 \textbf{Shift the effort from repair to validation.} The analysis of chapter~4
 shows that validating inputs before execution is more reliable than enriching the
-base of crash patterns. A first geometric validation was added; it could be
+base of crash patterns. A first geometric validation was added ; it could be
 extended systematically to all the exposed parameters.
 
 \textbf{Extend the surrogate.} The surrogate covers only two parameters. Since
@@ -2371,7 +2368,7 @@ geometry for instance, is now within reach. The code is written for an
 arbitrary number of variables.
 
 \textbf{Make time-step self-healing reliable.} The benchmark showed that the fix
-is undone by the solver's adaptive controller; acting on the maximum time step
+is undone by the solver's adaptive controller ; acting on the maximum time step
 rather than on the initial one is an identified and localised correction.
 
 \textbf{Complete the validation of the thresholds.} The correlation for the
@@ -2537,7 +2534,7 @@ LANGCHAIN. \textit{LangChain / LangGraph documentation} [online].
 \textbf{English} & \textbf{French} & \textbf{Definition}\\
 \midrule
 \endhead
-Burnup & Taux de combustion & Energy extracted per unit mass of fuel; a measure
+Burnup & Taux de combustion & Energy extracted per unit mass of fuel ; a measure
   of ageing\\
 Cladding & Gaine & Metallic tube (Zircaloy) surrounding the fuel\\
 Coolant & Caloporteur & Fluid removing heat from the core\\
@@ -2550,7 +2547,7 @@ Densification & Densification & Volume reduction of the fuel early in
 Digital twin & Jumeau numérique & Numerical model of a physical system, kept up
   to date by its operating data\\
 DNBR (Departure from Nucleate Boiling Ratio) & --- & Margin to the boiling
-  crisis; a thermal-hydraulics quantity\\
+  crisis ; a thermal-hydraulics quantity\\
 Finite volume method & Volumes finis & Conservative discretisation method\\
 Fission gas release (FGR) & Relâchement des gaz de fission & Release of fission
   gases out of the fuel matrix\\
@@ -2723,10 +2720,10 @@ was kept disabled, together with its justification, as a record.
 \textbf{Criterion} & \textbf{Quantity} & \textbf{Limit} & \textbf{Remark}\\
 \midrule
 Centreline melting & Temperature, maximum & \SI{3113}{\kelvin} &
-  Unirradiated $\mathrm{UO_2}$; the limit decreases with burnup (see
+  Unirradiated $\mathrm{UO_2}$ ; the limit decreases with burnup (see
   below)\\
 PCMI strain & \textbf{Plastic} $\theta\theta$ strain, cladding zone &
-  \SI{1}{\percent} & Usual design criterion; see [7], [8]\\
+  \SI{1}{\percent} & Usual design criterion ; see [7], [8]\\
 Permanent strain & Equivalent creep strain, cladding zone &
   \SI{1}{\percent} & Limit taken over by default, \textbf{not validated}\\
 Cladding stress & $\theta\theta$ stress, cladding zone &
@@ -2836,7 +2833,7 @@ did not allow (§\ref{sec:validation-emulateur}).
 \vspace{0.3cm}
 \noindent
 \textit{Range of validity.} The surrogate is reliable only within this domain.
-Any prediction outside it is extrapolation; this is why the uncertainty of the
+Any prediction outside it is extrapolation ; this is why the uncertainty of the
 Gaussian process is systematically displayed next to the predicted value.
 
 %---------------------------------------------------------------- Appendix F --
@@ -2883,8 +2880,8 @@ safeguard.
 
 \vspace{0.4cm}
 \noindent
-\textit{Reading the last two columns.} ``Correction in base'' indicates that the
-knowledge base associates a remedy with the expected pattern; ``cause treatable''
+\textit{Reading the last two columns.} "Correction in base" indicates that the
+knowledge base associates a remedy with the expected pattern ; "cause treatable"
 indicates that this remedy can, by its nature, address the root cause. A single
 fault in the catalogue meets both conditions, and it is the only one that
 self-healing resolves (§\ref{sec:epreuve}).
@@ -2894,8 +2891,8 @@ self-healing resolves (§\ref{sec:epreuve}).
 \label{ann:session}
 
 \noindent Transcript of a real session, captured after the corrections of
-section~\ref{sec:angle-mort}. Tool results are abridged; the sequence of calls
-is complete. The session was conducted in French; the request is translated
+section~\ref{sec:angle-mort}. Tool results are abridged ; the sequence of calls
+is complete. The session was conducted in French ; the request is translated
 here.
 
 \vspace{0.4cm}
@@ -2918,8 +2915,8 @@ safety margins are met.
   \texttt{template\_name} \emph{inside} the parameters : the key is reported as
   ignored\\
 \addlinespace
-2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejected} : ``is not a valid
-  OpenFOAM case''. The agent had launched the execution \emph{in parallel} with
+2 & \texttt{offbeat\_executor} & \textcolor{cAlert}{Rejected} : "is not a valid
+  OpenFOAM case". The agent had launched the execution \emph{in parallel} with
   the creation, before the case existed\\
 \addlinespace
 3 & \texttt{input\_creator} & The agent corrects itself : \texttt{template\_name}
@@ -2928,9 +2925,9 @@ safety margins are met.
 4 & \texttt{offbeat\_executor} & Mesh generated, simulation successful on the
   first attempt\\
 \addlinespace
-5 & \texttt{data\_processor} & Axial profile \SIrange{968.7}{1263.5}{\kelvin};
-  radial profile centre \SI{1220.6}{\kelvin}, periphery \SI{601.6}{\kelvin};
-  hoop stress \SI{-38.81}{\mega\pascal}; PCT \SI{634.5}{\kelvin};
+5 & \texttt{data\_processor} & Axial profile \SIrange{968.7}{1263.5}{\kelvin} ;
+  radial profile centre \SI{1220.6}{\kelvin}, periphery \SI{601.6}{\kelvin} ;
+  hoop stress \SI{-38.81}{\mega\pascal} ; PCT \SI{634.5}{\kelvin} ;
   three figures generated\\
 \bottomrule
 \end{tabularx}
@@ -2946,7 +2943,7 @@ aims at : the model orchestrates, the tools validate.
 
 \vspace{0.3cm}
 \noindent
-\textbf{What it also shows.} The request comprised four steps; the agent carried
+\textbf{What it also shows.} The request comprised four steps ; the agent carried
 out three. It announced that it was going to launch the safety analysis, then
 ended its turn without doing so. Long chaining therefore remains imperfect,
 something the tool-selection benchmark did not measure either : it evaluates only
