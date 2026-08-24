@@ -10,12 +10,10 @@ et calqué sur `Rapport_Modele_PRe.pdf`.
 | `rapport_PRe.tex` | français | 52 |
 | `rapport_PRe_EN.tex` | **anglais, version à rendre** | 52 |
 
-La version anglaise est assemblée depuis `en/p01…p16.tex` (un fichier par
-partie). **Toute correction doit être faite dans `en/`**, puis réassemblée :
-
-```bash
-cat en/p*.tex > rapport_PRe_EN.tex
-```
+`rapport_PRe_EN.tex` est un **fichier unique** : on l'édite directement, il
+n'y a plus de sources séparées à réassembler. (Jusqu'au 24 août 2026 le texte
+vivait dans `en/p01…p16.tex` et le `.tex` était généré ; cette organisation a
+été abandonnée parce qu'éditer le fichier généré faisait perdre le travail.)
 
 Les deux versions partagent la même structure : mêmes numéros de figures, de
 tableaux et de sections, mêmes valeurs numériques (vérifié : les 114

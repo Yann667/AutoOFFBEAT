@@ -309,8 +309,7 @@ docker run --rm -p 8000:8000 --add-host=host.docker.internal:host-gateway \
 | File | Contents |
 |---|---|
 | [`rapport/rapport_PRe_EN.pdf`](rapport/rapport_PRe_EN.pdf) | **Full report, English, 52 pages** |
-| `rapport/rapport_PRe_EN.tex` | Assembled LaTeX source |
-| `rapport/en/p01…p16.tex` | Source by part; edit here, then `cat en/p*.tex > rapport_PRe_EN.tex` |
+| `rapport/rapport_PRe_EN.tex` | LaTeX source, single file |
 | `rapport/compiler.sh --en` | Compiles in ~5 s (3 passes) |
 
 Chapter 4 (results and stress-testing) and chapter 5 (false starts) are the

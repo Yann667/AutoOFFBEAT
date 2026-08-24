@@ -10,7 +10,6 @@ __pycache__/
 
 # Sortie de compilation LaTeX et sources du rapport : inutiles a l'execution.
 rapport/build/
-rapport/en/
 
 # Index RAG : reconstruit dans le conteneur.
 offbeat_skills/.rag_index/
