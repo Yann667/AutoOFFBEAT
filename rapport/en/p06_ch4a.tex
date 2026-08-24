@@ -108,17 +108,12 @@ pellet and of the cladding.
   (0,300.0) (170.0,639.09) (354.1,637.71) (456.9,641.51)
   (590.2,637.90) (710.9,637.39) (729.2,637.39)};
 \addlegendentry{Cladding (PCT)}
-\addplot[color=black!55,mark=triangle*,dashed] coordinates {
-  (170.0,623.3) (354.1,686.2) (456.9,702.0)
-  (590.2,747.0) (710.9,787.8) (729.2,793.8)};
-\addlegendentry{$\Delta T$ across the pellet, fixed $z$}
 \end{axis}
 \end{tikzpicture}
 \caption[Pellet and cladding temperatures over the cycle]{Evolution of the
-temperatures over the cycle. The two upper curves are maxima taken over the
-whole rod; the dashed curve is the centre-to-edge drop across the pellet at a
-fixed axial position, \SI{0.45}{\metre}, where the local power stays constant
-to within \SI{0.5}{\percent}.}
+maximum pellet and cladding temperatures over the cycle. Both are maxima taken
+over the whole rod, which is why the pellet curve is not monotonic : the
+hottest point moves as the axial power profile shifts.}
 \label{fig:temp}
 \end{figure}
 
