@@ -304,7 +304,7 @@ post-processing, safety analysis) and a self-healing loop diagnoses solver
 crashes from an editable knowledge base. The system was then extended towards a
 \textbf{digital-twin prototype} of a fuel rod, including a Gaussian-process
 surrogate which, on a first test, places pellet-cladding gap closure within
-\SI{4.4}{\percent} in \SI{2}{\milli\second} instead of \SI{36}{\second},
+\SI{4.6}{\percent} in \SI{2}{\milli\second} instead of \SI{36}{\second},
 for a linear power absent from its \num{25} training points. The second part of
 the work is the \textbf{measured stress-testing} of the system through two
 engineering benchmarks : on twelve injected faults, self-healing handled only
@@ -338,7 +338,7 @@ une boucle d'auto-réparation diagnostique les plantages du solveur à partir
 d'une base de connaissance éditable. Le système a ensuite été étendu vers un
 \textbf{jumeau numérique} de crayon combustible, incluant un émulateur par
 processus gaussien qui prédit la date de fermeture du jeu pastille-gaine à
-\SI{4.4}{\percent} près, en \SI{2}{\milli\second} au lieu de \SI{36}{\second},
+\SI{4.6}{\percent} près, en \SI{2}{\milli\second} au lieu de \SI{36}{\second},
 pour une puissance absente de son apprentissage. Le second volet du travail est
 la \textbf{mise à l'épreuve mesurée} du système~ : un banc de douze fautes
 injectées montre que l'auto-réparation ne traite que les plantages dont la cause
@@ -1496,13 +1496,13 @@ simulation of the previous section (figure~\ref{fig:pcmi}).
 The continuous curve is the surrogate prediction, the markers are the states
 computed by OFFBEAT. The zero crossing, the onset of PCMI, is predicted at
 \num{387} days against \num{370} computed, a deviation of
-\SI{4.4}{\percent}.}
+\SI{4.6}{\percent}.}
 \label{fig:pcmi}
 \end{figure}
 
 The surrogate places gap closure at \textbf{387 days}, against
 \textbf{370 days} obtained by interpolating the states computed by
-OFFBEAT : a deviation of \SI{4.4}{\percent}, that is sixteen days over a two-year
+OFFBEAT : a deviation of \SI{4.6}{\percent}, that is sixteen days over a two-year
 cycle. The cost of the prediction is \SI{2}{\milli\second}, against
 \SI{36}{\second} for the complete simulation, an acceleration factor of about
 18000 times.
