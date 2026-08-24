@@ -117,27 +117,42 @@ hottest point moves as the axial power profile shifts.}
 \label{fig:temp}
 \end{figure}
 
-The cladding temperature remains remarkably stable, around \SI{637}{\kelvin},
-which is consistent : it is essentially imposed by the coolant.
+The cladding temperature remains very stable, around \SI{637}{\kelvin},
+which is consistent because it is essentially imposed by the coolant.
 
-The pellet curve is less straightforward, and reading it taught us something.
-It does not rise monotonically : it peaks at \SI{1489}{\kelvin} on day
-\num{457}, falls back to \SI{1444}{\kelvin}, then rises again. Degradation of
-the fuel conductivity cannot explain that, since it only ever goes one way.
+The pellet curve on the contrary does not rise monotonically, it peaks at \SI{1489}{\kelvin} on day
+\num{457} and falls back to \SI{1444}{\kelvin}, then rises again. Degradation of
+the fuel conductivity cannot explain that, because it only goes one way.
 
-The cause is that this curve is a maximum taken over the \emph{whole} rod,
-while the axial power profile of the template shifts between three tabulated
-shapes over the cycle. The location of the hottest point moves accordingly,
-from \SI{0.75}{\metre} to \SI{0.45}{\metre}, then \SI{1.05}{\metre}, and the
-local power density there varies by \SI{10}{\percent}. The peak of day
-\num{457} is simply the moment when the axial peaking factor is highest.
+Our first explanation was that the curve is a maximum taken over the whole rod,
+so it merely follows the hottest point as that point moves. Checking cell by
+cell showed this to be incomplete. The temperature is non-monotonic at
+\emph{every} axial position, not only where the maximum happens to sit : at
+\SI{0.15}{\metre} it goes \SI{1150}{\kelvin}, \SI{1242}{\kelvin},
+\SI{1117}{\kelvin}, then back up. Something makes individual points cool down.
 
-Fixing the axial position separates the two effects. At \SI{0.45}{\metre},
-where the local power stays constant to within \SI{0.5}{\percent}, the drop
-across the pellet rises monotonically from \SI{623}{\kelvin} to
-\SI{794}{\kelvin}, that is a \SI{27}{\percent} increase in the thermal
-resistance of the fuel. \textbf{That} is the degradation of the conductivity
-under irradiation, and it is monotonic as it should be.
+That something is the axial power profile, which the template tabulates at
+twelve instants and which cycles between three shapes. It does not simply move
+a peak : it \textbf{redistributes the power along the rod}, so the local power
+density at a fixed height is not constant either. Over the cycle it varies by
+\SI{14}{\percent} at mid-height and by up to \SI{49}{\percent} near the ends.
+A point that receives less power cools down, however degraded the fuel around it
+has become.
+
+Temperature is therefore the wrong quantity in which to look for the
+conductivity. The right one is the \textbf{thermal resistance} of the pellet,
+the centre-to-edge drop divided by the power density that produces it. That
+ratio rises by \SIrange{24}{27}{\percent} at every height, and monotonically at
+seven of the ten positions sampled ; the three exceptions are the rod ends,
+where the local power swings so widely that the extraction becomes noisy. Since
+this ratio is proportional to $1/k$, it puts the loss of conductivity over the
+cycle at about \SI{20}{\percent}.
+
+The picture is then consistent : writing
+$T_{\text{centre}} \simeq T_{\text{edge}} + R_{\text{th}}\,q$, the resistance
+$R_{\text{th}}$ rises monotonically as the fuel degrades, while the local power
+$q$ oscillates as the profile reshapes. The temperature inherits the
+oscillation, which is why no curve of $T$ can be monotonic.
 
 One detail confirms the picture from the other side : over the same period the
 pellet \emph{outer} temperature falls, from \SI{712}{\kelvin} to
@@ -200,11 +215,9 @@ put into tension by the pellet.}
 \label{fig:gap-stress}
 \end{figure}
 
-Read together, these two curves are what convinced us the model behaves as it
-should. As long as the gap remains open, the cladding is
-\textbf{compressed} by the coolant pressure : the stress is negative, of the
-order of \SI{-43}{\mega\pascal}. The gap closes somewhere around day
-\numrange{354}{457}; the stress then becomes \textbf{positive} and grows to
+These two curves are the main argument in favor of the model. As long as the gap remains open, the cladding is
+\textbf{compressed} by the coolant pressure : the stress is negative (about\SI{-43}{\mega\pascal}). The gap closes between days 
+354 and 457. The stress then becomes \textbf{positive} and grows to
 \SI{79}{\mega\pascal}. This is the signature of PCMI : the pellet, as it
 swells, puts the cladding into tension. The automatic prognosis (block~D2)
 places the crossing of the closure threshold at about \SI{2.33e7}{\second}, that
@@ -213,7 +226,6 @@ is at one third of the cycle, consistent with the curve.
 \subsection{Spatial distribution of the temperature}
 
 Figure~\ref{fig:carte} maps the temperature over the whole rod at end of cycle.
-The mesh is a \num{40}$\times$\num{11} grid in $(r,z)$, so the fields can be
-read as a section rather than only as profiles. The radial scale is exaggerated
-by a factor of \num{600} : the rod is \SI{5.3}{\milli\metre} in radius for
-\SI{3.2}{\metre} in height, and drawn to scale it would be a hairline.
+The mesh is a \num{40}$\times$\num{11} grid in $(r,z)$. The radial scale is exaggerated
+by a factor of \num{600}, the rod is \SI{5.3}{\milli\metre} in radius for
+\SI{3.2}{\metre} in height. If it was to scale, it would be a impossible to see.

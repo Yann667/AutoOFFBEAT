@@ -54,15 +54,13 @@ Pellet-cladding gap & \SI{-8.0}{\micro\metre} & \SI{5.0}{\micro\metre}
 \end{table}
 
 \noindent
-The stress limit here is not a constant : it is read from the \texttt{sigmaY}
+The stress limit here is not a constant. It is read from the \texttt{sigmaY}
 field computed by the solver, and the value reported is the one at the most
 highly loaded point (section~\ref{sec:seuils}).
 
 The rod therefore stays comfortably within the margins on all thermomechanical
 criteria, but pellet-cladding contact is established. This result is expected
-for a rod at the end of a second cycle and is not alarming in itself : it means
-that the operating regime has changed in nature, which is precisely the
-information a digital twin should report.
+for a rod at the end of a second cycle. It is not a catastrophe for the regime to continue, but it is something a digital twin shall report.
 
 \section{Initial validation of the surrogate}
 \label{sec:validation-emulateur}
@@ -73,14 +71,12 @@ The first version of the surrogate had been trained on sixteen simulations
 crossing four linear heat rates and four durations between
 \SIrange{2000}{6500}{\second}. Its \textit{leave-one-out} validation gave
 coefficients of determination above $0.998$ on the three quantities tracked. The
-result looked excellent.
+result appeared excellent but they were not as two observations invalidated it. They were made by confronting this domain with the reference
+simulation of the previous section.
 
-It was not. Two observations, made by confronting this domain with the reference
-simulation of the previous section, invalidated it.
-
-First, the rod reaches \textbf{thermal equilibrium within a few thousand
+Firstly, the rod reaches \textbf{thermal equilibrium within a few thousand
 seconds}. At the two longest durations of the plan, the temperatures differ by
-only a few tenths of a kelvin (table~\ref{tab:saturation}) : these levels are
+only a few tenths of a kelvin (table~\ref{tab:saturation}). These levels are
 duplicates. Of the four duration values, only two carried information, and the
 regression problem was in fact almost one-dimensional : power alone sufficed to
 predict the output. The high $R^2$ was therefore mostly measuring how easy the
@@ -109,11 +105,11 @@ carries information.}
 \end{tabularx}
 \end{table}
 
-Second and above all, the reference simulation runs to \SI{6.3e7}{\second}, that
+Secondly, the reference simulation runs to \SI{6.3e7}{\second}, that
 is about \textbf{ten thousand times} beyond the upper bound of the training
-domain. Yet the phenomena that matter for safety (swelling, creep, gap closure,
-PCMI) unfold precisely over these long time scales, entirely absent from the
-design of experiments. The surrogate was therefore modelling only the
+domain. Yet the phenomena that matters for safety (swelling, creep, gap closure,
+PCMI) unfold precisely over these long time scales. Hence they were entirely absent from the
+experiments. The surrogate was therefore modelling only the
 \emph{initial thermal transient}, while the dashboard's interactive simulator
 implied that it was predicting safety margins.
 
@@ -132,11 +128,9 @@ in about thirty minutes.
 The gain is visible in the data themselves. Over the new domain, the minimum gap
 width \textbf{changes sign}, going from \SI{+32}{\micro\metre} to
 \SI{-13}{\micro\metre} depending on the conditions : the surrogate can now learn
-gap closure, and therefore the onset of PCMI. The circumferential strain also
+gap closure, and therefore the occurence of PCMI. The circumferential strain also
 becomes non-monotonic and changes sign, reflecting the inward creep of the
-cladding before the pellet pushes it back.
-
-Figure~\ref{fig:parite} compares the values predicted by \textit{leave-one-out}
+cladding before the pellet pushes it back. Figure~\ref{fig:parite} compares the values predicted by a \textit{leave-one-out}
 cross-validation with those computed by OFFBEAT over this new domain.
 
 \begin{figure}[htbp]
@@ -184,7 +178,7 @@ non-monotonic, not a regression of the method.}
 \toprule
 \textbf{Predicted quantity} &
 \textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ short domain\\
- (\SIrange{2}{6.5}{\kilo\second})\end{tabular}} &
+ (30min to 2h)\end{tabular}} &
 \textbf{\begin{tabular}{@{}c@{}}$R^2$ (LOO)\\ realistic domain\\
  (3 months to 2 years)\end{tabular}} &
 \textbf{\begin{tabular}{@{}c@{}}Mean\\ error\end{tabular}}\\
