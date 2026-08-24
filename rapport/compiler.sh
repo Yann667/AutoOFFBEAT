@@ -4,9 +4,8 @@
 # Overleaf en version gratuite impose un delai de compilation court. Compiler
 # ici prend environ 5 secondes (3 passes) et n'a aucune limite.
 #
-#   ./compiler.sh              compile la version francaise
-#   ./compiler.sh --en         compile la version anglaise
-#   ./compiler.sh --en --ouvrir  compile puis ouvre le PDF
+#   ./compiler.sh              compile le rapport
+#   ./compiler.sh --ouvrir     compile puis ouvre le PDF
 #   ./compiler.sh mon.tex      compile un fichier explicite
 #
 # Prerequis (deja installes) :
@@ -16,13 +15,12 @@
 set -u
 cd "$(dirname "$0")" || exit 1
 
-SRC=rapport_PRe.tex
+SRC=rapport_PRe_EN.tex
 OUT=build
 OUVRIR=""
 for arg in "$@"; do
     case "$arg" in
-        --en)     SRC=rapport_PRe_EN.tex ;;
-        --fr)     SRC=rapport_PRe.tex ;;
+        --en)     SRC=rapport_PRe_EN.tex ;;   # conserve : ancienne habitude
         --ouvrir) OUVRIR=1 ;;
         *.tex)    SRC=$arg ;;
     esac

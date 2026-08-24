@@ -3,35 +3,31 @@
 Premier jet du rapport de stage, structuré selon `CONTENU DU RAPPORT_PRe.pdf`
 et calqué sur `Rapport_Modele_PRe.pdf`.
 
-## Deux versions
+## La source
 
-| Fichier | Langue | Pages |
-|---|---|---|
-| `rapport_PRe.tex` | français | 52 |
-| `rapport_PRe_EN.tex` | **anglais, version à rendre** | 52 |
+`rapport_PRe_EN.tex` est le **fichier unique** du rapport : on l'édite
+directement, il n'y a rien à réassembler.
 
-`rapport_PRe_EN.tex` est un **fichier unique** : on l'édite directement, il
-n'y a plus de sources séparées à réassembler. (Jusqu'au 24 août 2026 le texte
-vivait dans `en/p01…p16.tex` et le `.tex` était généré ; cette organisation a
-été abandonnée parce qu'éditer le fichier généré faisait perdre le travail.)
-
-Les deux versions partagent la même structure : mêmes numéros de figures, de
-tableaux et de sections, mêmes valeurs numériques (vérifié : les 114
-coordonnées pgfplots et l'ensemble des littéraux `\SI`/`\num` sont
-identiques d'une version à l'autre). Seuls la prose, les légendes et les
-étiquettes d'axes sont traduits. Le résumé français est conservé dans la
-version anglaise (`\begin{otherlanguage}{french}`), les consignes PRe
-exigeant l'abstract dans les deux langues.
+Deux organisations antérieures ont été abandonnées, en août 2026. Le texte a
+d'abord vécu dans `en/p01…p16.tex`, le `.tex` étant généré par concaténation :
+éditer le fichier généré faisait perdre le travail. Une version française,
+`rapport_PRe.tex`, a ensuite cessé d'être maintenue et a été retirée ; elle
+reste consultable dans l'historique git. Le résumé français demeure dans la
+version anglaise (`\begin{otherlanguage}{french}`), les consignes PRe exigeant
+l'abstract dans les deux langues.
 
 ## Compilation
 
 ```bash
-./compiler.sh          # version française
-./compiler.sh --en     # version anglaise  (~5 s, 3 passes)
-./compiler.sh --en --ouvrir
+./compiler.sh            # ~5 s, 3 passes
+./compiler.sh --ouvrir   # compile puis ouvre le PDF
 
-./surveiller.sh --en   # recompile à chaque sauvegarde (~1,6 s)
+./surveiller.sh          # recompile à chaque sauvegarde (~1,6 s)
 ```
+
+Le PDF suivi par git est `rapport_PRe_EN.pdf`. Il n'est **pas** régénéré
+automatiquement : après compilation, recopier `build/rapport_PRe_EN.pdf`
+par-dessus, sinon le PDF publié ne correspond plus à la source.
 
 Ou à la main :
 

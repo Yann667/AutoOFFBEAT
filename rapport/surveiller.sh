@@ -6,22 +6,20 @@
 # passe est refaite a chaque sauvegarde (~1,6 s), les passes suivantes n'etant
 # lancees que lorsque les references bougent.
 #
-#   ./surveiller.sh              surveille rapport_PRe.tex (francais)
-#   ./surveiller.sh --en         surveille rapport_PRe_EN.tex (anglais)
-#   ./surveiller.sh --en --triple  force trois passes (references sures)
+#   ./surveiller.sh              surveille rapport_PRe_EN.tex
+#   ./surveiller.sh --triple     force trois passes (references sures)
 #
 # Arret : Ctrl+C.
 
 set -u
 cd "$(dirname "$0")" || exit 1
 
-SRC=rapport_PRe.tex
+SRC=rapport_PRe_EN.tex
 OUT=build
 TRIPLE=""
 for arg in "$@"; do
     case "$arg" in
-        --en)     SRC=rapport_PRe_EN.tex ;;
-        --fr)     SRC=rapport_PRe.tex ;;
+        --en)     SRC=rapport_PRe_EN.tex ;;   # conserve : ancienne habitude
         --triple) TRIPLE=--triple ;;
         *.tex)    SRC=$arg ;;
     esac
